@@ -17,16 +17,16 @@ import {
 } from 'c2app-models-utils';
 // @ts-ignore
 import ch from '../ch.json';
-import mapboxgl, { LinePaint, MapboxGeoJSONFeature } from 'mapbox-gl';
 import { routingSvc } from './routing-service';
 import { Pages } from '../models';
+import { GeoJSONFeature, LayerSpecification, LinePaintProps, SymbolLayoutProps } from 'maplibre-gl';
 
 export interface ILayer {
   layerName: string;
   showLayer: boolean;
-  type: mapboxgl.AnyLayer;
-  layout?: mapboxgl.AnyLayout;
-  paint?: mapboxgl.AnyPaint;
+  type: LayerSpecification;
+  layout?: Partial<SymbolLayoutProps>;
+  paint?: LinePaintProps | Record<string, any>;
   filter?: any[];
 }
 
@@ -60,7 +60,7 @@ export interface IAppModel {
     alert?: IAlert;
 
     // Clicking/Selecting
-    clickedFeature?: MapboxGeoJSONFeature;
+    clickedFeature?: GeoJSONFeature;
     selectedFeatures?: FeatureCollection;
     latestDrawing: Feature;
     clearDrawing: {
@@ -115,7 +115,7 @@ export interface IActions {
   openAlert: (alert: IAlert) => void;
 
   // Clicking/selecting
-  updateClickedFeature: (feature: MapboxGeoJSONFeature) => void;
+  updateClickedFeature: (feature: GeoJSONFeature) => void;
   updateSelectedFeatures: (features: Array<Feature>) => void;
   resetClickedFeature: () => void;
 
@@ -300,9 +300,9 @@ export const appStateMgmt = {
                     return 0.05;
                   }
                 };
-
+                // TODO FIX
                 source.layers.forEach((layer: ILayer, index: number) => {
-                  (layer.paint as LinePaint)['line-opacity'] = opacityCalc((source.dts as Array<number>)[index]);
+                  if (layer.paint) layer.paint['line-opacity'] = opacityCalc((source.dts as Array<number>)[index]);
                 });
               });
               return sources;
@@ -312,7 +312,7 @@ export const appStateMgmt = {
       },
 
       // Clicking/selecting
-      updateClickedFeature: (feature: MapboxGeoJSONFeature) => {
+      updateClickedFeature: (feature: GeoJSONFeature) => {
         us({
           app: {
             clickedFeature: () => {
@@ -532,7 +532,7 @@ export const appStateMgmt = {
                       layout: {
                         'text-field': '{cellLabel}',
                         'text-allow-overlap': true,
-                      },
+                      } as any, // TODO FIX
                       paint: {
                         'text-opacity': 0.5,
                       },
@@ -569,7 +569,7 @@ export const appStateMgmt = {
                       'icon-image': icon,
                       'icon-size': icon === 'ground' ? 0.1 : icon === 'air' ? 0.25 : 0.5,
                       'icon-allow-overlap': true,
-                    },
+                    } as any, // TODO FIX
                   },
                 ] as ILayer[],
               } as ISource);
@@ -694,7 +694,7 @@ export const appStateMgmt = {
                         'icon-image': 'chemical',
                         'icon-size': 0.5,
                         'icon-allow-overlap': true,
-                      },
+                      } as any, // TODO FIX
                     },
                   ] as ILayer[],
                 } as ISource);
@@ -758,7 +758,7 @@ export const appStateMgmt = {
                         'icon-image': 'chemical',
                         'icon-size': 0.5,
                         'icon-allow-overlap': true,
-                      },
+                      } as any, // TODO FIX
                     },
                   ] as ILayer[],
                 } as ISource);

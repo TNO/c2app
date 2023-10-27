@@ -1,11 +1,16 @@
 import m from 'mithril';
 import { routingSvc } from './services/routing-service';
 
-import 'material-icons/iconfont/material-icons.css';
+import 'material-icons/iconfont/filled.css';
 import 'materialize-css/dist/css/materialize.min.css';
+import 'materialize-css/dist/js/materialize.min.js';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
-import 'mapbox-gl/dist/mapbox-gl.css';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+import '@mapbox-controls/compass/src/index.css';
+import '@mapbox-controls/zoom/src/index.css';
+import '@mapbox-controls/tooltip/src/index.css';
+import '@mapbox-controls/ruler/src/index.css';
 
 import './styles.css';
 

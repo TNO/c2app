@@ -1,16 +1,26 @@
 import m from 'mithril';
-import mapboxgl from 'mapbox-gl';
+import maplibre, { IControl, Map as MaplibreMap } from 'maplibre-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 // @ts-ignore
-import { RulerControl } from 'mapbox-gl-controls';
 import { MeiosisComponent } from '../../services/meiosis';
 import * as MapUtils from './map-utils';
+import * as updateSourcesAndLayers from './updateSourcesAndLayers';
+import CompassControl from '@mapbox-controls/compass';
+import ZoomControl from '@mapbox-controls/zoom';
+import RulerControl from '@mapbox-controls/ruler';
+// https://github.com/korywka/mapbox-controls/tree/master/packages/tooltip
+// import TooltipControl from '@mapbox-controls/tooltip';
+
+// @ts-ignore
+MapboxDraw.constants.classes.CONTROL_BASE = 'maplibregl-ctrl';
+// @ts-ignore
+MapboxDraw.constants.classes.CONTROL_PREFIX = 'maplibregl-ctrl-';
+// @ts-ignore
+MapboxDraw.constants.classes.CONTROL_GROUP = 'maplibregl-ctrl-group';
 
 export const Map: MeiosisComponent = () => {
-  mapboxgl.accessToken = process.env.ACCESSTOKEN || '';
-  let map: mapboxgl.Map;
+  let map: MaplibreMap;
   let draw: MapboxDraw;
-  let token: boolean = process.env.ACCESSTOKEN ? true : false;
 
   return {
     view: () => {
@@ -19,31 +29,31 @@ export const Map: MeiosisComponent = () => {
     // Executes once on creation
     oncreate: ({ attrs: { state: appState, actions } }) => {
       // Create map and add controls
-      map = new mapboxgl.Map({
+      map = new MaplibreMap({
         container: 'mapboxMap',
-        style: token
-          ? `mapbox://styles/${appState.app.mapStyle}`
+        style: process.env.VECTOR_TILE_SERVER
+          ? process.env.VECTOR_TILE_SERVER
           : {
-            'version': 8,
-            'sources': {
-              'brt-achtergrondkaart': {
-                'type': 'raster',
-                'tiles': ['https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png'],
-                'tileSize': 256,
-                'minzoom': 1,
-                'maxzoom': 19,
-                'attribution': 'Kaartgegevens: <a href="https://kadaster.nl">Kadaster</a>'
+              version: 8,
+              sources: {
+                'brt-achtergrondkaart': {
+                  type: 'raster',
+                  tiles: ['https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png'],
+                  tileSize: 256,
+                  minzoom: 1,
+                  maxzoom: 19,
+                  attribution: 'Kaartgegevens: <a href="https://kadaster.nl">Kadaster</a>',
+                },
               },
+              glyphs: 'https://api.pdok.nl/lv/bgt/ogc/v1_0/resources/fonts/{fontstack}/{range}.pbf',
+              layers: [
+                {
+                  id: 'standard-raster',
+                  type: 'raster',
+                  source: 'brt-achtergrondkaart',
+                },
+              ],
             },
-            'glyphs': 'https://api.pdok.nl/lv/bgt/ogc/v1_0/resources/fonts/{fontstack}/{range}.pbf',
-            'layers': [
-              {
-                'id': 'standard-raster',
-                'type': 'raster',
-                'source': 'brt-achtergrondkaart',
-              }
-            ]
-          },
         center: [4.35, 51.911] as [number, number],
         zoom: 12,
       });
@@ -52,9 +62,15 @@ export const Map: MeiosisComponent = () => {
 
       // Add draw controls
       draw = new MapboxDraw(MapUtils.drawConfig);
-      map.addControl(new mapboxgl.NavigationControl(), 'top-left');
-      map.addControl(draw, 'top-left');
-      map.addControl(new RulerControl(), 'top-left');
+      map.addControl(new maplibre.NavigationControl(), 'top-left');
+      map.addControl(draw as unknown as IControl, 'top-left');
+      map.addControl(new RulerControl() as unknown as IControl, 'top-left');
+      map.addControl(new CompassControl() as unknown as IControl, 'bottom-right');
+      map.addControl(new ZoomControl() as unknown as IControl, 'bottom-right');
+      // map.addControl(new TooltipControl() as unknown as IControl, 'bottom-right');
+      map.addControl(new RulerControl() as unknown as IControl, 'bottom-right');
+      map.on('ruler.on', () => console.log('Ruler activated'));
+      map.on('ruler.off', () => console.log('Ruler deactivated'));
 
       // Add map listeners
       map.on('load', () => {
@@ -62,7 +78,7 @@ export const Map: MeiosisComponent = () => {
         map.on('draw.update', ({ features }) => MapUtils.handleDrawEvent(map, features, actions));
 
         map.once('styledata', () => {
-          MapUtils.updateSourcesAndLayers(appState, actions, map);
+          updateSourcesAndLayers.updateSourcesAndLayers(appState, actions, map);
           MapUtils.updateSatellite(appState, map);
         });
       });
@@ -82,11 +98,11 @@ export const Map: MeiosisComponent = () => {
       }
 
       // Check if basemap should be switched
-      if (token && !map.getStyle().sprite?.includes(appState.app.mapStyle)) {
-        MapUtils.switchBasemap(map, appState.app.mapStyle).catch();
-      }
+      // if (token && !map.getStyle().sprite?.includes(appState.app.mapStyle)) {
+      //   MapUtils.switchBasemap(map, appState.app.mapStyle).catch();
+      // }
 
-      MapUtils.updateSourcesAndLayers(appState, actions, map);
+      updateSourcesAndLayers.updateSourcesAndLayers(appState, actions, map);
       MapUtils.updateSatellite(appState, map);
     },
   };

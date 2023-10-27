@@ -1,5 +1,4 @@
 import m, { FactoryComponent } from 'mithril';
-import { MapboxGeoJSONFeature } from 'mapbox-gl';
 import { IActions, ISource, IAppModel } from '../../services/meiosis';
 import M from 'materialize-css';
 import { LayoutForm } from 'mithril-ui-form';
@@ -10,24 +9,29 @@ import {
   IChemicalIncidentScenario,
   ICbrnProperties,
 } from 'c2app-models-utils';
+import { GeoJSONFeature } from 'maplibre-gl';
 
-export const formatMan = (ft: MapboxGeoJSONFeature) => {
+export const formatMan = (ft: GeoJSONFeature) => {
   const props = ft?.properties;
   return m('div', [
-    m('p', 'Layer Name: ' + ft.layer.id),
+    // TODO FIX
+    // m('p', 'Layer Name: ' + ft.layer.id),
     m('p', 'Type: ' + props?.type),
     m('p', 'Callsign: ' + props?.name),
   ]);
 };
-export const formatCar = (ft: MapboxGeoJSONFeature) => {
+export const formatCar = (ft: GeoJSONFeature) => {
   const props = ft?.properties;
-  return m('div', [m('p', 'Layer Name: ' + ft.layer.id), m('p', 'Type: ' + props?.type)]);
+  // TODO FIX
+  return m('div', [m('p', 'Layer Name: ?'), m('p', 'Type: ' + props?.type)]);
+  // return m('div', [m('p', 'Layer Name: ' + ft.layer.id), m('p', 'Type: ' + props?.type)]);
 };
 
-export const formatUnknown = (ft: MapboxGeoJSONFeature) => {
+export const formatUnknown = (ft: GeoJSONFeature) => {
   const props = ft?.properties;
   return m('div', [
-    m('p', 'Layer Name: ' + ft.layer.id),
+    // TODO FIX
+    // m('p', 'Layer Name: ' + ft.layer.id),
     m('p', 'ID: ' + props?.id),
     m('p', 'Height: ' + props?.height),
   ]);
@@ -39,13 +43,16 @@ export const alertFormatComponent: FactoryComponent<{
 }> = () => {
   return {
     view: (vnode) => {
-      const ft = vnode.attrs.state.app.clickedFeature as MapboxGeoJSONFeature;
+      const ft = vnode.attrs.state.app.clickedFeature as GeoJSONFeature;
       const alert = vnode.attrs.state.app.sources.find((v: ISource) => {
-        return v.sourceName + v.id === ft.source;
+        // TODO FIX
+        return v.sourceName;
+        // return v.sourceName + v.id === ft.source;
       }) as ISource;
       return m('div', [
-        m('p', 'Layer Name: ' + ft.layer.id),
-        m('p', 'Source Name: ' + ft.source),
+        // TODO FIX
+        // m('p', 'Layer Name: ' + ft.layer.id),
+        // m('p', 'Source Name: ' + ft.source),
         m('p', 'Comments: ' + (ft.properties as ICbrnProperties).comments),
         m('p', 'Toxicity: ' + (ft.properties as ICbrnProperties).toxicityLevel),
         m('p', 'Confidence: ' + (ft.properties as ICbrnProperties).confidence),
@@ -81,7 +88,7 @@ export const contextFormatComponent: FactoryComponent<{
 }> = () => {
   return {
     view: (vnode) => {
-      const ft = vnode.attrs.state.app.clickedFeature as MapboxGeoJSONFeature;
+      const ft = vnode.attrs.state.app.clickedFeature as GeoJSONFeature;
       return m('div', [
         m('p', 'ID: ' + ft.properties?.id),
         m('p', 'Description: ' + ft.properties?.description),
@@ -97,7 +104,7 @@ export const resourceFormatComponent: FactoryComponent<{
 }> = () => {
   return {
     view: (vnode) => {
-      const ft = vnode.attrs.state.app.clickedFeature as MapboxGeoJSONFeature;
+      const ft = vnode.attrs.state.app.clickedFeature as GeoJSONFeature;
       return m('div', [
         m('p', 'ID: ' + ft.properties?.id),
         m('p', 'Type: ' + ft.properties?.resourceType),
@@ -114,7 +121,7 @@ export const sensorFormatComponent: FactoryComponent<{
 }> = () => {
   return {
     view: (vnode) => {
-      const ft = vnode.attrs.state.app.clickedFeature as MapboxGeoJSONFeature;
+      const ft = vnode.attrs.state.app.clickedFeature as GeoJSONFeature;
       const sensors = JSON.parse(ft.properties?.sensors);
       return m(
         'li',
@@ -142,7 +149,7 @@ export const incidentLocationFormatComponent: FactoryComponent<{
   };
   return {
     view: (vnode) => {
-      const ft = vnode.attrs.state.app.clickedFeature as MapboxGeoJSONFeature;
+      const ft = vnode.attrs.state.app.clickedFeature as GeoJSONFeature;
       const scenario = JSON.parse(ft.properties?.scenario) as IChemicalIncidentScenario;
       const form = formGenerator({});
 
@@ -172,7 +179,7 @@ export const incidentLocationFormatComponent: FactoryComponent<{
           form,
           obj: source,
           section: 'source',
-        })
+        }),
       ];
     },
     oncreate: () => {

@@ -1,11 +1,12 @@
 import m from 'mithril';
-import mapboxgl, { GeoJSONSource, LinePaint, MapboxGeoJSONFeature } from 'mapbox-gl';
 import bbox from '@turf/bbox';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { Point, Feature, Polygon, FeatureCollection, Geometry } from 'geojson';
 import { IActions, IAppModel, ILayer, ISource, SourceType } from '../../services/meiosis';
 import SquareGrid from '@turf/square-grid';
 import polylabel from 'polylabel';
+import { GeoJSONSource, GeoJSONFeature, Map as MaplibreMap, Style } from 'maplibre-gl';
+
 // ICONS
 import car from '../../assets/Operations/Car.png';
 import van from '../../assets/Operations/Car.png';
@@ -34,8 +35,8 @@ export const drawConfig = {
   },
 };
 
-export const handleDrawEvent = (map: mapboxgl.Map, features: MapboxGeoJSONFeature[], actions: IActions) => {
-  actions.updateDrawings(features[0] as MapboxGeoJSONFeature);
+export const handleDrawEvent = (map: MaplibreMap, features: GeoJSONFeature[], actions: IActions) => {
+  actions.updateDrawings(features[0] as GeoJSONFeature);
   if (features[0].geometry.type === 'Polygon') {
     getFeaturesInPolygon(map, features, actions);
   }
@@ -46,7 +47,7 @@ export const handleDrawEvent = (map: mapboxgl.Map, features: MapboxGeoJSONFeatur
   instance.open();
 };
 
-const getFeaturesInPolygon = (map: mapboxgl.Map, features: Feature[], actions: IActions) => {
+const getFeaturesInPolygon = (map: MaplibreMap, features: Feature[], actions: IActions) => {
   let layers: Array<string> = [];
 
   if (map.getLayer('ResourcesresourcesIDfiremanResources')) layers.push('ResourcesresourcesIDfiremanResources');
@@ -76,17 +77,13 @@ const getFeaturesInPolygon = (map: mapboxgl.Map, features: Feature[], actions: I
   actions.updateSelectedFeatures(polyFeatures);
 };
 
-export const displayInfoSidebar = (features: MapboxGeoJSONFeature[], actions: IActions) => {
-  actions.updateClickedFeature(features[0] as MapboxGeoJSONFeature);
+export const displayInfoSidebar = (features: GeoJSONFeature[], actions: IActions) => {
+  actions.updateClickedFeature(features[0] as GeoJSONFeature);
   const instance = M.Sidenav.getInstance(document.getElementById('slide-out-2') as HTMLElement);
   instance.open();
 };
 
-export const getGridSource = (
-  map: mapboxgl.Map,
-  actions: IActions,
-  appState: IAppModel
-): FeatureCollection<Polygon> => {
+export const getGridSource = (map: MaplibreMap, actions: IActions, appState: IAppModel): FeatureCollection<Polygon> => {
   if (appState.app.gridOptions.updateLocation) {
     const bounds = map.getBounds();
     actions.updateGridLocation([bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()]);
@@ -135,116 +132,109 @@ export const getLabelsSource = (gridSource: FeatureCollection<Polygon>): Feature
   } as FeatureCollection;
 };
 
-export const loadImages = (map: mapboxgl.Map) => {
-  map.loadImage(fireman, function (error: any, image: ImageBitmap) {
+export const loadImages = (map: MaplibreMap) => {
+  map.loadImage(fireman, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('FIREFIGHTER')) map.addImage('FIREFIGHTER', image as ImageBitmap);
   });
-  map.loadImage(policeman, function (error: any, image: ImageBitmap) {
+  map.loadImage(policeman, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('POLICE')) map.addImage('POLICE', image as ImageBitmap);
   });
-  map.loadImage(sanitary, function (error: any, image: ImageBitmap) {
+  map.loadImage(sanitary, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('MEDICAL')) map.addImage('MEDICAL', image as ImageBitmap);
   });
-  map.loadImage(first_responder, function (error: any, image: ImageBitmap) {
+  map.loadImage(first_responder, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('OTHER')) map.addImage('OTHER', image as ImageBitmap);
   });
-  map.loadImage(car, function (error: any, image: ImageBitmap) {
+  map.loadImage(car, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('CAR')) map.addImage('CAR', image as ImageBitmap);
   });
-  map.loadImage(van, function (error: any, image: ImageBitmap) {
+  map.loadImage(van, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('VAN')) map.addImage('VAN', image as ImageBitmap);
   });
-  map.loadImage(truck, function (error: any, image: ImageBitmap) {
+  map.loadImage(truck, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('TRUCK')) map.addImage('TRUCK', image as ImageBitmap);
   });
-  map.loadImage(air, function (error: any, image: ImageBitmap) {
+  map.loadImage(air, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('AIR')) map.addImage('AIR', image as ImageBitmap);
   });
-  map.loadImage(ground, function (error: any, image: ImageBitmap) {
+  map.loadImage(ground, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('GROUND')) map.addImage('GROUND', image as ImageBitmap);
   });
-  map.loadImage(chemical, function (error: any, image: ImageBitmap) {
+  map.loadImage(chemical, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('chemical')) map.addImage('chemical', image as ImageBitmap);
   });
-  map.loadImage(roadBlock, function (error: any, image: ImageBitmap) {
+  map.loadImage(roadBlock, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('roadBlock')) map.addImage('roadBlock', image as ImageBitmap);
   });
-  map.loadImage(media, function (error: any, image: ImageBitmap) {
+  map.loadImage(media, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('media')) map.addImage('media', image as ImageBitmap);
   });
-  map.loadImage(controlPoint, function (error: any, image: ImageBitmap) {
+  map.loadImage(controlPoint, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('controlPoint')) map.addImage('controlPoint', image as ImageBitmap);
   });
-  map.loadImage(divisionCommand, function (error: any, image: ImageBitmap) {
+  map.loadImage(divisionCommand, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('divisionCommand')) map.addImage('divisionCommand', image as ImageBitmap);
   });
-  map.loadImage(evacuation, function (error: any, image: ImageBitmap) {
+  map.loadImage(evacuation, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('evacuation')) map.addImage('evacuation', image as ImageBitmap);
   });
-  map.loadImage(helicopter, function (error: any, image: ImageBitmap) {
+  map.loadImage(helicopter, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('helicopter')) map.addImage('helicopter', image as ImageBitmap);
   });
-  map.loadImage(military, function (error: any, image: ImageBitmap) {
+  map.loadImage(military, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
     if (!map.hasImage('military')) map.addImage('military', image as ImageBitmap);
   });
 };
 
-export const switchBasemap = async (map: mapboxgl.Map, styleID: string) => {
+export const switchBasemap = async (map: MaplibreMap, styleID: string) => {
   const currentStyle = map.getStyle();
-  const newStyle = (await m.request(
-    `https://api.mapbox.com/styles/v1/${styleID}?access_token=` + process.env.ACCESSTOKEN
-  )) as mapboxgl.Style;
+  const newStyle = await m.request<Style>(`https://api.mapbox.com/styles/v1/${styleID}`);
 
   // ensure any sources from the current style are copied across to the new style
-  newStyle.sources = Object.assign({}, currentStyle.sources, newStyle.sources);
+  // newStyle.sources = Object.assign({}, currentStyle.sources, newStyle.sources);
+  Object.entries(currentStyle.sources)?.forEach(([id, source]) => newStyle.addSource(id, source));
 
-  // find the index of where to insert our layers to retain in the new style
-  let labelIndex = newStyle.layers?.findIndex((el) => {
-    return el.id == 'state-label';
-  });
+  // TODO FIX
+  // // find the index of where to insert our layers to retain in the new style
+  // let labelIndex = newStyle.layers?.findIndex((el) => {
+  //   return el.id == 'state-label';
+  // });
 
-  // default to on top
-  if (labelIndex === -1) {
-    labelIndex = newStyle.layers?.length;
-  }
-  const appLayers = currentStyle.layers?.filter((el) => {
-    // app layers are the layers to retain, and these are any layers which have a different source set
-    const source = (el as any).source;
-    return source &&
-      source != 'mapbox://mapbox.satellite' &&
-      source != 'mapbox' &&
-      source != 'composite';
-  });
+  // // default to on top
+  // if (labelIndex === -1) {
+  //   labelIndex = newStyle.layers?.length;
+  // }
+  // const appLayers = currentStyle.layers?.filter((el) => {
+  //   // app layers are the layers to retain, and these are any layers which have a different source set
+  //   const source = (el as any).source;
+  //   return source && source != 'mapbox://mapbox.satellite' && source != 'mapbox' && source != 'composite';
+  // });
 
-  if (!newStyle || !newStyle.layers || !appLayers) return;
-  newStyle.layers = [
-    ...newStyle.layers.slice(0, labelIndex),
-    ...appLayers,
-    ...newStyle.layers.slice(labelIndex, -1),
-  ];
+  // if (!newStyle || !newStyle.layers || !appLayers) return;
+  // newStyle.layers = [...newStyle.layers.slice(0, labelIndex), ...appLayers, ...newStyle.layers.slice(labelIndex, -1)];
 
-  map.setStyle(newStyle);
+  // map.setStyle(newStyle);
   loadImages(map);
 };
 
-export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, map: mapboxgl.Map) => {
+export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, map: MaplibreMap) => {
   appState.app.sources.forEach((source: ISource) => {
     // Set source
     const sourceName = source.sourceName.concat(source.id);
@@ -258,38 +248,37 @@ export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, m
     }
 
     // Set Layers
-    source.layers.forEach((layer: ILayer) => {
-      const layerName = sourceName.concat(layer.layerName);
-
-      if (!map.getLayer(layerName)) {
-        map.addLayer({
-          id: layerName,
-          type: layer.type.type,
-          source: sourceName,
-          layout: layer.layout ? layer.layout : {},
-          // @ts-ignore        
-          paint: layer.paint ? layer.paint : {},
-          filter: layer.filter ? layer.filter : ['all'],
-        });
-        map.on('click', layerName, ({ features }) => displayInfoSidebar(features as MapboxGeoJSONFeature[], actions));
-        map.on('mouseenter', layerName, () => (map.getCanvas().style.cursor = 'pointer'));
-        map.on('mouseleave', layerName, () => (map.getCanvas().style.cursor = ''));
-      }
-      map.setLayoutProperty(layerName, 'visibility', layer.showLayer ? 'visible' : 'none');
-      if (source.sourceCategory === SourceType.alert || source.sourceCategory === SourceType.plume)
-        map.setPaintProperty(layerName, 'line-opacity', (layer.paint as LinePaint)['line-opacity']);
+    source.layers.forEach((_layer: ILayer) => {
+      // const layerName = sourceName.concat(layer.layerName);
+      // TODO FIX
+      // if (!map.getLayer(layerName)) {
+      //   map.addLayer({
+      //     id: layerName,
+      //     type: layer.type.type,
+      //     source: sourceName,
+      //     layout: layer.layout ? layer.layout : {},
+      //     paint: layer.paint ? layer.paint : {},
+      //     filter: layer.filter ? layer.filter : ['all'],
+      //   });
+      //   map.on('click', layerName, ({ features }) => displayInfoSidebar(features as GeoJSONFeature[], actions));
+      //   map.on('mouseenter', layerName, () => (map.getCanvas().style.cursor = 'pointer'));
+      //   map.on('mouseleave', layerName, () => (map.getCanvas().style.cursor = ''));
+      // }
+      // map.setLayoutProperty(layerName, 'visibility', layer.showLayer ? 'visible' : 'none');
+      // if (source.sourceCategory === SourceType.alert || source.sourceCategory === SourceType.plume)
+      //   layer.paint && map.setPaintProperty(layerName, 'line-opacity', layer.paint['line-opacity']);
     });
   });
 };
 
-export const updateGrid = (appState: IAppModel, actions: IActions, map: mapboxgl.Map) => {
+export const updateGrid = (appState: IAppModel, actions: IActions, map: MaplibreMap) => {
   const gridSource = getGridSource(map, actions, appState);
   const gridLabelsSource = getLabelsSource(gridSource);
 
   actions.updateGrid(gridSource, gridLabelsSource);
 };
 
-export const updateSatellite = (appState: IAppModel, map: mapboxgl.Map) => {
+export const updateSatellite = (appState: IAppModel, map: MaplibreMap) => {
   // Set source
   const sourceName = 'wms-satellite-source';
   if (!map.getSource(sourceName)) {
@@ -316,11 +305,15 @@ export const updateSatellite = (appState: IAppModel, map: mapboxgl.Map) => {
       },
       // Place the satellite layer under the aerial indicators (airports, helipads) but only if that layer exists (i.e. using mapbox token)
       // Otherwise append it to the layers array and show above all layers
-      map.getLayer('aeroway-line') ? 'aeroway-line' : null as any
+      map.getLayer('aeroway-line') ? 'aeroway-line' : (null as any)
     );
   }
   map.setLayoutProperty(layerName, 'visibility', appState.app.showSatellite ? 'visible' : 'none');
   if (map.getLayer('building')) {
-    map.setPaintProperty('building', 'fill-opacity', appState.app.showSatellite ? 0 : ["interpolate", ["linear"], ["zoom"], 15, 0, 16, 1]);
+    map.setPaintProperty(
+      'building',
+      'fill-opacity',
+      appState.app.showSatellite ? 0 : ['interpolate', ['linear'], ['zoom'], 15, 0, 16, 1]
+    );
   }
 };

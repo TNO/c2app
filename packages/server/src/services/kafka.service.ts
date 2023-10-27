@@ -1,6 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { TestBedAdapter, Logger, LogLevel, IAdapterMessage, ProduceRequest } from 'node-test-bed-adapter';
-import { DefaultWebSocketGateway } from '../gateway/default-websocket.gateway';
+import {
+  TestBedAdapter,
+  AdapterLogger,
+  LogLevel,
+  AdapterMessage,
+  AdapterProducerRecord,
+  RecordMetadata,
+} from 'node-test-bed-adapter';
+import { DefaultWebSocketGateway } from '../gateway/default-websocket.gateway.js';
 import { FeatureCollection } from 'geojson';
 import {
   IAlert,
@@ -11,13 +18,7 @@ import {
   IMission,
   ISensor,
 } from 'c2app-models-utils';
-import { MessagesService } from '../messages/messages.service';
-
-interface ISendResponse {
-  [topic: string]: {
-    [partition: number]: number;
-  };
-}
+import { MessagesService } from '../messages/messages.service.js';
 
 const SimEntityFeatureCollectionTopic = 'simulation_entity_featurecollection';
 const capMessage = 'standard_cap';
@@ -28,13 +29,13 @@ const sensorTopic = 'sensor';
 const messageTopic = 'message_incoming';
 const chemicalIncidentTopic = 'chemical_incident';
 const plumeTopic = 'cbrn_geojson';
-const c2000Topic = 'c2000';
-const log = Logger.instance;
+// const c2000Topic = 'c2000';
+const log = AdapterLogger.instance;
 
 @Injectable()
 export class KafkaService {
   public adapter: TestBedAdapter;
-  public messageQueue: IAdapterMessage[] = [];
+  public messageQueue: AdapterMessage[] = [];
   public busy = false;
 
   constructor(
@@ -50,21 +51,21 @@ export class KafkaService {
     return new Promise(async (resolve) => {
       log.info('Init KafkaService');
       this.adapter = new TestBedAdapter({
-        clientId: 'c2app-server',
+        groupId: process.env.GROUP_ID || 'c2app-server',
         kafkaHost: process.env.KAFKA_HOST || 'localhost:3501',
         schemaRegistry: process.env.SCHEMA_REGISTRY || 'localhost:3502',
         consume: process.env.CONSUME
-          ? process.env.CONSUME.split(',').map((t) => ({ topic: t.trim() }))
+          ? process.env.CONSUME.split(',').map((t) => t.trim())
           : [
-              { topic: SimEntityFeatureCollectionTopic },
-              { topic: capMessage },
-              { topic: contextTopic },
-              { topic: missionTopic },
-              { topic: resourceTopic },
-              { topic: sensorTopic },
-              { topic: chemicalIncidentTopic },
-              { topic: plumeTopic },
-              { topic: messageTopic },
+              SimEntityFeatureCollectionTopic,
+              capMessage,
+              contextTopic,
+              missionTopic,
+              resourceTopic,
+              sensorTopic,
+              chemicalIncidentTopic,
+              plumeTopic,
+              messageTopic,
             ],
         logging: {
           logToConsole: LogLevel.Info,
@@ -77,7 +78,7 @@ export class KafkaService {
           log.error(e);
         });
       });
-      this.adapter.on('message', (message: IAdapterMessage) => {
+      this.adapter.on('message', (message: AdapterMessage) => {
         this.messageQueue.push(message);
         this.handleMessage();
       });
@@ -91,12 +92,12 @@ export class KafkaService {
     });
   }
 
-  public send(payloads: ProduceRequest | ProduceRequest[], cb: (error?: any, data?: ISendResponse) => any): any {
+  public send(payloads: AdapterProducerRecord, cb: (error?: any, data?: RecordMetadata[]) => any): any {
     if (this.adapter.isConnected) {
       this.adapter.send(payloads, cb);
     } else {
       log.warn('Test-bed not connected');
-      cb(null, {});
+      cb(null, []);
     }
   }
 
@@ -116,7 +117,7 @@ export class KafkaService {
           this.socket.server.emit('alert', value as IAlert);
           break;
         case contextTopic:
-          const context = KafkaService.prepareContext(value as IContext)
+          const context = KafkaService.prepareContext(value as IContext);
           this.messagesService.create('contexts', context);
           this.socket.server.emit('context', context);
           break;
@@ -188,11 +189,11 @@ export class KafkaService {
   }
 
   private static prepareContext(context: IContext) {
-      if (context.geometry[`nl.tno.assistance.geojson.geometry.Polygon`]) {
-        context.geometry = context.geometry[`nl.tno.assistance.geojson.geometry.Polygon`];
-      } else if (context.geometry[`nl.tno.assistance.geojson.geometry.MultiPolygon`]) {
-        context.geometry = context.geometry[`nl.tno.assistance.geojson.geometry.MultiPolygon`];
-      }
+    if (context.geometry[`nl.tno.assistance.geojson.geometry.Polygon`]) {
+      context.geometry = context.geometry[`nl.tno.assistance.geojson.geometry.Polygon`];
+    } else if (context.geometry[`nl.tno.assistance.geojson.geometry.MultiPolygon`]) {
+      context.geometry = context.geometry[`nl.tno.assistance.geojson.geometry.MultiPolygon`];
+    }
     return context as IContext;
   }
 }

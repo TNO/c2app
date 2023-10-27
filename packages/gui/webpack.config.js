@@ -11,7 +11,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 module.exports = (env) => {
   const isProduction = env.production;
   const outputPath = path.resolve(__dirname, isProduction ? '../../docs' : './dist');
-  const publicPath = isProduction ? 'https://erikvullings.github.io/c2app/' : process.env.SERVER_URL + '/' ;
+  const publicPath = isProduction ? 'https://tno.github.io/c2app/' : process.env.SERVER_URL + '/';
 
   console.log(`Running in ${isProduction ? 'production' : 'development'} mode, output directed to ${outputPath}.`);
 
@@ -21,14 +21,14 @@ module.exports = (env) => {
     devtool: isProduction ? 'source-map' : 'inline-source-map',
     devServer: {
       liveReload: true,
-      port: 1234,
+      port: 8080,
       compress: true,
     },
     plugins: [
+      new Dotenv(),
       new webpack.WatchIgnorePlugin({
         paths: [/\.js$/, /\.d\.ts$/],
       }),
-      new Dotenv(),
       new HtmlWebpackPlugin({
         title: 'SAFR',
         favicon: './src/favicon.ico',

@@ -2,12 +2,12 @@ import { existsSync, mkdirSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { cwd } from 'process';
 import { Injectable } from '@nestjs/common';
-import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
-import * as loki from 'lokijs';
+import { CreateMessageDto } from './dto/create-message.dto.js';
+import { UpdateMessageDto } from './dto/update-message.dto.js';
+import loki from 'lokijs';
 import { Collection } from 'lokijs';
-import * as lfsa from 'lokijs/src/loki-fs-structured-adapter';
-import { sortByDateDesc } from '../utils';
+import lfsa from 'lokijs/src/loki-fs-structured-adapter.js';
+import { sortByDateDesc } from '../utils/index.js';
 
 const dbName = process.env.DB || 'db/safr.db';
 

@@ -31,11 +31,11 @@ export class Socket {
 
   constructor(us: UpdateStream) {
     // @ts-ignore
-    this.socket = io(process.env.SERVER_URL as string, 
-    { 
+    console.table({ url: process.env.SERVER_URL, path: process.env.SERVER_PATH });
+    this.socket = io(process.env.SERVER_URL as string, {
       // @ts-ignore
-	    path: process.env.SERVER_PATH  as string 
-	});
+      path: process.env.SERVER_PATH as string,
+    });
     // ASSISTANCE context
     this.socket.on('context', (data: IContext) => {
       const fc = {
@@ -116,7 +116,7 @@ export class Socket {
         features: features,
       } as FeatureCollection;
 
-      const uniqueTypes = resourceTypes.filter((v, i, a) => a.indexOf(v) === i) as Array<string>;
+      // const uniqueTypes = resourceTypes.filter((v, i, a) => a.indexOf(v) === i) as Array<string>;
 
       us({
         app: {
@@ -127,19 +127,20 @@ export class Socket {
 
             if (index > -1) {
               sources[index].source = fc;
-              sources[index].layers = uniqueTypes.map((type: string) => {
-                return {
-                  layerName: type + 'Resources',
-                  showLayer: true,
-                  type: { type: 'symbol' } as mapboxgl.AnyLayer,
-                  layout: {
-                    'icon-image': type,
-                    'icon-size': type === 'GROUND' ? 0.1 : type === 'AIR' ? 0.25 : 0.5,
-                    'icon-allow-overlap': true,
-                  },
-                  filter: ['all', ['in', 'resourceSubType', type]],
-                } as ILayer;
-              }) as ILayer[];
+              // TODO FIX
+              // sources[index].layers = uniqueTypes.map((type: string) => {
+              //   return {
+              //     layerName: type + 'Resources',
+              //     showLayer: true,
+              //     type: { type: 'symbol' } as mapboxgl.AnyLayer,
+              //     layout: {
+              //       'icon-image': type,
+              //       'icon-size': type === 'GROUND' ? 0.1 : type === 'AIR' ? 0.25 : 0.5,
+              //       'icon-allow-overlap': true,
+              //     },
+              //     filter: ['all', ['in', 'resourceSubType', type]],
+              //   } as ILayer;
+              // }) as ILayer[];
             } else {
               sources.push({
                 id: 'resourcesID',
@@ -147,19 +148,20 @@ export class Socket {
                 sourceName: 'Resources',
                 sourceCategory: SourceType.realtime,
                 shared: false,
-                layers: uniqueTypes.map((type: string) => {
-                  return {
-                    layerName: type + 'Resources',
-                    showLayer: true,
-                    type: { type: 'symbol' } as mapboxgl.AnyLayer,
-                    layout: {
-                      'icon-image': type,
-                      'icon-size': type === 'GROUND' ? 0.1 : type === 'AIR' ? 0.25 : 0.5,
-                      'icon-allow-overlap': true,
-                    },
-                    filter: ['all', ['in', 'resourceSubType', type]],
-                  } as ILayer;
-                }) as ILayer[],
+                // TODO FIX
+                // layers: uniqueTypes.map((type: string) => {
+                //   return {
+                //     layerName: type + 'Resources',
+                //     showLayer: true,
+                //     type: { type: 'symbol' } as mapboxgl.AnyLayer,
+                //     layout: {
+                //       'icon-image': type,
+                //       'icon-size': type === 'GROUND' ? 0.1 : type === 'AIR' ? 0.25 : 0.5,
+                //       'icon-allow-overlap': true,
+                //     },
+                //     filter: ['all', ['in', 'resourceSubType', type]],
+                //   } as ILayer;
+                // }) as ILayer[],
               } as ISource);
             }
             return sources;
@@ -230,18 +232,19 @@ export class Socket {
                 sourceName: 'Sensors',
                 sourceCategory: SourceType.realtime,
                 shared: false,
-                layers: [
-                  {
-                    layerName: 'Sensors',
-                    showLayer: true,
-                    type: { type: 'symbol' } as mapboxgl.AnyLayer,
-                    layout: {
-                      'icon-image': 'media',
-                      'icon-size': 0.5,
-                      'icon-allow-overlap': true,
-                    },
-                  },
-                ] as ILayer[],
+                // TODO FIX
+                // layers: [
+                //   {
+                //     layerName: 'Sensors',
+                //     showLayer: true,
+                //     type: { type: 'symbol' } as mapboxgl.AnyLayer,
+                //     layout: {
+                //       'icon-image': 'media',
+                //       'icon-size': 0.5,
+                //       'icon-allow-overlap': true,
+                //     },
+                //   },
+                // ] as ILayer[],
               } as ISource);
             }
             return sources;
@@ -287,18 +290,19 @@ export class Socket {
                 sourceName: 'IncidentLocation',
                 sourceCategory: SourceType.chemical_incident,
                 shared: false,
-                layers: [
-                  {
-                    layerName: 'Incident',
-                    showLayer: true,
-                    type: { type: 'symbol' } as mapboxgl.AnyLayer,
-                    layout: {
-                      'icon-image': 'chemical',
-                      'icon-size': 0.5,
-                      'icon-allow-overlap': true,
-                    },
-                  },
-                ] as ILayer[],
+                // TODO FIX
+                // layers: [
+                //   {
+                //     layerName: 'Incident',
+                //     showLayer: true,
+                //     type: { type: 'symbol' } as mapboxgl.AnyLayer,
+                //     layout: {
+                //       'icon-image': 'chemical',
+                //       'icon-size': 0.5,
+                //       'icon-allow-overlap': true,
+                //     },
+                //   },
+                // ] as ILayer[],
               } as ISource);
             }
             return sources;

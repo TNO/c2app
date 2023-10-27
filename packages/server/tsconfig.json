@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "NodeNext",
     "declaration": true,
     "noImplicitAny": false,
     "removeComments": true,
@@ -8,7 +8,9 @@
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es6",
+    "esModuleInterop": true,
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
     "sourceMap": true,
     "allowJs": false,
     "rootDir": "./src",

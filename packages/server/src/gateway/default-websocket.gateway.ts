@@ -6,7 +6,7 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { FeatureCollection, Feature } from 'geojson';
-import { uuid4 } from '../utils';
+import { uuid4 } from '../utils/index.js';
 import { Server, Socket } from 'socket.io';
 import {
   IServerMessage,
@@ -24,16 +24,19 @@ import { ConfigService } from '@nestjs/config';
 
 @WebSocketGateway({ cors: { origin: true } })
 export class DefaultWebSocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private httpService: HttpService, private configService: ConfigService) {}
-
   @WebSocketServer() server: Server;
   private clients: number = 0;
   private groups: Map<string, IServerGroup> = new Map<string, IServerGroup>();
   public callsignToSocketId: Map<string, string> = new Map<string, string>();
-  private URL: string = this.configService.get<string>('DISPERSION_SERVICE')
-    ? `${this.configService.get<string>('DISPERSION_SERVICE') + '/process'}`
-    : 'http://localhost:8080/process';
+  private URL: string;
   private pop_URL: string = 'http://localhost:3333/detailed';
+
+  constructor(private httpService: HttpService, private configService: ConfigService) {
+    this.URL =
+      this.configService && this.configService.get<string>('DISPERSION_SERVICE')
+        ? `${this.configService.get<string>('DISPERSION_SERVICE') + '/process'}`
+        : 'http://localhost:8080/process';
+  }
 
   /** Handlers */
   async handleConnection(client: Socket) {

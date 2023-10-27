@@ -1,6 +1,6 @@
 {
   "name": "safr",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "GUI for visualizing chemical hazards and FR positions.",
   "scripts": {
     "clean": "pnpm -r --parallel run cleanup",
@@ -13,16 +13,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TNOCS/c2app.git"
+    "url": "git+https://github.com/TNO/c2app.git"
   },
   "keywords": [
     "mithril",
     "c2"
   ],
-  "author": "Timo van der Kuil <timo_kuil@hotmail.com> (http://www.tno.nl)",
+  "author": "Timo van der Kuil <timo_kuil@hotmail.com>, Erik Vullings <erik.vullings@tno.nl> (http://www.tno.nl)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/TNOCS/c2app/issues"
+    "url": "https://github.com/TNO/c2app/issues"
   },
-  "homepage": "https://github.com/TNOCS/c2app#readme"
+  "homepage": "https://github.com/TNO/c2app#readme",
+  "devDependencies": {
+    "@rspack/cli": "^0.3.8"
+  }
 }

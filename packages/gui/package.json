@@ -15,10 +15,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@mapbox-controls/compass": "1.0.1",
-    "@mapbox-controls/ruler": "^1.0.1",
-    "@mapbox-controls/tooltip": "^1.0.1",
-    "@mapbox-controls/zoom": "^1.0.1",
     "@mapbox/mapbox-gl-draw": "^1.4.3",
     "@turf/bbox": "^6.5.0",
     "@turf/boolean-point-in-polygon": "^6.5.0",

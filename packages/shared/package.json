@@ -26,6 +26,9 @@
     "url": "https://github.com/TNOCS/c2app/issues"
   },
   "homepage": "https://github.com/TNOCS/c2app#readme",
+  "dependencies": {
+    "mithril-ui-form-plugin": "0.6.2"
+  },
   "devDependencies": {
     "@types/geojson": "^7946.0.12",
     "rimraf": "^5.0.5",

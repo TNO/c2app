@@ -1,4 +1,5 @@
 export * from './c2-app-value';
+export * from './layer-style';
 export { IAlert, IArea, IInfo, IResource } from './cap-value';
 export { IAssistanceMessage } from './message-value';
 export { IAssistanceResource, ResourceType, ResourceSubtype, IAttitude, ICamera, IGeometry } from './resource-value';

@@ -1,5 +1,4 @@
 import { extname, join, resolve } from 'path';
-import express from 'express';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module.js';
@@ -35,9 +34,6 @@ async function bootstrap() {
 
   const layerStylesPath = resolve(cwd(), 'layer_styles');
   await convertToJsonArrayAndWriteIndexJson(layerStylesPath);
-
-  app.use('/layer_styles', express.static(layerStylesPath));
-  app.use('/', express.static(resolve(cwd(), 'public')));
 
   await app.listen(port, () => console.log(`Listening on port ${port}.`));
 }

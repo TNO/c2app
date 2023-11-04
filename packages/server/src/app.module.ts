@@ -7,8 +7,8 @@ import { DefaultWebSocketGateway } from './gateway/default-websocket.gateway.js'
 import { ConfigModule } from '@nestjs/config';
 import { MessagesModule } from './messages/messages.module.js';
 import { MessagesService } from './messages/messages.service.js';
-import { join } from 'node:path';
-import { cwd } from 'node:process';
+import { join } from 'path';
+import { cwd } from 'process';
 
 @Module({
   imports: [
@@ -22,6 +22,6 @@ import { cwd } from 'node:process';
     }),
     HttpModule, ConfigModule.forRoot(), MessagesModule],
   controllers: [AppController],
-  providers: [DefaultWebSocketGateway, KafkaService, MessagesService],
+  providers: [DefaultWebSocketGateway, MessagesService, KafkaService],
 })
 export class AppModule { }

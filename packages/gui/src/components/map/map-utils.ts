@@ -78,6 +78,7 @@ const getFeaturesInPolygon = (map: MaplibreMap, features: Feature[], actions: IA
 };
 
 export const displayInfoSidebar = (features: GeoJSONFeature[], actions: IActions) => {
+  console.log(features);
   actions.updateClickedFeature(features[0] as GeoJSONFeature);
   const instance = M.Sidenav.getInstance(document.getElementById('slide-out-2') as HTMLElement);
   instance.open();
@@ -130,6 +131,16 @@ export const getLabelsSource = (gridSource: FeatureCollection<Polygon>): Feature
       } as Feature;
     }),
   } as FeatureCollection;
+};
+
+export const loadMissingImages = (map: MaplibreMap) => {
+  map.on('styleimagemissing', (e) => {
+    console.log('Missing image:');
+    console.log(e);
+    // const id = e.id; // id of the missing image
+
+    // map.addImage(id, {width, height: width, data});
+  });
 };
 
 export const loadImages = (map: MaplibreMap) => {

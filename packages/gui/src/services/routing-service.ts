@@ -51,20 +51,20 @@ class RoutingService {
     return this.pages.reduce((r, p) => {
       r[p.route] = p.hasSidebar
         ? {
-            render: () =>
-              m(this.layout, { state: states(), actions: actions }, [
-                m(p.sidebar, { state: states(), actions: actions }),
-                m(p.component, { state: states(), actions: actions }),
-              ]),
-          }
+          render: () =>
+            m(this.layout, { state: states(), actions: actions }, [
+              m(p.sidebar, { state: states(), actions: actions }),
+              m(p.component, { state: states(), actions: actions }),
+            ]),
+        }
         : {
-            render: () =>
-              m(
-                this.layout,
-                { state: states(), actions: actions },
-                m(p.component, { state: states(), actions: actions })
-              ),
-          };
+          render: () =>
+            m(
+              this.layout,
+              { state: states(), actions: actions },
+              m(p.component, { state: states(), actions: actions })
+            ),
+        };
       return r;
     }, {} as RouteDefs);
   }
@@ -87,7 +87,7 @@ export const routingSvc: RoutingService = new RoutingService(Layout, [
     title: 'Chat',
     icon: 'chat',
     route: '/chat',
-    visible: true,
+    visible: false,
     component: Chat,
     sidebar: chatSidebar,
     hasSidebar: true,
@@ -97,7 +97,7 @@ export const routingSvc: RoutingService = new RoutingService(Layout, [
     title: 'Settings',
     icon: 'settings',
     route: '/settings',
-    visible: true,
+    visible: false,
     component: Settings,
     sidebar: sideBar,
     hasSidebar: false,
@@ -107,7 +107,7 @@ export const routingSvc: RoutingService = new RoutingService(Layout, [
     title: 'Alerts',
     icon: 'warning',
     route: '/alerts',
-    visible: true,
+    visible: false,
     component: Alerts,
     sidebar: sideBar,
     hasSidebar: false,

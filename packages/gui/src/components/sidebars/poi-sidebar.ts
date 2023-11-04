@@ -1,6 +1,5 @@
 import m from 'mithril';
 import { MeiosisComponent } from '../../services/meiosis';
-import M from 'materialize-css';
 import {
   formatMan,
   formatCar,
@@ -39,22 +38,22 @@ export const poiSidebar: MeiosisComponent = () => {
               ? clickedFeature?.properties?.type === 'resource'
                 ? m(resourceFormatComponent, { state, actions })
                 : clickedFeature?.properties?.type === 'sensor'
-                ? m(sensorFormatComponent, { state, actions })
-                : clickedFeature?.properties?.type === 'context'
-                ? m(contextFormatComponent, { state, actions })
-                : clickedFeature?.properties?.type === 'plume'
-                ? m(alertFormatComponent, { state, actions })
-                : clickedFeature?.properties?.type === 'incidentLocation'
-                ? m(incidentLocationFormatComponent, { state, actions })
-                : clickedFeature?.properties?.type === 'MAN'
-                ? formatMan(clickedFeature)
-                : clickedFeature?.properties?.type === 'CAR'
-                ? formatCar(clickedFeature)
-                : clickedFeature?.properties?.type === 'FIREFIGHTER'
-                ? formatMan(clickedFeature)
-                : formatUnknown(clickedFeature)
+                  ? m(sensorFormatComponent, { state, actions })
+                  : clickedFeature?.properties?.type === 'context'
+                    ? m(contextFormatComponent, { state, actions })
+                    : clickedFeature?.properties?.type === 'plume'
+                      ? m(alertFormatComponent, { state, actions })
+                      : clickedFeature?.properties?.type === 'incidentLocation'
+                        ? m(incidentLocationFormatComponent, { state, actions })
+                        : clickedFeature?.properties?.type === 'MAN'
+                          ? formatMan(clickedFeature)
+                          : clickedFeature?.properties?.type === 'CAR'
+                            ? formatCar(clickedFeature)
+                            : clickedFeature?.properties?.type === 'FIREFIGHTER'
+                              ? formatMan(clickedFeature)
+                              : formatUnknown(clickedFeature)
               : // If there is no clicked feature
-                m('p', ''),
+              m('p', ''),
           ]),
           m('p', sensorDict),
           m('div', { style: 'margin: 128px' }),

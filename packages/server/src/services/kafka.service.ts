@@ -6,6 +6,7 @@ import {
   AdapterMessage,
   AdapterProducerRecord,
   RecordMetadata,
+  FeatureCollectionType,
 } from 'node-test-bed-adapter';
 import { DefaultWebSocketGateway } from '../gateway/default-websocket.gateway.js';
 import { FeatureCollection } from 'geojson';
@@ -21,8 +22,9 @@ import {
 import { MessagesService } from '../messages/messages.service.js';
 
 const SimEntityFeatureCollectionTopic = 'simulation_entity_featurecollection';
-const capMessage = 'standard_cap';
+const geojsonLayer = 'standard_geojson';
 const contextTopic = 'context';
+const capMessage = 'standard_cap';
 const resourceTopic = 'resource';
 const missionTopic = 'mission';
 const sensorTopic = 'sensor';
@@ -40,7 +42,7 @@ export class KafkaService {
 
   constructor(
     @Inject(DefaultWebSocketGateway) private readonly socket: DefaultWebSocketGateway,
-    private readonly messagesService: MessagesService
+    @Inject(MessagesService) private readonly messagesService: MessagesService
   ) {
     this.createAdapter().catch((e) => {
       log.error(e);
@@ -57,16 +59,17 @@ export class KafkaService {
         consume: process.env.CONSUME
           ? process.env.CONSUME.split(',').map((t) => t.trim())
           : [
-              SimEntityFeatureCollectionTopic,
-              capMessage,
-              contextTopic,
-              missionTopic,
-              resourceTopic,
-              sensorTopic,
-              chemicalIncidentTopic,
-              plumeTopic,
-              messageTopic,
-            ],
+            SimEntityFeatureCollectionTopic,
+            capMessage,
+            contextTopic,
+            geojsonLayer,
+            missionTopic,
+            resourceTopic,
+            sensorTopic,
+            chemicalIncidentTopic,
+            plumeTopic,
+            messageTopic,
+          ],
         logging: {
           logToConsole: LogLevel.Info,
           logToKafka: LogLevel.Warn,
@@ -105,50 +108,52 @@ export class KafkaService {
     while (this.messageQueue.length > 0 && !this.busy) {
       this.busy = true;
       const { topic, value } = this.messageQueue.shift();
-
+      console.log(JSON.stringify(value))
       switch (topic) {
+        case geojsonLayer:
         case SimEntityFeatureCollectionTopic:
-          const positions = KafkaService.preparePositions(value as FeatureCollection);
-          this.messagesService.create('positions', positions);
-          this.socket.server.emit('positions', positions);
+          const geojson = KafkaService.normalizeGeoJSON(value as FeatureCollection);
+          console.log(JSON.stringify(geojson))
+          this.socket.server.emit('geojson', geojson);
+          this.messagesService.create('geojson', geojson);
           break;
         case capMessage:
-          this.messagesService.create('alerts', value);
           this.socket.server.emit('alert', value as IAlert);
+          this.messagesService.create('alerts', value);
           break;
         case contextTopic:
           const context = KafkaService.prepareContext(value as IContext);
-          this.messagesService.create('contexts', context);
           this.socket.server.emit('context', context);
+          this.messagesService.create('contexts', context);
           break;
         case missionTopic:
-          this.messagesService.create('missions', value);
           this.socket.server.emit('mission', value as IMission);
+          this.messagesService.create('missions', value);
           break;
         case resourceTopic:
-          this.messagesService.create('resources', value);
           this.socket.server.emit('resource', value as IAssistanceResource);
+          this.messagesService.create('resources', value);
           break;
         case sensorTopic:
-          this.messagesService.create('sensors', value);
           this.socket.server.emit('sensor', value as ISensor);
+          this.messagesService.create('sensors', value);
           break;
         case chemicalIncidentTopic:
-          this.messagesService.create('chemical_incidents', value);
           this.socket.server.emit('chemical_incident', value as ISensor);
+          this.messagesService.create('chemical_incidents', value);
           break;
         case plumeTopic:
           const plume = KafkaService.preparePlume(value as ICbrnFeatureCollection);
-          this.messagesService.create('plumes', plume);
           this.socket.server.emit('plume', plume);
+          this.messagesService.create('plumes', plume);
           break;
         case messageTopic:
           const msg = value as IAssistanceMessage;
           const { resource } = msg;
           // Send message only to the resource that is mentioned
           if (this.socket.callsignToSocketId.get(resource)) {
-            this.messagesService.create('sas_messages', msg);
             this.socket.server.to(this.socket.callsignToSocketId.get(resource)).emit('sas_message', msg);
+            this.messagesService.create('sas_messages', msg);
           } else {
             console.log('Alert for ID: ' + msg.resource + ', resource not logged in!');
           }
@@ -162,9 +167,19 @@ export class KafkaService {
     }
   }
 
-  private static preparePositions(collection: FeatureCollection) {
+  private static normalizeGeoJSON(collection: FeatureCollection) {
     for (const feature of collection.features) {
-      feature.geometry = feature.geometry['eu.driver.model.sim.support.geojson.geometry.Point'];
+      feature.geometry = Object.entries(feature.geometry).map(([_key, value]) => value).shift();
+      feature.properties = Object.entries(feature.properties).reduce((acc, [key, value]) => {
+        acc[key] = typeof value.string !== 'undefined'
+          ? value.string
+          : typeof value.int !== 'undefined'
+            ? value.int
+            : typeof value.double !== 'undefined'
+              ? value.double
+              : value;
+        return acc;
+      }, {} as Record<string, any>)
     }
     return collection as FeatureCollection;
   }

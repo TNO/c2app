@@ -13,6 +13,7 @@ import {
   IGroup,
   IMessage,
   ISensor,
+  LayerStyle,
   uuid4,
 } from 'c2app-models-utils';
 // @ts-ignore
@@ -20,6 +21,7 @@ import ch from '../ch.json';
 import { routingSvc } from './routing-service';
 import { Pages } from '../models';
 import { GeoJSONFeature, LayerSpecification, LinePaintProps, SymbolLayoutProps } from 'maplibre-gl';
+import { layerStylesSvc } from './layer_styles';
 
 export interface ILayer {
   layerName: string;
@@ -82,6 +84,7 @@ export interface IAppModel {
     newMessages: { [key: string]: number };
 
     // Layers/styles
+    layerStyles?: LayerStyle<Record<string, any>>[];
     sources: Array<ISource>;
     mapStyle: string;
     switchStyle: boolean;
@@ -96,6 +99,7 @@ export interface IAppModel {
       scenario: IChemicalIncidentScenario;
       control_parameters: IChemicalIncidentControlParameters;
     };
+
   };
 }
 
@@ -108,6 +112,7 @@ export interface IActions {
   ) => void;
 
   // Core
+  loadLayerStyles: () => Promise<void>;
   drawingCleared: () => void;
   createPOI: () => void;
 
@@ -195,7 +200,7 @@ export const appStateMgmt = {
       newMessages: {} as { [key: string]: number },
 
       // Layers/styles
-
+      layerStyles: undefined,
       sources: [] as Array<ISource>,
       mapStyle: 'mapbox/streets-v11',
       gridOptions: {
@@ -215,7 +220,7 @@ export const appStateMgmt = {
       },
     },
   },
-  actions: (us: UpdateStream, states: Stream<IAppModel>) => {
+  actions: (update: UpdateStream, states: Stream<IAppModel>) => {
     return {
       // Utils
       switchToPage: (
@@ -227,8 +232,14 @@ export const appStateMgmt = {
       },
 
       // Core
+      loadLayerStyles: async () => {
+        const layerStyles = await layerStylesSvc.loadStyles();
+        if (!layerStyles) return;
+        console.log(layerStyles);
+        update({ app: { layerStyles } })
+      },
       drawingCleared: () => {
-        us({
+        update({
           app: {
             clearDrawing: { delete: false, id: '' },
             drawings: undefined,
@@ -236,7 +247,7 @@ export const appStateMgmt = {
         });
       },
       createPOI: () => {
-        us({
+        update({
           app: {
             gridOptions: { updateGrid: true },
           },
@@ -245,7 +256,7 @@ export const appStateMgmt = {
 
       // Alerts
       openAlert: (alert: IAlert) => {
-        us({
+        update({
           app: {
             alert: () => {
               return alert;
@@ -255,7 +266,7 @@ export const appStateMgmt = {
       },
 
       setCHOpacities: (val: number, name: string) => {
-        us({
+        update({
           app: {
             sources: (sources: Array<ISource>) => {
               sources.forEach((source: ISource) => {
@@ -313,7 +324,7 @@ export const appStateMgmt = {
 
       // Clicking/selecting
       updateClickedFeature: (feature: GeoJSONFeature) => {
-        us({
+        update({
           app: {
             clickedFeature: () => {
               return feature;
@@ -322,16 +333,16 @@ export const appStateMgmt = {
         });
       },
       updateSelectedFeatures: (features: Array<Feature>) => {
-        us({ app: { selectedFeatures: { type: 'FeatureCollection', features: features } } });
+        update({ app: { selectedFeatures: { type: 'FeatureCollection', features: features } } });
       },
       resetClickedFeature: () => {
-        us({ app: { clickedFeature: undefined } });
+        update({ app: { clickedFeature: undefined } });
       },
 
       //Groups
       initGroups: async () => {
         const result = await states()['app'].socket.serverInit(states());
-        us({
+        update({
           app: {
             groups: () => {
               return result;
@@ -346,14 +357,14 @@ export const appStateMgmt = {
         });
       },
       createGroup: async (name: string) => {
-        us({
+        update({
           app: {
             clearDrawing: { delete: true, id: states()['app'].latestDrawing.id },
           },
         });
         if (!states()['app'].selectedFeatures) return;
         const result = await states()['app'].socket.serverCreate(states(), name);
-        us({
+        update({
           app: {
             groups: () => {
               return result;
@@ -370,7 +381,7 @@ export const appStateMgmt = {
       updateGroup: async (index: number, name: string) => {
         const group = states()['app'].groups[index];
         const result = await states()['app'].socket.serverUpdate(states(), group.id, name);
-        us({
+        update({
           app: {
             groups: () => {
               return result;
@@ -386,7 +397,7 @@ export const appStateMgmt = {
       },
       deleteGroup: async (group: IGroup) => {
         const result = await states()['app'].socket.serverDelete(states(), group.id);
-        us({
+        update({
           app: {
             groups: () => {
               return result;
@@ -397,7 +408,7 @@ export const appStateMgmt = {
 
       // Profile
       updateProfile: (data: string) => {
-        us({
+        update({
           app: {
             profile: () => {
               return data;
@@ -406,7 +417,7 @@ export const appStateMgmt = {
         });
       },
       updateCallsign: (data: string) => {
-        us({
+        update({
           app: {
             callsign: () => {
               return data;
@@ -417,7 +428,7 @@ export const appStateMgmt = {
 
       // Chat
       openChat: (group: IGroup) => {
-        us({
+        update({
           app: {
             chat: () => {
               return group;
@@ -433,7 +444,7 @@ export const appStateMgmt = {
         states()['app'].socket.serverSend(states(), group, message);
       },
       setGroupEdit: (index: number) => {
-        us({
+        update({
           app: {
             editGroup: index,
           },
@@ -442,14 +453,14 @@ export const appStateMgmt = {
 
       // Layers/style
       switchStyle: (style: string) => {
-        us({
+        update({
           app: {
             mapStyle: style,
           },
         });
       },
       toggleLayer: (sourceIndex: number, layerIndex: number) => {
-        us({
+        update({
           app: {
             sources: (sources: Array<ISource>) => {
               // Toggle all layers of a source
@@ -469,21 +480,21 @@ export const appStateMgmt = {
         });
       },
       updateGridOptions: (gridCellSize: number, updateLocation: boolean) => {
-        us({
+        update({
           app: {
             gridOptions: { gridCellSize: gridCellSize, updateLocation: updateLocation, updateGrid: true },
           },
         });
       },
       updateGridLocation: (bbox: [number, number, number, number]) => {
-        us({
+        update({
           app: {
             gridOptions: { gridLocation: bbox },
           },
         });
       },
       updateGrid: (gridSource: FeatureCollection, gridLabelSource: FeatureCollection) => {
-        us({
+        update({
           app: {
             gridOptions: { updateGrid: false },
             sources: (sources: Array<ISource>) => {
@@ -530,7 +541,7 @@ export const appStateMgmt = {
                       showLayer: false,
                       type: { type: 'symbol' } as mapboxgl.AnyLayer,
                       layout: {
-                        'text-field': '{cellLabel}',
+                        'text-field': '${cellLabel}',
                         'text-allow-overlap': true,
                       } as any, // TODO FIX
                       paint: {
@@ -546,7 +557,7 @@ export const appStateMgmt = {
         });
       },
       createCustomLayer: (layerName: string, icon: string, checked: boolean, shareWith: string[]) => {
-        us({
+        update({
           app: {
             sources: (sources: Array<ISource>) => {
               const gridIndex = sources.findIndex((source: ISource) => {
@@ -579,7 +590,7 @@ export const appStateMgmt = {
         });
       },
       updateCustomLayers: (layerName: string, _icon: string, _checked: boolean, _shareWith: string[]) => {
-        us({
+        update({
           app: {
             customLayers: (layers: Array<[string, boolean]>) => {
               layers.push([layerName, false] as [string, boolean]);
@@ -596,7 +607,7 @@ export const appStateMgmt = {
         });
       },
       addDrawingsToLayer: (index: number) => {
-        us({
+        update({
           app: {
             sources: (sources: Array<ISource>) => {
               sources[index].source.features.push(states()['app'].latestDrawing as Feature);
@@ -610,10 +621,10 @@ export const appStateMgmt = {
         });
       },
       updateDrawings: (feature: Feature) => {
-        us({ app: { latestDrawing: feature } });
+        update({ app: { latestDrawing: feature } });
       },
       deleteLayer: (sourceIndex: number) => {
-        us({
+        update({
           app: {
             sources: (sources: Array<ISource>) => {
               sources.splice(sourceIndex, 1);
@@ -623,14 +634,14 @@ export const appStateMgmt = {
         });
       },
       setLayerEdit: (sourceIndex: number) => {
-        us({
+        update({
           app: {
             editLayer: sourceIndex,
           },
         });
       },
       toggleSatellite: () => {
-        us({
+        update({
           app: {
             showSatellite: !states()['app'].showSatellite,
           },
@@ -645,7 +656,7 @@ export const appStateMgmt = {
         hazard.context = 'CTXT20200101100000';
 
         states()['app'].socket.serverCHT(hazard);
-        us({
+        update({
           app: {
             clearDrawing: {
               delete: true,
@@ -707,7 +718,7 @@ export const appStateMgmt = {
 
       updateCHT: (chemicalIncident: IChemicalIncident) => {
         states()['app'].socket.serverCHT(chemicalIncident);
-        us({
+        update({
           app: {
             clearDrawing: {
               delete: true,
@@ -774,7 +785,7 @@ export const appStateMgmt = {
           states()['app'].latestDrawing
         )) as FeatureCollection;
 
-        us({
+        update({
           app: {
             sources: (sources: Array<ISource>) => {
               const index = sources.findIndex((source: ISource) => {
@@ -819,7 +830,11 @@ const app = {
   // Services that run everytime the state is updated (so after the action is done)
   services: [] as Array<(s: IAppModel) => Partial<IAppModel> | void>,
   // Effects run from state update until some condition is met (can cause infinite loop)
-  effects: (_update: UpdateStream, _actions: IActions) => [] as Array<(state: IAppModel) => Promise<void> | void>,
+  effects: (_update: UpdateStream, actions: IActions) => [
+    (state) => {
+      if (!state.app.layerStyles) actions.loadLayerStyles()
+    },
+  ] as Array<(state: IAppModel) => Promise<void> | void>,
 };
 
 const runServices = (startingState: IAppModel) =>

@@ -23,6 +23,8 @@ import {
 import M from 'materialize-css';
 import mapboxgl from 'mapbox-gl';
 import m from 'mithril';
+import { FeatureCollectionId } from '../models';
+import { uniqueId } from 'mithril-materialized';
 
 export class Socket {
   private socket: ioSocket;
@@ -434,45 +436,95 @@ export class Socket {
     });
     // These positions are received directly from the agent-smith simulator
     // These are therefore NOT assistance resources, but 'just' simEntities
-    /*this.socket.on('positions', (data: FeatureCollection) => {
-      if (!this.shouldUpdate()) {
-      } else {
-        us({
-          app: {
-            sources: (sources: Array<ISource>) => {
-              const index = sources.findIndex((source: ISource) => {
-                return source.sourceName === 'Positions';
-              });
-              if (index > -1) {
-                sources[index].source = data;
-              } else {
-                sources.push({
-                  id: 'testid1',
-                  source: data as FeatureCollection,
-                  sourceName: 'Positions',
-                  sourceCategory: SourceType.realtime,
-                  shared: false,
-                  layers: [
-                    {
-                      layerName: 'Firemen',
-                      showLayer: true,
-                      type: { type: 'symbol' } as mapboxgl.AnyLayer,
-                      layout: {
-                        'icon-image': 'fireman',
-                        'icon-size': 0.5,
-                        'icon-allow-overlap': true,
-                      },
-                      filter: ['all', ['in', 'type', 'man', 'firefighter']],
+    this.socket.on('geojson', (source: FeatureCollectionId) => {
+      if (!this.shouldUpdate()) return;
+      const { layerId: id = uniqueId(), layerName: sourceName = '' } = source;
+      console.log(source);
+      us({
+        app: {
+          sources: (sources: Array<ISource>) => {
+            const index = sources.findIndex((source: ISource) => source.id === id);
+            if (index > -1) {
+              sources[index].source = source;
+            } else {
+              sources.push({
+                id,
+                source,
+                sourceName,
+                sourceCategory: SourceType.realtime,
+                shared: false,
+                layers: [
+                  {
+                    layerName: 'areas',
+                    showLayer: true,
+                    type: { type: 'fill' } as mapboxgl.FillLayer,
+                    paint: {
+                      'fill-color': ['coalesce', ["get", "fill"], "#555555"],
+                      'fill-opacity': ['coalesce', ["get", "fill-opacity"], 0.6],
                     },
-                  ] as ILayer[],
-                } as ISource);
-              }
-              return sources;
-            },
+                    filter: ['==', '$type', 'Polygon']
+                  },
+                  {
+                    layerName: 'lines',
+                    showLayer: true,
+                    type: { type: 'line' } as mapboxgl.LineLayer,
+                    paint: {
+                      'line-color': ['coalesce', ["get", "stroke"], "#555555"],
+                      'line-width': ['coalesce', ["get", "stroke-width"], 2],
+                      'line-opacity': ['coalesce', ["get", "stroke-opacity"], 1],
+                    },
+                    // filter: ['==', '$type', 'Polygon']
+                  },
+                  // {
+                  //   layerName: 'points',
+                  //   showLayer: true,
+                  //   type: { type: 'circle' } as mapboxgl.CircleLayer,
+                  //   paint: {
+                  //     'circle-radius': 6,
+                  //     'circle-color': '#B42222'
+                  //   },
+                  //   filter: ['==', '$type', 'Point']
+                  // },
+                  {
+                    layerName: 'icons',
+                    showLayer: true,
+                    type: { type: 'symbol' } as mapboxgl.SymbolLayer,
+                    layout: {
+                      // 'icon-image': ['coalesce', ["get", "marker-symbol"], "pin"],
+                      // 'icon-size': ['coalesce', ["get", "marker-size"], .2], // small, medium or large
+                      // 'icon-color': ['coalesce', ["get", "marker-color"], "#7e7e7e"],
+                      'icon-image': [
+                        'coalesce',
+                        ['get', 'marker-symbol'],
+                        // ['image', ['concat', ['get', 'icon'], '_15']],
+                        'OTHER'
+                      ],
+                      'text-field': ['coalesce', ['get', 'title'], ""],
+                      'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                      'text-offset': [0, 0.6],
+                      'text-anchor': 'top'
+                    },
+                    filter: ['==', '$type', 'Point']
+                  },
+                  // {
+                  //   layerName: 'points',
+                  //   showLayer: true,
+                  //   type: { type: 'symbol' } as mapboxgl.AnyLayer,
+                  //   layout: {
+                  //     'icon-image': 'fireman',
+                  //     'icon-size': 0.5,
+                  //     'icon-allow-overlap': true,
+                  //   } as any,
+                  //   filter: ['all', ['in', 'type', 'man', 'firefighter']],
+                  // },
+                ] as ILayer[],
+              } as ISource);
+            }
+            return sources;
           },
-        });
-      }
-    });*/
+        },
+      });
+    });
     // CAP Alert
     this.socket.on('alert', (data: IAlert) => {
       const alertArea = (data.info as IInfo).area as IArea[];
@@ -588,12 +640,12 @@ export class Socket {
     this.socket.emit(
       'client-message',
       { id: group.id, callsign: s.app.callsign, message: message },
-      (_result: string) => {}
+      (_result: string) => { }
     );
   }
 
   serverCHT(chemicalIncident: Partial<IChemicalIncident>) {
-    this.socket.emit('client-cht', { hazard: chemicalIncident }, (_result: string) => {});
+    this.socket.emit('client-cht', { hazard: chemicalIncident }, (_result: string) => { });
   }
 
   serverPopulator(feature: Feature): Promise<FeatureCollection> {

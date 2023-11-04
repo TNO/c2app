@@ -5,9 +5,6 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { MeiosisComponent } from '../../services/meiosis';
 import * as MapUtils from './map-utils';
 import * as updateSourcesAndLayers from './updateSourcesAndLayers';
-import CompassControl from '@mapbox-controls/compass';
-import ZoomControl from '@mapbox-controls/zoom';
-import RulerControl from '@mapbox-controls/ruler';
 // https://github.com/korywka/mapbox-controls/tree/master/packages/tooltip
 // import TooltipControl from '@mapbox-controls/tooltip';
 
@@ -21,42 +18,42 @@ MapboxDraw.constants.classes.CONTROL_GROUP = 'maplibregl-ctrl-group';
 export const Map: MeiosisComponent = () => {
   let map: MaplibreMap;
   let draw: MapboxDraw;
-
+  console.table(process.env.VECTOR_TILE_SERVER === 'undefined')
   return {
     view: () => {
       return m('#mapboxMap.col.s12.l9.right');
     },
-    // Executes once on creation
     oncreate: ({ attrs: { state: appState, actions } }) => {
       // Create map and add controls
       map = new MaplibreMap({
         container: 'mapboxMap',
-        style: process.env.VECTOR_TILE_SERVER
+        style: process.env.VECTOR_TILE_SERVER && process.env.VECTOR_TILE_SERVER !== 'undefined'
           ? process.env.VECTOR_TILE_SERVER
           : {
-              version: 8,
-              sources: {
-                'brt-achtergrondkaart': {
-                  type: 'raster',
-                  tiles: ['https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png'],
-                  tileSize: 256,
-                  minzoom: 1,
-                  maxzoom: 19,
-                  attribution: 'Kaartgegevens: <a href="https://kadaster.nl">Kadaster</a>',
-                },
+            version: 8,
+            sources: {
+              'brt-achtergrondkaart': {
+                type: 'raster',
+                tiles: ['https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png'],
+                tileSize: 256,
+                minzoom: 1,
+                maxzoom: 19,
+                attribution: 'Kaartgegevens: <a href="https://kadaster.nl">Kadaster</a>',
               },
-              glyphs: 'https://api.pdok.nl/lv/bgt/ogc/v1_0/resources/fonts/{fontstack}/{range}.pbf',
-              layers: [
-                {
-                  id: 'standard-raster',
-                  type: 'raster',
-                  source: 'brt-achtergrondkaart',
-                },
-              ],
             },
+            glyphs: 'https://api.pdok.nl/lv/bgt/ogc/v1_0/resources/fonts/{fontstack}/{range}.pbf',
+            layers: [
+              {
+                id: 'standard-raster',
+                type: 'raster',
+                source: 'brt-achtergrondkaart',
+              },
+            ],
+          },
         center: [4.35, 51.911] as [number, number],
         zoom: 12,
       });
+      MapUtils.loadMissingImages(map);
       MapUtils.loadImages(map);
       MapUtils.updateGrid(appState, actions, map);
 
@@ -64,13 +61,6 @@ export const Map: MeiosisComponent = () => {
       draw = new MapboxDraw(MapUtils.drawConfig);
       map.addControl(new maplibre.NavigationControl(), 'top-left');
       map.addControl(draw as unknown as IControl, 'top-left');
-      map.addControl(new RulerControl() as unknown as IControl, 'top-left');
-      map.addControl(new CompassControl() as unknown as IControl, 'bottom-right');
-      map.addControl(new ZoomControl() as unknown as IControl, 'bottom-right');
-      // map.addControl(new TooltipControl() as unknown as IControl, 'bottom-right');
-      map.addControl(new RulerControl() as unknown as IControl, 'bottom-right');
-      map.on('ruler.on', () => console.log('Ruler activated'));
-      map.on('ruler.off', () => console.log('Ruler deactivated'));
 
       // Add map listeners
       map.on('load', () => {

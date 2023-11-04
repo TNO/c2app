@@ -16,10 +16,11 @@ p {
 
 #mapboxMap {
   position: absolute;
-  top: 67px;
-  width: calc(100% - 250px);
+  top: 0px;
+  width: 100vw;
+  /* width: calc(100% - 250px); */
   bottom: 0;
-  left: 250px;
+  left: 0;
 }
 
 #slide-out {

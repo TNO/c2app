@@ -151,7 +151,12 @@ export const loadMissingImages = (map: MaplibreMap) => {
   map.on('styleimagemissing', (e) => {
     console.log('Missing image:');
     console.log(e);
-    // const id = e.id; // id of the missing image
+    const id = e.id; // id of the missing image
+    const url = `${process.env.SERVER_URL}/layer_styles/${id}`;
+    map.loadImage(url, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+      if (error) throw error;
+      if (!map.hasImage(id)) map.addImage(id, image as ImageBitmap);
+    });
 
     // map.addImage(id, {width, height: width, data});
   });
@@ -373,7 +378,7 @@ const defaultLayerStyle = {
 
 export const featureCollectionToSource = (source: FeatureCollectionExt, styles: LayerStyle<any>[] = []) => {
   const { layerId: id = uniqueId(), layerName: sourceName = '', layerStyle = 'default' } = source;
-  const style = styles.filter(s => s.id === layerStyle).shift() || defaultLayerStyle;
+  const style = styles.filter(s => layerStyle.toUpperCase() === s.id.toUpperCase()).shift() || defaultLayerStyle;
   return {
     id,
     source,
@@ -383,43 +388,6 @@ export const featureCollectionToSource = (source: FeatureCollectionExt, styles: 
     layers: style.layers || [] as ILayer[],
   } as ISource;
 }
-
-// export const updateSourcesAndLayers = (appState: IAppModel, _actions: IActions, map: MaplibreMap) => {
-//   appState.app.sources.forEach((source: ISource) => {
-//     // Set source
-//     const sourceName = toSourceName(source);
-//     if (!map.getSource(sourceName)) {
-//       map.addSource(sourceName, {
-//         type: 'geojson',
-//         data: source.source,
-//       });
-//     } else {
-//       (map.getSource(sourceName) as GeoJSONSource).setData(source.source);
-//     }
-
-//     // Set Layers
-//     source.layers.forEach((layer: ILayer) => {
-//       const layerName = toLayerName(sourceName, layer);
-//       // TODO FIX
-//       if (!map.getLayer(layerName)) {
-//         map.addLayer({
-//           id: layerName,
-//           type: layer.type.type,
-//           source: sourceName,
-//           layout: layer.layout ? layer.layout : {},
-//           paint: layer.paint ? layer.paint : {},
-//           filter: layer.filter ? layer.filter : ['all'],
-//         });
-//         map.on('click', layerName, ({ features }) => displayInfoSidebar(features as GeoJSONFeature[], actions));
-//         map.on('mouseenter', layerName, () => (map.getCanvas().style.cursor = 'pointer'));
-//         map.on('mouseleave', layerName, () => (map.getCanvas().style.cursor = ''));
-//       }
-//       map.setLayoutProperty(layerName, 'visibility', layer.showLayer ? 'visible' : 'none');
-//       if (source.sourceCategory === SourceType.alert || source.sourceCategory === SourceType.plume)
-//         layer.paint && map.setPaintProperty(layerName, 'line-opacity', layer.paint['line-opacity']);
-//     });
-//   });
-// };
 
 export const updateGrid = (appState: IAppModel, actions: IActions, map: MaplibreMap) => {
   const gridSource = getGridSource(map, actions, appState);

@@ -3,6 +3,127 @@
   "name": "Taktische Zeichen",
   "iconPath": "tactical_signs",
   "type": "symbol",
+  "ui": [
+    {
+      "id": "title",
+      "label": "Titel",
+      "type": "text"
+    },
+    {
+      "id": "description",
+      "label": "Beschreibung",
+      "type": "textarea"
+    }
+  ],
+  "layers": [
+    {
+      "layerName": "areas",
+      "showLayer": true,
+      "type": {
+        "type": "fill"
+      },
+      "paint": {
+        "fill-color": [
+          "coalesce",
+          [
+            "get",
+            "fill"
+          ],
+          "#555555"
+        ],
+        "fill-opacity": [
+          "coalesce",
+          [
+            "get",
+            "fill-opacity"
+          ],
+          0.6
+        ]
+      },
+      "filter": [
+        "==",
+        "$type",
+        "Polygon"
+      ]
+    },
+    {
+      "layerName": "lines",
+      "showLayer": true,
+      "type": {
+        "type": "line"
+      },
+      "paint": {
+        "line-color": [
+          "coalesce",
+          [
+            "get",
+            "stroke"
+          ],
+          "#555555"
+        ],
+        "line-width": [
+          "coalesce",
+          [
+            "get",
+            "stroke-width"
+          ],
+          2
+        ],
+        "line-opacity": [
+          "coalesce",
+          [
+            "get",
+            "stroke-opacity"
+          ],
+          1
+        ]
+      }
+    },
+    {
+      "layerName": "icons",
+      "showLayer": true,
+      "type": {
+        "type": "symbol"
+      },
+      "layout": {
+        "icon-size": 0.1,
+        "icon-image": [
+          "coalesce",
+          [
+            "concat",
+            "tactical_signs/",
+            [
+              "get",
+              "marker-symbol"
+            ]
+          ],
+          "OTHER"
+        ],
+        "text-field": [
+          "coalesce",
+          [
+            "get",
+            "title"
+          ],
+          ""
+        ],
+        "text-font": [
+          "Open Sans Semibold",
+          "Arial Unicode MS Bold"
+        ],
+        "text-offset": [
+          0,
+          0.6
+        ],
+        "text-anchor": "top"
+      },
+      "filter": [
+        "==",
+        "$type",
+        "Point"
+      ]
+    }
+  ],
   "layout": {
     "icon-image": "symbol",
     "icon-anchor": "bottom",

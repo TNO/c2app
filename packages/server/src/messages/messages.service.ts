@@ -40,11 +40,11 @@ export class MessagesService {
   }
 
   clearAllCollections() {
-    this.db.removeCollection
     Object.keys(this.messageTopicStore).forEach(topic => {
-      console.log(`Removing DB collection ${topic}.`)
-      this.db.removeCollection(topic)
+      console.log(`Removing DB collection ${topic}.`);
+      this.db.removeCollection(topic);
     });
+    this.db.saveDatabase();
   }
 
   /** This action adds a new message, or updates an existing one if the message ID is found */

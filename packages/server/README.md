@@ -10,3 +10,7 @@ The server starts a simple node application, that:
 npm i
 npm start
 ```
+
+## Resetting the DB
+
+After sending a `standard_geojson` message, whose `layerId` equals `CLEAR_ALL_COLLECTIONS`, the DB is reset.

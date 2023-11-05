@@ -53,7 +53,7 @@ export class KafkaService {
     return new Promise(async (resolve) => {
       log.info('Init KafkaService');
       this.adapter = new TestBedAdapter({
-        groupId: process.env.GROUP_ID || `safr_${Math.round(Math.random() * 1000000)}`,
+        groupId: process.env.GROUP_ID || `safr_${Math.round(Math.random() * 1000)}`,
         kafkaHost: process.env.KAFKA_HOST || 'localhost:3501',
         schemaRegistry: process.env.SCHEMA_REGISTRY || 'localhost:3502',
         consume: process.env.CONSUME
@@ -112,12 +112,14 @@ export class KafkaService {
       switch (topic) {
         case geojsonLayer:
         case SimEntityFeatureCollectionTopic:
-          if (value && value.hasOwnProperty('layerId') && value['layerId'] === 'CLEAR_ALL_COLLECTIONS')
+          if (value && value.hasOwnProperty('layerId') && value['layerId'] === 'CLEAR_ALL_COLLECTIONS') {
             this.messagesService.clearAllCollections();
-          const geojson = KafkaService.normalizeGeoJSON(value as FeatureCollection);
-          console.log(JSON.stringify(geojson))
-          this.socket.server.emit('geojson', geojson);
-          this.messagesService.create('geojson', geojson);
+          } else {
+            const geojson = KafkaService.normalizeGeoJSON(value as FeatureCollection);
+            console.log(JSON.stringify(geojson))
+            this.socket.server.emit('geojson', geojson);
+            this.messagesService.create('geojson', geojson);
+          }
           break;
         case capMessage:
           const alert = value as IAlert;

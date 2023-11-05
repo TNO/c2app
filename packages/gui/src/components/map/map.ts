@@ -50,8 +50,8 @@ export const Map: MeiosisComponent = () => {
               },
             ],
           },
-        center: [4.35, 51.911] as [number, number],
-        zoom: 12,
+        center: actions.getLonLat(),
+        zoom: actions.getZoomLevel(),
       });
       MapUtils.loadMissingImages(map);
       MapUtils.loadImages(map);
@@ -71,6 +71,9 @@ export const Map: MeiosisComponent = () => {
           updateSourcesAndLayers.updateSourcesAndLayers(appState, actions, map);
           MapUtils.updateSatellite(appState, map);
         });
+
+        map.on('zoomend', () => MapUtils.setZoomLevel(map, actions));
+        map.on('moveend', () => MapUtils.setLonLat(map, actions));
       });
     },
     // Executes on every redraw

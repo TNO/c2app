@@ -47,6 +47,16 @@ export const handleDrawEvent = (map: MaplibreMap, features: GeoJSONFeature[], ac
   instance.open();
 };
 
+export const setZoomLevel = (map: MaplibreMap, actions: IActions) => {
+  const zoom = map.getZoom();
+  actions.setZoomLevel(zoom);
+}
+
+export const setLonLat = (map: MaplibreMap, actions: IActions) => {
+  const lonlat = map.getCenter();
+  actions.setLonLat([lonlat.lng, lonlat.lat]);
+}
+
 const getFeaturesInPolygon = (map: MaplibreMap, features: Feature[], actions: IActions) => {
   let layers: Array<string> = [];
 

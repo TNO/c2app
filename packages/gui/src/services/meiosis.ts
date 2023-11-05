@@ -23,6 +23,9 @@ import { Pages } from '../models';
 import { GeoJSONFeature, LayerSpecification, LinePaintProps, SymbolLayoutProps } from 'maplibre-gl';
 import { layerStylesSvc } from './layer_styles';
 
+const ZOOM_LEVEL = "SAFR_ZOOM_LEVEL";
+const LON_LAT = "SAFR_LON_LAT";
+
 export interface ILayer {
   layerName: string;
   showLayer: boolean;
@@ -140,6 +143,10 @@ export interface IActions {
   sendChat: (group: IGroup, message: string) => void;
 
   // Layers/styles
+  setZoomLevel: (zoomLevel: number) => void,
+  getZoomLevel: () => number,
+  setLonLat: (lonlat: [lon: number, lat: number]) => void,
+  getLonLat: () => [lon: number, lat: number],
   switchStyle: (style: string) => void;
   toggleLayer: (sourceIndex: number, layerIndex: number) => void;
   updateGridLocation: (bbox: [number, number, number, number]) => void;
@@ -452,6 +459,10 @@ export const appStateMgmt = {
       },
 
       // Layers/style
+      setZoomLevel: (zoomLevel: number) => { localStorage.setItem(ZOOM_LEVEL, zoomLevel.toString()) },
+      getZoomLevel: () => +(localStorage.getItem(ZOOM_LEVEL) || 4),
+      setLonLat: (lonlat: [lon: number, lat: number]) => { localStorage.setItem(LON_LAT, JSON.stringify(lonlat)) },
+      getLonLat: () => JSON.parse(localStorage.getItem(LON_LAT) || "[5, 53]") as [lon: number, lat: number],
       switchStyle: (style: string) => {
         update({
           app: {

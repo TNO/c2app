@@ -5,7 +5,7 @@ import { Point, Feature, Polygon, FeatureCollection, Geometry } from 'geojson';
 import { IActions, IAppModel, ILayer, ISource, SourceType } from '../../services/meiosis';
 import SquareGrid from '@turf/square-grid';
 import polylabel from 'polylabel';
-import { GeoJSONSource, GeoJSONFeature, Map as MaplibreMap, Style } from 'maplibre-gl';
+import { GeoJSONSource, GeoJSONFeature, Map as MaplibreMap, Style, LayerSpecification } from 'maplibre-gl';
 
 // ICONS
 import car from '../../assets/Operations/Car.png';
@@ -25,13 +25,17 @@ import chemical from '../../assets/Incidents/Chemical.png';
 import air from '../../assets/Operations/air.png';
 import ground from '../../assets/Operations/ground.png';
 import first_responder from '../../assets/Operations/Medical services.png';
+import { FeatureCollectionExt } from '../../models';
+import { uniqueId } from 'mithril-materialized';
+import { LayerStyle } from 'c2app-models-utils';
 
 export const drawConfig = {
   displayControlsDefault: false,
   controls: {
     polygon: true,
-    trash: true,
     point: true,
+    line_string: true,
+    trash: true,
   },
 };
 
@@ -255,10 +259,17 @@ export const switchBasemap = async (map: MaplibreMap, styleID: string) => {
   loadImages(map);
 };
 
+/** Convert a source to a unique name */
+export const toSourceName = (source: ISource) => `${source.sourceName}.${source.id}`.toLowerCase().replace(/\s/g, '_');
+
+/** Convert a layer to a unique name */
+export const toLayerName = (sourceName: string, layer: ILayer) => `${sourceName}.${layer.layerName}`.toLowerCase().replace(/\s/g, '_');
+
 export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, map: MaplibreMap) => {
-  appState.app.sources.forEach((source: ISource) => {
+  console.log('UPDATING SOURCES AND LAYERS');
+  appState.app.sources.filter(s => s.source.features?.length > 0).forEach((source: ISource) => {
     // Set source
-    const sourceName = source.sourceName.concat(source.id);
+    const sourceName = toSourceName(source);
     if (!map.getSource(sourceName)) {
       map.addSource(sourceName, {
         type: 'geojson',
@@ -269,28 +280,146 @@ export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, m
     }
 
     // Set Layers
-    source.layers.forEach((_layer: ILayer) => {
-      // const layerName = sourceName.concat(layer.layerName);
-      // TODO FIX
-      // if (!map.getLayer(layerName)) {
-      //   map.addLayer({
-      //     id: layerName,
-      //     type: layer.type.type,
-      //     source: sourceName,
-      //     layout: layer.layout ? layer.layout : {},
-      //     paint: layer.paint ? layer.paint : {},
-      //     filter: layer.filter ? layer.filter : ['all'],
-      //   });
-      //   map.on('click', layerName, ({ features }) => displayInfoSidebar(features as GeoJSONFeature[], actions));
-      //   map.on('mouseenter', layerName, () => (map.getCanvas().style.cursor = 'pointer'));
-      //   map.on('mouseleave', layerName, () => (map.getCanvas().style.cursor = ''));
-      // }
-      // map.setLayoutProperty(layerName, 'visibility', layer.showLayer ? 'visible' : 'none');
-      // if (source.sourceCategory === SourceType.alert || source.sourceCategory === SourceType.plume)
-      //   layer.paint && map.setPaintProperty(layerName, 'line-opacity', layer.paint['line-opacity']);
+    console.log(source)
+    source.layers.filter(l => typeof l.showLayer === 'undefined' || l.showLayer === true).forEach((layer: ILayer) => {
+      const layerName = toLayerName(sourceName, layer);
+
+      if (!map.getLayer(layerName)) {
+        const mapLayer = { id: layerName, ...layer, type: layer.type.type, source: sourceName } as LayerSpecification;
+        console.log(mapLayer)
+        map.addLayer(mapLayer);
+        map.on('click', layerName, ({ features }) => displayInfoSidebar(features as GeoJSONFeature[], actions));
+        map.on('mouseenter', layerName, () => (map.getCanvas().style.cursor = 'pointer'));
+        map.on('mouseleave', layerName, () => (map.getCanvas().style.cursor = ''));
+      }
+      map.setLayoutProperty(layerName, 'visibility', layer.showLayer ? 'visible' : 'none');
+      if (source.sourceCategory === SourceType.alert || source.sourceCategory === SourceType.plume)
+        layer.paint && map.setPaintProperty(layerName, 'line-opacity', layer.paint['line-opacity']);
     });
   });
-};
+}
+
+const defaultLayerStyle = {
+  id: 'default',
+  name: 'Default layer style',
+  iconPath: `${process.env.SERVER_URL}/layer_styles/maki`,
+  layers: [
+    {
+      layerName: 'areas',
+      showLayer: true,
+      type: { type: 'fill' } as mapboxgl.FillLayer,
+      paint: {
+        'fill-color': ['coalesce', ["get", "fill"], "#555555"],
+        'fill-opacity': ['coalesce', ["get", "fill-opacity"], 0.6],
+      },
+      filter: ['==', '$type', 'Polygon']
+    },
+    {
+      layerName: 'lines',
+      showLayer: true,
+      type: { type: 'line' } as mapboxgl.LineLayer,
+      paint: {
+        'line-color': ['coalesce', ["get", "stroke"], "#555555"],
+        'line-width': ['coalesce', ["get", "stroke-width"], 2],
+        'line-opacity': ['coalesce', ["get", "stroke-opacity"], 1],
+      },
+      // filter: ['==', '$type', 'Polygon']
+    },
+    // {
+    //   layerName: 'points',
+    //   showLayer: true,
+    //   type: { type: 'circle' } as mapboxgl.CircleLayer,
+    //   paint: {
+    //     'circle-radius': 6,
+    //     'circle-color': '#B42222'
+    //   },
+    //   filter: ['==', '$type', 'Point']
+    // },
+    {
+      layerName: 'icons',
+      showLayer: true,
+      type: { type: 'symbol' } as mapboxgl.SymbolLayer,
+      layout: {
+        // 'icon-image': ['coalesce', ["get", "marker-symbol"], "pin"],
+        // 'icon-size': ['coalesce', ["get", "marker-size"], .2], // small, medium or large
+        // 'icon-color': ['coalesce', ["get", "marker-color"], "#7e7e7e"],
+        'icon-image': [
+          'coalesce',
+          ['get', 'marker-symbol'],
+          // ['image', ['concat', ['get', 'icon'], '_15']],
+          'OTHER'
+        ],
+        'text-field': ['coalesce', ['get', 'title'], ""],
+        'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+        'text-offset': [0, 0.6],
+        'text-anchor': 'top'
+      },
+      filter: ['==', '$type', 'Point']
+    },
+    // {
+    //   layerName: 'points',
+    //   showLayer: true,
+    //   type: { type: 'symbol' } as mapboxgl.AnyLayer,
+    //   layout: {
+    //     'icon-image': 'fireman',
+    //     'icon-size': 0.5,
+    //     'icon-allow-overlap': true,
+    //   } as any,
+    //   filter: ['all', ['in', 'type', 'man', 'firefighter']],
+    // },
+  ] as ILayer[],
+  icons: [] as Array<[name: string, src: string]>,
+} as LayerStyle<any>;
+
+export const featureCollectionToSource = (source: FeatureCollectionExt, styles: LayerStyle<any>[] = []) => {
+  const { layerId: id = uniqueId(), layerName: sourceName = '', layerStyle = 'default' } = source;
+  const style = styles.filter(s => s.id === layerStyle).shift() || defaultLayerStyle;
+  return {
+    id,
+    source,
+    sourceName,
+    sourceCategory: SourceType.realtime,
+    shared: false,
+    layers: style.layers || [] as ILayer[],
+  } as ISource;
+}
+
+// export const updateSourcesAndLayers = (appState: IAppModel, _actions: IActions, map: MaplibreMap) => {
+//   appState.app.sources.forEach((source: ISource) => {
+//     // Set source
+//     const sourceName = toSourceName(source);
+//     if (!map.getSource(sourceName)) {
+//       map.addSource(sourceName, {
+//         type: 'geojson',
+//         data: source.source,
+//       });
+//     } else {
+//       (map.getSource(sourceName) as GeoJSONSource).setData(source.source);
+//     }
+
+//     // Set Layers
+//     source.layers.forEach((layer: ILayer) => {
+//       const layerName = toLayerName(sourceName, layer);
+//       // TODO FIX
+//       if (!map.getLayer(layerName)) {
+//         map.addLayer({
+//           id: layerName,
+//           type: layer.type.type,
+//           source: sourceName,
+//           layout: layer.layout ? layer.layout : {},
+//           paint: layer.paint ? layer.paint : {},
+//           filter: layer.filter ? layer.filter : ['all'],
+//         });
+//         map.on('click', layerName, ({ features }) => displayInfoSidebar(features as GeoJSONFeature[], actions));
+//         map.on('mouseenter', layerName, () => (map.getCanvas().style.cursor = 'pointer'));
+//         map.on('mouseleave', layerName, () => (map.getCanvas().style.cursor = ''));
+//       }
+//       map.setLayoutProperty(layerName, 'visibility', layer.showLayer ? 'visible' : 'none');
+//       if (source.sourceCategory === SourceType.alert || source.sourceCategory === SourceType.plume)
+//         layer.paint && map.setPaintProperty(layerName, 'line-opacity', layer.paint['line-opacity']);
+//     });
+//   });
+// };
 
 export const updateGrid = (appState: IAppModel, actions: IActions, map: MaplibreMap) => {
   const gridSource = getGridSource(map, actions, appState);

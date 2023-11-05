@@ -19,23 +19,24 @@ import {
   IInfo,
   IArea,
   ResourceSubtype,
+  LayerStyle,
 } from 'c2app-models-utils';
 import M from 'materialize-css';
 import mapboxgl from 'mapbox-gl';
 import m from 'mithril';
-import { FeatureCollectionId } from '../models';
+import { FeatureCollectionExt } from '../models';
 import { uniqueId } from 'mithril-materialized';
+import { featureCollectionToSource } from '../components/map/map-utils';
 
 export class Socket {
   private socket: ioSocket;
   private resources = {} as { [id: string]: IAssistanceResource };
   private sensors = {} as { [id: string]: ISensor };
+  private layerStyles = [] as LayerStyle<Record<string, any>>[];
 
   constructor(us: UpdateStream) {
-    // @ts-ignore
     console.table({ url: process.env.SERVER_URL, path: process.env.SERVER_PATH });
     this.socket = io(process.env.SERVER_URL as string, {
-      // @ts-ignore
       path: process.env.SERVER_PATH as string,
     });
     // ASSISTANCE context
@@ -436,9 +437,9 @@ export class Socket {
     });
     // These positions are received directly from the agent-smith simulator
     // These are therefore NOT assistance resources, but 'just' simEntities
-    this.socket.on('geojson', (source: FeatureCollectionId) => {
-      if (!this.shouldUpdate()) return;
-      const { layerId: id = uniqueId(), layerName: sourceName = '' } = source;
+    this.socket.on('geojson', (source: FeatureCollectionExt) => {
+      // if (!this.shouldUpdate()) return;
+      const { layerId: id = uniqueId() } = source;
       console.log(source);
       us({
         app: {
@@ -447,78 +448,79 @@ export class Socket {
             if (index > -1) {
               sources[index].source = source;
             } else {
-              sources.push({
-                id,
-                source,
-                sourceName,
-                sourceCategory: SourceType.realtime,
-                shared: false,
-                layers: [
-                  {
-                    layerName: 'areas',
-                    showLayer: true,
-                    type: { type: 'fill' } as mapboxgl.FillLayer,
-                    paint: {
-                      'fill-color': ['coalesce', ["get", "fill"], "#555555"],
-                      'fill-opacity': ['coalesce', ["get", "fill-opacity"], 0.6],
-                    },
-                    filter: ['==', '$type', 'Polygon']
-                  },
-                  {
-                    layerName: 'lines',
-                    showLayer: true,
-                    type: { type: 'line' } as mapboxgl.LineLayer,
-                    paint: {
-                      'line-color': ['coalesce', ["get", "stroke"], "#555555"],
-                      'line-width': ['coalesce', ["get", "stroke-width"], 2],
-                      'line-opacity': ['coalesce', ["get", "stroke-opacity"], 1],
-                    },
-                    // filter: ['==', '$type', 'Polygon']
-                  },
-                  // {
-                  //   layerName: 'points',
-                  //   showLayer: true,
-                  //   type: { type: 'circle' } as mapboxgl.CircleLayer,
-                  //   paint: {
-                  //     'circle-radius': 6,
-                  //     'circle-color': '#B42222'
-                  //   },
-                  //   filter: ['==', '$type', 'Point']
-                  // },
-                  {
-                    layerName: 'icons',
-                    showLayer: true,
-                    type: { type: 'symbol' } as mapboxgl.SymbolLayer,
-                    layout: {
-                      // 'icon-image': ['coalesce', ["get", "marker-symbol"], "pin"],
-                      // 'icon-size': ['coalesce', ["get", "marker-size"], .2], // small, medium or large
-                      // 'icon-color': ['coalesce', ["get", "marker-color"], "#7e7e7e"],
-                      'icon-image': [
-                        'coalesce',
-                        ['get', 'marker-symbol'],
-                        // ['image', ['concat', ['get', 'icon'], '_15']],
-                        'OTHER'
-                      ],
-                      'text-field': ['coalesce', ['get', 'title'], ""],
-                      'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                      'text-offset': [0, 0.6],
-                      'text-anchor': 'top'
-                    },
-                    filter: ['==', '$type', 'Point']
-                  },
-                  // {
-                  //   layerName: 'points',
-                  //   showLayer: true,
-                  //   type: { type: 'symbol' } as mapboxgl.AnyLayer,
-                  //   layout: {
-                  //     'icon-image': 'fireman',
-                  //     'icon-size': 0.5,
-                  //     'icon-allow-overlap': true,
-                  //   } as any,
-                  //   filter: ['all', ['in', 'type', 'man', 'firefighter']],
-                  // },
-                ] as ILayer[],
-              } as ISource);
+              sources.push(featureCollectionToSource(source, this.layerStyles))
+              // sources.push({
+              //   id,
+              //   source,
+              //   sourceName,
+              //   sourceCategory: SourceType.realtime,
+              //   shared: false,
+              //   layers: [
+              //     {
+              //       layerName: 'areas',
+              //       showLayer: true,
+              //       type: { type: 'fill' } as mapboxgl.FillLayer,
+              //       paint: {
+              //         'fill-color': ['coalesce', ["get", "fill"], "#555555"],
+              //         'fill-opacity': ['coalesce', ["get", "fill-opacity"], 0.6],
+              //       },
+              //       filter: ['==', '$type', 'Polygon']
+              //     },
+              //     {
+              //       layerName: 'lines',
+              //       showLayer: true,
+              //       type: { type: 'line' } as mapboxgl.LineLayer,
+              //       paint: {
+              //         'line-color': ['coalesce', ["get", "stroke"], "#555555"],
+              //         'line-width': ['coalesce', ["get", "stroke-width"], 2],
+              //         'line-opacity': ['coalesce', ["get", "stroke-opacity"], 1],
+              //       },
+              //       // filter: ['==', '$type', 'Polygon']
+              //     },
+              //     // {
+              //     //   layerName: 'points',
+              //     //   showLayer: true,
+              //     //   type: { type: 'circle' } as mapboxgl.CircleLayer,
+              //     //   paint: {
+              //     //     'circle-radius': 6,
+              //     //     'circle-color': '#B42222'
+              //     //   },
+              //     //   filter: ['==', '$type', 'Point']
+              //     // },
+              //     {
+              //       layerName: 'icons',
+              //       showLayer: true,
+              //       type: { type: 'symbol' } as mapboxgl.SymbolLayer,
+              //       layout: {
+              //         // 'icon-image': ['coalesce', ["get", "marker-symbol"], "pin"],
+              //         // 'icon-size': ['coalesce', ["get", "marker-size"], .2], // small, medium or large
+              //         // 'icon-color': ['coalesce', ["get", "marker-color"], "#7e7e7e"],
+              //         'icon-image': [
+              //           'coalesce',
+              //           ['get', 'marker-symbol'],
+              //           // ['image', ['concat', ['get', 'icon'], '_15']],
+              //           'OTHER'
+              //         ],
+              //         'text-field': ['coalesce', ['get', 'title'], ""],
+              //         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+              //         'text-offset': [0, 0.6],
+              //         'text-anchor': 'top'
+              //       },
+              //       filter: ['==', '$type', 'Point']
+              //     },
+              //     // {
+              //     //   layerName: 'points',
+              //     //   showLayer: true,
+              //     //   type: { type: 'symbol' } as mapboxgl.AnyLayer,
+              //     //   layout: {
+              //     //     'icon-image': 'fireman',
+              //     //     'icon-size': 0.5,
+              //     //     'icon-allow-overlap': true,
+              //     //   } as any,
+              //     //   filter: ['all', ['in', 'type', 'man', 'firefighter']],
+              //     // },
+              //   ] as ILayer[],
+              // } as ISource);
             }
             return sources;
           },
@@ -598,6 +600,10 @@ export class Socket {
       });
       M.toast({ html: 'New Alert' });
     });
+  }
+
+  setLayerStyles(layerStyles: LayerStyle<Record<string, any>>[]) {
+    this.layerStyles = layerStyles;
   }
 
   serverInit(s: IAppModel): Promise<Array<IGroup>> {

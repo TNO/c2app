@@ -4,7 +4,6 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 // @ts-ignore
 import { MeiosisComponent } from '../../services/meiosis';
 import * as MapUtils from './map-utils';
-import * as updateSourcesAndLayers from './updateSourcesAndLayers';
 // https://github.com/korywka/mapbox-controls/tree/master/packages/tooltip
 // import TooltipControl from '@mapbox-controls/tooltip';
 
@@ -55,7 +54,7 @@ export const Map: MeiosisComponent = () => {
       });
       MapUtils.loadMissingImages(map);
       MapUtils.loadImages(map);
-      MapUtils.updateGrid(appState, actions, map);
+      // MapUtils.updateGrid(appState, actions, map);
 
       // Add draw controls
       draw = new MapboxDraw(MapUtils.drawConfig);
@@ -63,17 +62,19 @@ export const Map: MeiosisComponent = () => {
       map.addControl(draw as unknown as IControl, 'top-left');
 
       // Add map listeners
-      map.on('load', () => {
+      map.on('load', async () => {
         map.on('draw.create', ({ features }) => MapUtils.handleDrawEvent(map, features, actions));
         map.on('draw.update', ({ features }) => MapUtils.handleDrawEvent(map, features, actions));
 
-        map.once('styledata', () => {
-          updateSourcesAndLayers.updateSourcesAndLayers(appState, actions, map);
-          MapUtils.updateSatellite(appState, map);
-        });
-
         map.on('zoomend', () => MapUtils.setZoomLevel(map, actions));
         map.on('moveend', () => MapUtils.setLonLat(map, actions));
+
+        await actions.loadGeoJSON();
+
+        map.once('styledata', () => {
+          MapUtils.updateSourcesAndLayers(appState, actions, map);
+          MapUtils.updateSatellite(appState, map);
+        });
       });
     },
     // Executes on every redraw
@@ -95,7 +96,7 @@ export const Map: MeiosisComponent = () => {
       //   MapUtils.switchBasemap(map, appState.app.mapStyle).catch();
       // }
 
-      updateSourcesAndLayers.updateSourcesAndLayers(appState, actions, map);
+      MapUtils.updateSourcesAndLayers(appState, actions, map);
       MapUtils.updateSatellite(appState, map);
     },
   };

@@ -19,9 +19,11 @@ import {
 // @ts-ignore
 import ch from '../ch.json';
 import { routingSvc } from './routing-service';
-import { Pages } from '../models';
+import { FeatureCollectionExt, Pages } from '../models';
 import { GeoJSONFeature, LayerSpecification, LinePaintProps, SymbolLayoutProps } from 'maplibre-gl';
 import { layerStylesSvc } from './layer_styles';
+import { restServiceFactory } from './rest-service';
+import { featureCollectionToSource } from '../components/map/map-utils';
 
 const ZOOM_LEVEL = "SAFR_ZOOM_LEVEL";
 const LON_LAT = "SAFR_LON_LAT";
@@ -115,7 +117,6 @@ export interface IActions {
   ) => void;
 
   // Core
-  loadLayerStyles: () => Promise<void>;
   drawingCleared: () => void;
   createPOI: () => void;
 
@@ -143,6 +144,8 @@ export interface IActions {
   sendChat: (group: IGroup, message: string) => void;
 
   // Layers/styles
+  loadGeoJSON: () => Promise<void>,
+  // loadLayerStyles: () => Promise<void>;
   setZoomLevel: (zoomLevel: number) => void,
   getZoomLevel: () => number,
   setLonLat: (lonlat: [lon: number, lat: number]) => void,
@@ -169,6 +172,8 @@ export interface IActions {
   createPopulatorRequest: () => void;
 }
 
+const geojsonSvc = restServiceFactory<FeatureCollectionExt>('messages/geojson');
+
 export type ModelUpdateFunction = Partial<IAppModel> | ((model: Partial<IAppModel>) => Partial<IAppModel>);
 export type UpdateStream = Stream<Partial<ModelUpdateFunction>>;
 const update = Stream<ModelUpdateFunction>();
@@ -180,7 +185,7 @@ export type MeiosisComponent<T extends { [key: string]: any } = {}> = FactoryCom
 }>;
 
 /** Application state */
-export const appStateMgmt = {
+export const appState = {
   initial: {
     app: {
       // Core
@@ -239,12 +244,27 @@ export const appStateMgmt = {
       },
 
       // Core
-      loadLayerStyles: async () => {
-        const layerStyles = await layerStylesSvc.loadStyles();
-        if (!layerStyles) return;
-        console.log(layerStyles);
-        update({ app: { layerStyles } })
+      loadGeoJSON: async () => {
+        console.log('LOADING GEOJSON')
+        const layerStyles = await layerStylesSvc.loadStyles() || [];
+        const { socket } = states().app;
+        socket.setLayerStyles(layerStyles);
+        const sources = (await geojsonSvc.loadList()).map(source => featureCollectionToSource(source, layerStyles));
+        update({
+          app: {
+            layerStyles: () => layerStyles,
+            sources: () => sources,
+          }
+        })
       },
+      // loadLayerStyles: async () => {
+      //   const layerStyles = await layerStylesSvc.loadStyles();
+      //   if (!layerStyles) return;
+      //   console.log(layerStyles);
+      //   const { socket } = states().app;
+      //   socket.setLayerStyles(layerStyles);
+      //   update({ app: { layerStyles } })
+      // },
       drawingCleared: () => {
         update({
           app: {
@@ -834,17 +854,17 @@ export const appStateMgmt = {
 
 const app = {
   // Initial state of the appState
-  initial: Object.assign({}, appStateMgmt.initial) as IAppModel,
+  initial: Object.assign({}, appState.initial) as IAppModel,
   // Actions that can be called to update the state
   actions: (us: UpdateStream, states: Stream<IAppModel>) =>
-    Object.assign({}, appStateMgmt.actions(us, states)) as IActions,
+    Object.assign({}, appState.actions(us, states)) as IActions,
   // Services that run everytime the state is updated (so after the action is done)
   services: [] as Array<(s: IAppModel) => Partial<IAppModel> | void>,
   // Effects run from state update until some condition is met (can cause infinite loop)
-  effects: (_update: UpdateStream, actions: IActions) => [
-    (state) => {
-      if (!state.app.layerStyles) actions.loadLayerStyles()
-    },
+  effects: (_update: UpdateStream, _actions: IActions) => [
+    // (state) => {
+    //   if (!state.app.layerStyles) actions.loadGeoJSON()
+    // },
   ] as Array<(state: IAppModel) => Promise<void> | void>,
 };
 

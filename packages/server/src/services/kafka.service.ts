@@ -53,7 +53,7 @@ export class KafkaService {
     return new Promise(async (resolve) => {
       log.info('Init KafkaService');
       this.adapter = new TestBedAdapter({
-        groupId: process.env.GROUP_ID || 'c2app-server',
+        groupId: process.env.GROUP_ID || `safr_${Math.round(Math.random() * 1000000)}`,
         kafkaHost: process.env.KAFKA_HOST || 'localhost:3501',
         schemaRegistry: process.env.SCHEMA_REGISTRY || 'localhost:3502',
         consume: process.env.CONSUME
@@ -112,14 +112,17 @@ export class KafkaService {
       switch (topic) {
         case geojsonLayer:
         case SimEntityFeatureCollectionTopic:
+          if (value && value.hasOwnProperty('layerId') && value['layerId'] === 'CLEAR_ALL_COLLECTIONS')
+            this.messagesService.clearAllCollections();
           const geojson = KafkaService.normalizeGeoJSON(value as FeatureCollection);
           console.log(JSON.stringify(geojson))
           this.socket.server.emit('geojson', geojson);
           this.messagesService.create('geojson', geojson);
           break;
         case capMessage:
-          this.socket.server.emit('alert', value as IAlert);
-          this.messagesService.create('alerts', value);
+          const alert = value as IAlert;
+          this.socket.server.emit('alert', alert);
+          this.messagesService.create('alerts', alert);
           break;
         case contextTopic:
           const context = KafkaService.prepareContext(value as IContext);
@@ -168,6 +171,7 @@ export class KafkaService {
   }
 
   private static normalizeGeoJSON(collection: FeatureCollection) {
+    (collection as any).id = (collection as any).id || (collection as any).layerId;
     for (const feature of collection.features) {
       feature.geometry = Object.entries(feature.geometry).map(([_key, value]) => value).shift();
       feature.properties = Object.entries(feature.properties).reduce((acc, [key, value]) => {

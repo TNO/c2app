@@ -39,14 +39,33 @@ export class MessagesService {
     } as Partial<LokiConfigOptions>);
   }
 
+  clearAllCollections() {
+    this.db.removeCollection
+    Object.keys(this.messageTopicStore).forEach(topic => {
+      console.log(`Removing DB collection ${topic}.`)
+      this.db.removeCollection(topic)
+    });
+  }
+
+  /** This action adds a new message, or updates an existing one if the message ID is found */
   create(topic: string, message: CreateMessageDto) {
     if (!this.messageTopicStore.hasOwnProperty(topic)) {
       this.messageTopicStore[topic] = this.db.addCollection(topic);
     }
-    return this.messageTopicStore[topic].insert(message);
-    // return 'This action adds a new message';
+    const collection = this.messageTopicStore[topic];
+    const { id } = message as any;
+    if (id) {
+      const found = collection.findOne({ id });
+      if (found) {
+        const result = collection.update({ ...found, ...message });
+        console.log(result);
+        return result;
+      }
+    }
+    return collection.insert(message);
   }
 
+  /** Returns all messages, optionally filtered by the query */
   findAll(topic: string, query?: string) {
     if (!this.messageTopicStore.hasOwnProperty(topic)) {
       return [];
@@ -56,7 +75,6 @@ export class MessagesService {
       ? (JSON.parse(query) as { [prop: string]: string | number | { [ops: string]: string | number } })
       : undefined;
     return q ? collection.chain().find(q).sort(sortByDateDesc).data() : collection.chain().sort(sortByDateDesc).data();
-    // return `This action returns all messages`;
   }
 
   findOne(topic: string, query: string | number | { [key: string]: any }): LokiObj | false {

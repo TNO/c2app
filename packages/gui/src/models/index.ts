@@ -1,8 +1,9 @@
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
 export * from './page';
 
-export interface FeatureCollectionId<G extends Geometry | null = Geometry, P = GeoJsonProperties> extends FeatureCollection<G, P> {
-  /** Should be the same ID as the inject.id */
+/** Extended feature collection, with several additional properties */
+export interface FeatureCollectionExt<G extends Geometry | null = Geometry, P = GeoJsonProperties> extends FeatureCollection<G, P> {
+  /** Unique ID */
   id: string;
   /** Identifier of the map layer: layers with identical ID are overwritten */
   layerId?: string;

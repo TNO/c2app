@@ -6,10 +6,9 @@ export type LayerStyle<T extends Record<string, any>> = {
   /** Folder for icons */
   iconPath: string;
   /** Available icons, consisting of a friendly name and a relative path, e.g. full path is iconPath/src */
-  icons: [name: string, src: string];
-  /** Map layer type */
-  type: string;
-  /** Map layer layout */
-  layout?: Record<string, any>;
+  icons: Array<[name: string, src: string]>;
+  /** Map layers */
+  layer?: Record<string, any>[];
+  /** GUI form */
   ui?: UIForm<T>;
 }

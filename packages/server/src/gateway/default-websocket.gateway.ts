@@ -1,3 +1,4 @@
+import { Inject, Injectable } from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -22,6 +23,7 @@ import {
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 
+@Injectable()
 @WebSocketGateway({ cors: { origin: true } })
 export class DefaultWebSocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
@@ -31,7 +33,9 @@ export class DefaultWebSocketGateway implements OnGatewayConnection, OnGatewayDi
   private URL: string;
   private pop_URL: string = 'http://localhost:3333/detailed';
 
-  constructor(private httpService: HttpService, private configService: ConfigService) {
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService) {
     this.URL =
       this.configService && this.configService.get<string>('DISPERSION_SERVICE')
         ? `${this.configService.get<string>('DISPERSION_SERVICE') + '/process'}`

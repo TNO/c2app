@@ -5,7 +5,6 @@ import { Injectable } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto.js';
 import { UpdateMessageDto } from './dto/update-message.dto.js';
 import loki from 'lokijs';
-import { Collection } from 'lokijs';
 import lfsa from 'lokijs/src/loki-fs-structured-adapter.js';
 import { sortByDateDesc } from '../utils/index.js';
 
@@ -37,20 +36,19 @@ function removeDirectorySync(directoryPath: string): void {
 @Injectable()
 export class MessagesService {
   private db: loki;
-  private messageTopicStore = {} as { [topic: string]: Collection };
+  // private messageTopicStore = {} as { [topic: string]: Collection };
 
   constructor() {
-    const folderPath = dirname(resolve(cwd(), dbName));
-    if (!existsSync(folderPath)) mkdirSync(folderPath, { recursive: true });
-
     this.initialize();
   }
 
   private initialize() {
+    const folderPath = dirname(resolve(cwd(), dbName));
+    if (!existsSync(folderPath)) mkdirSync(folderPath, { recursive: true });
+
     const autoloadCallback = () => {
       if (this.db.collections && this.db.collections.length > 0) {
         this.db.collections.forEach((c) => {
-          this.messageTopicStore[c.name] = this.db.getCollection(c.name);
           console.log(`Number of entries in collection '${c.name}': ${c.count()}`);
         });
       }
@@ -81,28 +79,30 @@ export class MessagesService {
 
   /** This action adds a new message, or updates an existing one if the message ID is found */
   create(topic: string, message: CreateMessageDto) {
-    if (!this.messageTopicStore.hasOwnProperty(topic)) {
-      this.messageTopicStore[topic] = this.db.addCollection(topic);
-    }
-    const collection = this.messageTopicStore[topic];
+    // if (!this.db.getCollection(topic)) {
+    //   this.messageTopicStore[topic] = this.db.addCollection(topic);
+    // }
+    const collection = this.db.getCollection(topic) || this.db.addCollection(topic);
     const { id } = message as any;
     if (id) {
       const found = collection.findOne({ id });
       if (found) {
         const result = collection.update({ ...found, ...message });
-        console.log(result);
         return result;
       }
     }
+    console.log('CREATE inserting item');
     return collection.insert(message);
   }
 
   /** Returns all messages, optionally filtered by the query */
   findAll(topic: string, query?: string) {
-    if (!this.messageTopicStore.hasOwnProperty(topic)) {
+    console.log('Find all');
+    const collection = this.db.getCollection(topic);
+    if (!collection) {
+      console.log('No collection for topic ' + topic);
       return [];
     }
-    const collection = this.messageTopicStore[topic];
     const q = query
       ? (JSON.parse(query) as { [prop: string]: string | number | { [ops: string]: string | number } })
       : undefined;
@@ -110,10 +110,14 @@ export class MessagesService {
   }
 
   findOne(topic: string, query: string | number | { [key: string]: any }): LokiObj | false {
-    if (!this.messageTopicStore.hasOwnProperty(topic)) {
+    const collection = this.db.getCollection(topic);
+    if (!collection) {
       return false;
     }
-    const collection = this.messageTopicStore[topic];
+    // if (!this.messageTopicStore.hasOwnProperty(topic)) {
+    //   return false;
+    // }
+    // const collection = this.messageTopicStore[topic];
     if (typeof query === 'number') {
       return collection.get(query);
     }
@@ -128,19 +132,31 @@ export class MessagesService {
   }
 
   update(topic: string, id: number, msg: UpdateMessageDto): LokiObj | false {
-    if (!this.messageTopicStore.hasOwnProperty(topic)) {
+    const collection = this.db.getCollection(topic);
+    if (!collection) {
       return false;
     }
-    return this.messageTopicStore[topic].update(msg);
+    collection.update(msg);
+    // if (!this.messageTopicStore.hasOwnProperty(topic)) {
+    //   return false;
+    // }
+    // return this.messageTopicStore[topic].update(msg);
     // return `This action updates a #${id} message`;
   }
 
   remove(topic: string, id: number) {
-    if (!this.messageTopicStore.hasOwnProperty(topic)) {
+    const collection = this.db.getCollection(topic);
+    if (!collection) {
       return false;
     }
-    const item = this.messageTopicStore[topic].get(id);
-    return item ? this.messageTopicStore[topic].remove(item) : false;
+    const item = collection.get(id);
+    return item ? collection.remove(item) : false;
+
+    // if (!this.messageTopicStore.hasOwnProperty(topic)) {
+    //   return false;
+    // }
+    // const item = this.messageTopicStore[topic].get(id);
+    // return item ? this.messageTopicStore[topic].remove(item) : false;
     // return `This action removes a #${id} message`;
   }
 }

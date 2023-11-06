@@ -435,6 +435,14 @@ export class Socket {
       });
       M.toast({ html: 'Added to a new group' });
     });
+    this.socket.on('instructions', (data: { action: string }) => {
+      const { action } = data;
+      switch (action) {
+        case 'CLEAR_ALL_COLLECTIONS':
+          us({ app: { sources: () => [], } })
+          break;
+      }
+    });
     // These positions are received directly from the agent-smith simulator
     // These are therefore NOT assistance resources, but 'just' simEntities
     this.socket.on('geojson', (source: FeatureCollectionExt) => {

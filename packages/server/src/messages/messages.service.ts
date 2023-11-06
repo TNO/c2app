@@ -1,5 +1,5 @@
-import { existsSync, mkdirSync } from 'fs';
-import { resolve, dirname } from 'path';
+import { rmdirSync, existsSync, mkdirSync, readdirSync, lstatSync, unlinkSync } from 'fs';
+import { join, resolve, dirname } from 'path';
 import { cwd } from 'process';
 import { Injectable } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto.js';
@@ -11,6 +11,29 @@ import { sortByDateDesc } from '../utils/index.js';
 
 const dbName = process.env.DB || 'db/safr.db';
 
+function removeDirectorySync(directoryPath: string): void {
+  if (existsSync(directoryPath)) {
+    const files = readdirSync(directoryPath);
+
+    for (const file of files) {
+      const filePath = join(directoryPath, file);
+      if (lstatSync(filePath).isDirectory()) {
+        // Recursively remove subdirectories
+        removeDirectorySync(filePath);
+      } else {
+        // Remove files
+        unlinkSync(filePath);
+      }
+    }
+
+    // Remove the empty directory itself
+    rmdirSync(directoryPath);
+    console.log(`Directory ${directoryPath} and its contents have been removed.`);
+  } else {
+    console.error(`Directory ${directoryPath} does not exist.`);
+  }
+}
+
 @Injectable()
 export class MessagesService {
   private db: loki;
@@ -20,6 +43,10 @@ export class MessagesService {
     const folderPath = dirname(resolve(cwd(), dbName));
     if (!existsSync(folderPath)) mkdirSync(folderPath, { recursive: true });
 
+    this.initialize();
+  }
+
+  private initialize() {
     const autoloadCallback = () => {
       if (this.db.collections && this.db.collections.length > 0) {
         this.db.collections.forEach((c) => {
@@ -40,11 +67,16 @@ export class MessagesService {
   }
 
   clearAllCollections() {
-    Object.keys(this.messageTopicStore).forEach(topic => {
-      console.log(`Removing DB collection ${topic}.`);
-      this.db.removeCollection(topic);
+    this.db.close((err) => {
+      if (err) {
+        console.error(err);
+      } else {
+        const folder = dirname(join(cwd(), dbName));
+        if (existsSync(folder)) removeDirectorySync(folder);
+        console.log(`Successfully closed and deleted the database ${dbName}.`);
+        this.initialize();
+      }
     });
-    this.db.saveDatabase();
   }
 
   /** This action adds a new message, or updates an existing one if the message ID is found */

@@ -14,7 +14,7 @@ export class MessagesController {
 
   @Get('/:topic')
   findAll(@Param('topic') topic: string) {
-    // console.log(`Get messages in topic ${topic}`);
+    console.log(`Get messages in topic ${topic}`);
     return this.messagesService.findAll(topic);
   }
 

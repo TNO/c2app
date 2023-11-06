@@ -114,6 +114,7 @@ export class KafkaService {
         case SimEntityFeatureCollectionTopic:
           if (value && value.hasOwnProperty('layerId') && value['layerId'] === 'CLEAR_ALL_COLLECTIONS') {
             this.messagesService.clearAllCollections();
+            this.socket.server.emit('instructions', { action: 'CLEAR_ALL_COLLECTIONS' });
           } else {
             const geojson = KafkaService.normalizeGeoJSON(value as FeatureCollection);
             console.log(JSON.stringify(geojson))

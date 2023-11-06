@@ -1,5 +1,5 @@
 import { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
-import { SourceType, IAppModel, ILayer, ISource, UpdateStream } from './meiosis';
+import { SourceType, IAppModel, ILayer, ISource, UpdateStream, states } from './meiosis';
 import io, { Socket as ioSocket } from 'socket.io-client';
 import {
   IAlert,
@@ -26,7 +26,7 @@ import mapboxgl from 'mapbox-gl';
 import m from 'mithril';
 import { FeatureCollectionExt } from '../models';
 import { uniqueId } from 'mithril-materialized';
-import { featureCollectionToSource } from '../components/map/map-utils';
+import { featureCollectionToSource, toLayerName, toSourceName } from '../components/map/map-utils';
 
 export class Socket {
   private socket: ioSocket;
@@ -436,10 +436,25 @@ export class Socket {
       M.toast({ html: 'Added to a new group' });
     });
     this.socket.on('instructions', (data: { action: string }) => {
+      console.log(`INSTRUCTIONS RECEIVED: ${JSON.stringify(data)}`);
       const { action } = data;
       switch (action) {
         case 'CLEAR_ALL_COLLECTIONS':
-          us({ app: { sources: () => [], } })
+          const state = states();
+          const { sources = [], map } = state.app;
+          if (!map) break;
+          sources.forEach(source => {
+            const { layers = [] } = source;
+            const sourceName = toSourceName(source);
+            const s = map.getSource(sourceName);
+            if (s) {
+              layers.map(layer => toLayerName(sourceName, layer)).forEach(layerName => {
+                if (map.getLayer(layerName)) map.removeLayer(layerName);
+              });
+              map.removeSource(sourceName);
+            }
+          })
+          us({ app: { sources: () => [], } });
           break;
       }
     });

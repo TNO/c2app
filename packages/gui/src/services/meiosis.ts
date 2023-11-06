@@ -89,6 +89,7 @@ export interface IAppModel {
     newMessages: { [key: string]: number };
 
     // Layers/styles
+    map: maplibregl.Map;
     layerStyles?: LayerStyle<Record<string, any>>[];
     sources: Array<ISource>;
     mapStyle: string;
@@ -146,6 +147,7 @@ export interface IActions {
   // Layers/styles
   loadGeoJSON: () => Promise<void>,
   // loadLayerStyles: () => Promise<void>;
+  setMap: (map: maplibregl.Map) => void,
   setZoomLevel: (zoomLevel: number) => void,
   getZoomLevel: () => number,
   setLonLat: (lonlat: [lon: number, lat: number]) => void,
@@ -479,6 +481,7 @@ export const appState = {
       },
 
       // Layers/style
+      setMap: (map: maplibregl.Map) => update({ app: { map: () => map } }),
       setZoomLevel: (zoomLevel: number) => { localStorage.setItem(ZOOM_LEVEL, zoomLevel.toString()) },
       getZoomLevel: () => +(localStorage.getItem(ZOOM_LEVEL) || 4),
       setLonLat: (lonlat: [lon: number, lat: number]) => { localStorage.setItem(LON_LAT, JSON.stringify(lonlat)) },

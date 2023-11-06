@@ -272,7 +272,14 @@ export const toLayerName = (sourceName: string, layer: ILayer) => `${sourceName}
 
 export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, map: MaplibreMap) => {
   console.log('UPDATING SOURCES AND LAYERS');
-  appState.app.sources.filter(s => s.source.features?.length > 0).forEach((source: ISource) => {
+  const { sources = [] } = appState.app;
+  Object.entries(map.style.sourceCaches).forEach(([sourceName, source]) => {
+    console.log(sourceName);
+    const found = sources.find(s => s.sourceName === sourceName);
+    console.log(found);
+    console.log(source);
+  })
+  sources.filter(s => s.source.features?.length > 0).forEach((source: ISource) => {
     // Set source
     const sourceName = toSourceName(source);
     if (!map.getSource(sourceName)) {

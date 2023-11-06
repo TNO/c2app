@@ -75,6 +75,7 @@ export const Map: MeiosisComponent = () => {
           MapUtils.updateSourcesAndLayers(appState, actions, map);
           MapUtils.updateSatellite(appState, map);
         });
+        actions.setMap(map);
       });
     },
     // Executes on every redraw

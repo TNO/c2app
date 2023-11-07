@@ -20,6 +20,7 @@ import {
   ISensor,
 } from 'c2app-models-utils';
 import { MessagesService } from '../messages/messages.service.js';
+import { uniqueId } from '../utils/index.js';
 
 const SimEntityFeatureCollectionTopic = 'simulation_entity_featurecollection';
 const geojsonLayer = 'standard_geojson';
@@ -174,7 +175,9 @@ export class KafkaService {
   }
 
   private static normalizeGeoJSON(collection: FeatureCollection) {
-    (collection as any).id = (collection as any).id || (collection as any).layerId;
+    if (typeof (collection as any).id === 'undefined') {
+      (collection as any).id = (collection as any).layerId || uniqueId();
+    }
     for (const feature of collection.features) {
       feature.geometry = Object.entries(feature.geometry).map(([_key, value]) => value).shift();
       feature.properties = Object.entries(feature.properties).reduce((acc, [key, value]) => {

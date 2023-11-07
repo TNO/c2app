@@ -5,7 +5,15 @@ import { Point, Feature, Polygon, FeatureCollection, Geometry } from 'geojson';
 import { IActions, IAppModel, ILayer, ISource, SourceType } from '../../services/meiosis';
 import SquareGrid from '@turf/square-grid';
 import polylabel from 'polylabel';
-import { GeoJSONSource, GeoJSONFeature, Map as MaplibreMap, Style, LayerSpecification } from 'maplibre-gl';
+import {
+  GeoJSONSource,
+  GeoJSONFeature,
+  Map as MaplibreMap,
+  Style,
+  LayerSpecification,
+  Popup,
+  LngLatLike,
+} from 'maplibre-gl';
 
 // ICONS
 import car from '../../assets/Operations/Car.png';
@@ -28,6 +36,7 @@ import first_responder from '../../assets/Operations/Medical services.png';
 import { FeatureCollectionExt } from '../../models';
 import { uniqueId } from 'mithril-materialized';
 import { LayerStyle } from 'c2app-models-utils';
+import { UIForm } from 'mithril-ui-form';
 
 export const drawConfig = {
   displayControlsDefault: false,
@@ -54,12 +63,12 @@ export const handleDrawEvent = (map: MaplibreMap, features: GeoJSONFeature[], ac
 export const setZoomLevel = (map: MaplibreMap, actions: IActions) => {
   const zoom = map.getZoom();
   actions.setZoomLevel(zoom);
-}
+};
 
 export const setLonLat = (map: MaplibreMap, actions: IActions) => {
   const lonlat = map.getCenter();
   actions.setLonLat([lonlat.lng, lonlat.lat]);
-}
+};
 
 const getFeaturesInPolygon = (map: MaplibreMap, features: Feature[], actions: IActions) => {
   let layers: Array<string> = [];
@@ -92,7 +101,7 @@ const getFeaturesInPolygon = (map: MaplibreMap, features: Feature[], actions: IA
 };
 
 export const displayInfoSidebar = (features: GeoJSONFeature[], actions: IActions) => {
-  console.log(features);
+  if (!features || features.length === 0) return;
   actions.updateClickedFeature(features[0] as GeoJSONFeature);
   const instance = M.Sidenav.getInstance(document.getElementById('slide-out-2') as HTMLElement);
   instance.open();
@@ -149,16 +158,12 @@ export const getLabelsSource = (gridSource: FeatureCollection<Polygon>): Feature
 
 export const loadMissingImages = (map: MaplibreMap) => {
   map.on('styleimagemissing', (e) => {
-    console.log('Missing image:');
-    console.log(e);
     const id = e.id; // id of the missing image
     const url = `${process.env.SERVER_URL}/layer_styles/${id}`;
     map.loadImage(url, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
       if (error) throw error;
       if (!map.hasImage(id)) map.addImage(id, image as ImageBitmap);
     });
-
-    // map.addImage(id, {width, height: width, data});
   });
 };
 
@@ -268,48 +273,85 @@ export const switchBasemap = async (map: MaplibreMap, styleID: string) => {
 export const toSourceName = (source: ISource) => `${source.sourceName}.${source.id}`.toLowerCase().replace(/\s/g, '_');
 
 /** Convert a layer to a unique name */
-export const toLayerName = (sourceName: string, layer: ILayer) => `${sourceName}.${layer.layerName}`.toLowerCase().replace(/\s/g, '_');
+export const toLayerName = (sourceName: string, layer: ILayer) =>
+  `${sourceName}.${layer.layerName}`.toLowerCase().replace(/\s/g, '_');
 
 export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, map: MaplibreMap) => {
   console.log('UPDATING SOURCES AND LAYERS');
   const { sources = [] } = appState.app;
-  Object.entries(map.style.sourceCaches).forEach(([sourceName, source]) => {
-    console.log(sourceName);
-    const found = sources.find(s => s.sourceName === sourceName);
-    console.log(found);
-    console.log(source);
-  })
-  sources.filter(s => s.source.features?.length > 0).forEach((source: ISource) => {
-    // Set source
-    const sourceName = toSourceName(source);
-    if (!map.getSource(sourceName)) {
-      map.addSource(sourceName, {
-        type: 'geojson',
-        data: source.source,
-      });
-    } else {
-      (map.getSource(sourceName) as GeoJSONSource).setData(source.source);
-    }
-
-    // Set Layers
-    console.log(source)
-    source.layers.filter(l => typeof l.showLayer === 'undefined' || l.showLayer === true).forEach((layer: ILayer) => {
-      const layerName = toLayerName(sourceName, layer);
-
-      if (!map.getLayer(layerName)) {
-        const mapLayer = { id: layerName, ...layer, type: layer.type.type, source: sourceName } as LayerSpecification;
-        console.log(mapLayer)
-        map.addLayer(mapLayer);
-        map.on('click', layerName, ({ features }) => displayInfoSidebar(features as GeoJSONFeature[], actions));
-        map.on('mouseenter', layerName, () => (map.getCanvas().style.cursor = 'pointer'));
-        map.on('mouseleave', layerName, () => (map.getCanvas().style.cursor = ''));
+  sources
+    .filter((s) => s.source.features?.length > 0)
+    .forEach((source: ISource) => {
+      // Set source
+      const sourceName = toSourceName(source);
+      if (!map.getSource(sourceName)) {
+        map.addSource(sourceName, {
+          type: 'geojson',
+          data: source.source,
+          generateId: true //This ensures that all features have unique IDs
+        });
+      } else {
+        (map.getSource(sourceName) as GeoJSONSource).setData(source.source);
       }
-      map.setLayoutProperty(layerName, 'visibility', layer.showLayer ? 'visible' : 'none');
-      if (source.sourceCategory === SourceType.alert || source.sourceCategory === SourceType.plume)
-        layer.paint && map.setPaintProperty(layerName, 'line-opacity', layer.paint['line-opacity']);
+
+      // Set Layers
+      console.log(source);
+      source.layers
+        .filter((l) => typeof l.showLayer === 'undefined' || l.showLayer === true)
+        .forEach((layer: ILayer) => {
+          const layerName = toLayerName(sourceName, layer);
+
+          // Create a popup, but don't add it to the map yet.
+          const popup = new Popup({
+            closeButton: false,
+            closeOnClick: false,
+          });
+
+          if (!map.getLayer(layerName)) {
+            const mapLayer = {
+              id: layerName,
+              ...layer,
+              type: layer.type.type,
+              source: sourceName,
+            } as LayerSpecification;
+            console.log(mapLayer);
+            map.addLayer(mapLayer);
+            map.on('click', layerName, ({ features }) => displayInfoSidebar(features as GeoJSONFeature[], actions));
+            map.on('mouseenter', layerName, (e) => {
+              map.getCanvas().style.cursor = 'pointer';
+
+              const feature = e.features ? e.features[0] : undefined;
+              if (!feature) return;
+              console.log(feature)
+              const coordinates = (feature.geometry as Point).coordinates.slice();
+              const title = feature.properties.title;
+              const description = feature.properties.description;
+              const html = title || description;
+              if (!html) return;
+              // Ensure that if the map is zoomed out such that multiple
+              // copies of the feature are visible, the popup appears
+              // over the copy being pointed to.
+              while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+              }
+
+              // Populate the popup and set its coordinates
+              // based on the feature found.
+              popup
+                .setLngLat(coordinates as LngLatLike)
+                .setHTML(html)
+                .addTo(map);
+            });
+            map.on('mouseleave', layerName, () => {
+              map.getCanvas().style.cursor = '';
+            });
+          }
+          map.setLayoutProperty(layerName, 'visibility', layer.showLayer ? 'visible' : 'none');
+          if (source.sourceCategory === SourceType.alert || source.sourceCategory === SourceType.plume)
+            layer.paint && map.setPaintProperty(layerName, 'line-opacity', layer.paint['line-opacity']);
+        });
     });
-  });
-}
+};
 
 const defaultLayerStyle = {
   id: 'default',
@@ -321,19 +363,19 @@ const defaultLayerStyle = {
       showLayer: true,
       type: { type: 'fill' } as mapboxgl.FillLayer,
       paint: {
-        'fill-color': ['coalesce', ["get", "fill"], "#555555"],
-        'fill-opacity': ['coalesce', ["get", "fill-opacity"], 0.6],
+        'fill-color': ['coalesce', ['get', 'fill'], '#555555'],
+        'fill-opacity': ['coalesce', ['get', 'fill-opacity'], 0.6],
       },
-      filter: ['==', '$type', 'Polygon']
+      filter: ['==', '$type', 'Polygon'],
     },
     {
       layerName: 'lines',
       showLayer: true,
       type: { type: 'line' } as mapboxgl.LineLayer,
       paint: {
-        'line-color': ['coalesce', ["get", "stroke"], "#555555"],
-        'line-width': ['coalesce', ["get", "stroke-width"], 2],
-        'line-opacity': ['coalesce', ["get", "stroke-opacity"], 1],
+        'line-color': ['coalesce', ['get', 'stroke'], '#555555'],
+        'line-width': ['coalesce', ['get', 'stroke-width'], 2],
+        'line-opacity': ['coalesce', ['get', 'stroke-opacity'], 1],
       },
       // filter: ['==', '$type', 'Polygon']
     },
@@ -359,14 +401,14 @@ const defaultLayerStyle = {
           'coalesce',
           ['get', 'marker-symbol'],
           // ['image', ['concat', ['get', 'icon'], '_15']],
-          'OTHER'
+          'OTHER',
         ],
-        'text-field': ['coalesce', ['get', 'title'], ""],
+        'text-field': ['coalesce', ['get', 'title'], ''],
         'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
         'text-offset': [0, 0.6],
-        'text-anchor': 'top'
+        'text-anchor': 'top',
       },
-      filter: ['==', '$type', 'Point']
+      filter: ['==', '$type', 'Point'],
     },
     // {
     //   layerName: 'points',
@@ -383,18 +425,24 @@ const defaultLayerStyle = {
   icons: [] as Array<[name: string, src: string]>,
 } as LayerStyle<any>;
 
-export const featureCollectionToSource = (source: FeatureCollectionExt, styles: LayerStyle<any>[] = []) => {
-  const { layerId: id = uniqueId(), layerName: sourceName = '', layerStyle = 'default' } = source;
-  const style = styles.filter(s => layerStyle.toUpperCase() === s.id.toUpperCase()).shift() || defaultLayerStyle;
+export const featureCollectionToSource = (fc: FeatureCollectionExt, styles: LayerStyle<any>[] = []) => {
+  const {
+    layerId: id = uniqueId(),
+    layerName: sourceName = '',
+    layerStyle = 'default',
+    layerShared: shared = false,
+  } = fc;
+  const style = styles.filter((s) => s.id.toUpperCase() === layerStyle.toUpperCase()).shift() || defaultLayerStyle;
   return {
     id,
-    source,
+    source: fc,
     sourceName,
+    shared,
     sourceCategory: SourceType.realtime,
-    shared: false,
-    layers: style.layers || [] as ILayer[],
+    layers: style.layers || ([] as ILayer[]),
+    ui: style.ui || ([] as UIForm),
   } as ISource;
-}
+};
 
 export const updateGrid = (appState: IAppModel, actions: IActions, map: MaplibreMap) => {
   const gridSource = getGridSource(map, actions, appState);

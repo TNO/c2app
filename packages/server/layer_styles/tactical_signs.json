@@ -108,8 +108,12 @@
           ""
         ],
         "text-font": [
-          "Open Sans Semibold",
-          "Arial Unicode MS Bold"
+          "Noto Sans Bold",
+          "Noto Sans Regular",
+          "Roboto Medium",
+          "Noto Sans Italic",
+          "Roboto Condensed Italic",
+          "Roboto Regular"
         ],
         "text-offset": [
           0,
@@ -123,33 +127,6 @@
         "Point"
       ]
     }
-  ],
-  "layout": {
-    "icon-image": "symbol",
-    "icon-anchor": "bottom",
-    "icon-offset": [
-      0,
-      5
-    ],
-    "icon-overlap": "always",
-    "text-field": [
-      "get",
-      "name"
-    ],
-    "text-font": [
-      "Noto Sans Regular"
-    ],
-    "text-size": 12,
-    "text-offset": [
-      0,
-      0.75
-    ],
-    "text-anchor": "top"
-  },
-  "filter": [
-    "==",
-    "iconName",
-    "symbol"
   ],
   "icons": [
     [

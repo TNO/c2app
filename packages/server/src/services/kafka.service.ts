@@ -190,6 +190,7 @@ export class KafkaService {
               : value;
         return acc;
       }, {} as Record<string, any>)
+      if (typeof feature.properties.id === 'undefined') feature.properties.id = uniqueId();
     }
     return collection as FeatureCollection;
   }

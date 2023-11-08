@@ -14,6 +14,17 @@ export const uuid4 = () => {
   });
 };
 
+/**
+ * Create a unique ID
+ * @see https://stackoverflow.com/a/2117523/319711
+ *
+ * @returns id followed by 8 hexadecimal characters.
+ */
+export const uniqueId = () => {
+  // tslint:disable-next-line:no-bitwise
+  return 'xxxxxxxx'.replace(/[x]/g, () => ((Math.random() * 16) | 0).toString(16));
+};
+
 /** Sort descending by updated date (when updated is not available, use created date) */
 export const sortByDateDesc = (obj1: LokiObj, obj2: LokiObj) => {
   const time1 = obj1.meta.updated || obj1.meta.created;

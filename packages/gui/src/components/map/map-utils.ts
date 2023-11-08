@@ -326,7 +326,7 @@ export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, m
               const coordinates = (feature.geometry as Point).coordinates.slice();
               const title = feature.properties.title;
               const description = feature.properties.description;
-              const html = title || description;
+              const html = `${title ? `<h5>${title}</h5>` : ''}${description ? `<p>${description}</p>`: ''}`;
               if (!html) return;
               // Ensure that if the map is zoomed out such that multiple
               // copies of the feature are visible, the popup appears
@@ -344,6 +344,7 @@ export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, m
             });
             map.on('mouseleave', layerName, () => {
               map.getCanvas().style.cursor = '';
+              popup.remove();
             });
           }
           map.setLayoutProperty(layerName, 'visibility', layer.showLayer ? 'visible' : 'none');
@@ -404,7 +405,9 @@ const defaultLayerStyle = {
           'OTHER',
         ],
         'text-field': ['coalesce', ['get', 'title'], ''],
-        'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+        // Existing fonts are located in maptiler container, in /usr/src/app/node_modules/tileserver-gl-styles/fonts
+        // By default, only 'Noto Sans Regular' exists.
+        'text-font': ['Noto Sans Regular'],
         'text-offset': [0, 0.6],
         'text-anchor': 'top',
       },

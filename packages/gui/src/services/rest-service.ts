@@ -35,17 +35,17 @@ const createRestServiceFactory = (apiService: string) => {
         return await m
           .request<T>({
             method: 'PUT',
-            url: url + item.id,
+            url: url + item.$loki,
             body: fd || item,
             withCredentials,
           })
-          .catch((e) => console.error(e));
+          .catch((e) => console.error(JSON.stringify(e)));
       } catch (err) {
         return console.error((err as { message: string }).message);
       }
     };
 
-    const save = (item: Partial<T>, fd?: FormData) => (item.id ? update(item, fd) : create(item, fd));
+    const save = (item: Partial<T>, fd?: FormData) => (item.$loki ? update(item, fd) : create(item, fd));
 
     const del = async (id: string | number) => {
       try {

@@ -24,6 +24,7 @@ import { GeoJSONFeature, LayerSpecification, LinePaintProps, SymbolLayoutProps }
 import { layerStylesSvc } from './layer_styles';
 import { restServiceFactory } from './rest-service';
 import { featureCollectionToSource } from '../components/map/map-utils';
+import { UIForm } from 'mithril-ui-form';
 
 const ZOOM_LEVEL = "SAFR_ZOOM_LEVEL";
 const LON_LAT = "SAFR_LON_LAT";
@@ -55,6 +56,7 @@ export interface ISource {
   layers: ILayer[];
   shared: boolean;
   shareWith?: string[];
+  ui: UIForm;
 }
 
 export interface IAppModel {
@@ -67,7 +69,7 @@ export interface IAppModel {
     alert?: IAlert;
 
     // Clicking/Selecting
-    clickedFeature?: GeoJSONFeature;
+    clickedFeature?: GeoJSONFeature & { source?: string };
     selectedFeatures?: FeatureCollection;
     latestDrawing: Feature;
     clearDrawing: {
@@ -152,6 +154,7 @@ export interface IActions {
   getZoomLevel: () => number,
   setLonLat: (lonlat: [lon: number, lat: number]) => void,
   getLonLat: () => [lon: number, lat: number],
+  saveSource: (source: ISource) => Promise<void>;
   switchStyle: (style: string) => void;
   toggleLayer: (sourceIndex: number, layerIndex: number) => void;
   updateGridLocation: (bbox: [number, number, number, number]) => void;
@@ -259,14 +262,6 @@ export const appState = {
           }
         })
       },
-      // loadLayerStyles: async () => {
-      //   const layerStyles = await layerStylesSvc.loadStyles();
-      //   if (!layerStyles) return;
-      //   console.log(layerStyles);
-      //   const { socket } = states().app;
-      //   socket.setLayerStyles(layerStyles);
-      //   update({ app: { layerStyles } })
-      // },
       drawingCleared: () => {
         update({
           app: {
@@ -352,14 +347,9 @@ export const appState = {
       },
 
       // Clicking/selecting
-      updateClickedFeature: (feature: GeoJSONFeature) => {
-        update({
-          app: {
-            clickedFeature: () => {
-              return feature;
-            },
-          },
-        });
+      updateClickedFeature: (feature: GeoJSONFeature & { source?: string }) => {
+        console.log(feature);
+        update({ app: { clickedFeature: () => feature }});
       },
       updateSelectedFeatures: (features: Array<Feature>) => {
         update({ app: { selectedFeatures: { type: 'FeatureCollection', features: features } } });
@@ -486,6 +476,15 @@ export const appState = {
       getZoomLevel: () => +(localStorage.getItem(ZOOM_LEVEL) || 4),
       setLonLat: (lonlat: [lon: number, lat: number]) => { localStorage.setItem(LON_LAT, JSON.stringify(lonlat)) },
       getLonLat: () => JSON.parse(localStorage.getItem(LON_LAT) || "[5, 53]") as [lon: number, lat: number],
+      saveSource: async (source: ISource) => {
+        if (!source || !source.source) return;
+        await geojsonSvc.save(source.source);
+        update({ 
+          app: {
+            sources: (s: ISource[]) => s.map(source => source.id === source.id ? source : source)
+          }
+        })
+      },
       switchStyle: (style: string) => {
         update({
           app: {

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Inject, Put } from '@nestjs/common';
 import { MessagesService } from './messages.service.js';
 import { CreateMessageDto } from './dto/create-message.dto.js';
 import { UpdateMessageDto } from './dto/update-message.dto.js';
@@ -24,7 +24,7 @@ export class MessagesController {
     return this.messagesService.findOne(topic, query);
   }
 
-  @Patch('/:topic/:id')
+  @Put('/:topic/:id')
   update(@Param('topic') topic: string, @Param('id') id: string, @Body() msg: UpdateMessageDto) {
     return this.messagesService.update(topic, +id, msg);
   }

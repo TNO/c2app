@@ -8,7 +8,7 @@ export type LayerStyle<T extends Record<string, any>> = {
   /** Available icons, consisting of a friendly name and a relative path, e.g. full path is iconPath/src */
   icons: Array<[name: string, src: string]>;
   /** Map layers */
-  layer?: Record<string, any>[];
+  layers?: Record<string, any>[];
   /** GUI form */
   ui?: UIForm<T>;
 }

@@ -11,6 +11,8 @@ export interface FeatureCollectionExt<G extends Geometry | null = Geometry, P = 
   layerName?: string;
   /** Layer style name, determines visual appearance of map layer */
   layerStyle?: string;
+  /** Allow others to edit the layer */
+  layerShared?: boolean;
   /** Layer description */
   layerDesc?: string;
 }

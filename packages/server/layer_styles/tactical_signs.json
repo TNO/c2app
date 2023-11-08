@@ -108,12 +108,7 @@
           ""
         ],
         "text-font": [
-          "Noto Sans Bold",
-          "Noto Sans Regular",
-          "Roboto Medium",
-          "Noto Sans Italic",
-          "Roboto Condensed Italic",
-          "Roboto Regular"
+          "Noto Sans Regular"
         ],
         "text-offset": [
           0,

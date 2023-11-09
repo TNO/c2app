@@ -1,17 +1,14 @@
-import m from 'mithril';
 import { MeiosisComponent } from '../../services/meiosis';
-import M from 'materialize-css';
-import { gridModal, customLayerModal, createPOIModal, editLayerModal, editGroupModal } from './modals';
 
 export const mapSideBar: MeiosisComponent = () => {
   return {
-    view: ({ attrs: { state, actions } }) => {
+    view: () => {
       return [
-        m(gridModal, { state, actions }),
-        m(customLayerModal, { state, actions }),
-        m(createPOIModal, { state, actions }),
-        m(editLayerModal, { state, actions }),
-        m(editGroupModal, { state, actions }),
+        // m(createPOIModal, { state, actions }),
+        // m(gridModal, { state, actions }),
+        // m(customLayerModal, { state, actions }),
+        // m(editLayerModal, { state, actions }),
+        // m(editGroupModal, { state, actions }),
         // m('.col.l3.m4#slide-out.sidenav.sidenav-fixed', [
         //   /// GROUPS
         //   m('ul.collapsible', [
@@ -33,8 +30,8 @@ export const mapSideBar: MeiosisComponent = () => {
         // ]),
       ];
     },
-    oncreate: () => {
-      M.AutoInit();
-    },
+    // oncreate: () => {
+    //   M.AutoInit();
+    // },
   };
 };

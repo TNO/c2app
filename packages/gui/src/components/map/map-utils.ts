@@ -1,8 +1,8 @@
 import m from 'mithril';
-import bbox from '@turf/bbox';
-import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
-import { Point, Feature, Polygon, FeatureCollection, Geometry } from 'geojson';
-import { IActions, IAppModel, ILayer, ISource, SourceType } from '../../services/meiosis';
+// import bbox from '@turf/bbox';
+// import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
+import { Point, Feature, Polygon, FeatureCollection, Geometry, GeoJsonProperties } from 'geojson';
+import { IActions, IAppModel } from '../../services/meiosis';
 import SquareGrid from '@turf/square-grid';
 import polylabel from 'polylabel';
 import {
@@ -16,24 +16,25 @@ import {
 } from 'maplibre-gl';
 
 // ICONS
-import car from '../../assets/Operations/Car.png';
-import van from '../../assets/Operations/Car.png';
-import controlPoint from '../../assets/Operations/Control point.png';
-import divisionCommand from '../../assets/Operations/Division command.png';
-import evacuation from '../../assets/Operations/Evacuation.png';
-import fireman from '../../assets/Operations/Firemen unit.png';
-import helicopter from '../../assets/Operations/Helicopter.png';
-import media from '../../assets/Operations/Media.png';
-import sanitary from '../../assets/Operations/Medical services.png';
-import military from '../../assets/Operations/Military.png';
-import policeman from '../../assets/Operations/Police unit.png';
-import roadBlock from '../../assets/Operations/Road block.png';
-import truck from '../../assets/Operations/Truck.png';
-import chemical from '../../assets/Incidents/Chemical.png';
-import air from '../../assets/Operations/air.png';
-import ground from '../../assets/Operations/ground.png';
-import first_responder from '../../assets/Operations/Medical services.png';
-import { FeatureCollectionExt } from '../../models';
+import marker from '../../assets/icons/mapbox-marker-icon-20px-blue.png';
+// import car from '../../assets/Operations/Car.png';
+// import van from '../../assets/Operations/Car.png';
+// import controlPoint from '../../assets/Operations/Control point.png';
+// import divisionCommand from '../../assets/Operations/Division command.png';
+// import evacuation from '../../assets/Operations/Evacuation.png';
+// import fireman from '../../assets/Operations/Firemen unit.png';
+// import helicopter from '../../assets/Operations/Helicopter.png';
+// import media from '../../assets/Operations/Media.png';
+// import sanitary from '../../assets/Operations/Medical services.png';
+// import military from '../../assets/Operations/Military.png';
+// import policeman from '../../assets/Operations/Police unit.png';
+// import roadBlock from '../../assets/Operations/Road block.png';
+// import truck from '../../assets/Operations/Truck.png';
+// import chemical from '../../assets/Incidents/Chemical.png';
+// import air from '../../assets/Operations/air.png';
+// import ground from '../../assets/Operations/ground.png';
+// import first_responder from '../../assets/Operations/Medical services.png';
+import { FeatureCollectionExt, ILayer, ISource, SidebarMode, SourceType } from '../../models';
 import { uniqueId } from 'mithril-materialized';
 import { LayerStyle } from 'c2app-models-utils';
 import { UIForm } from 'mithril-ui-form';
@@ -48,16 +49,17 @@ export const drawConfig = {
   },
 };
 
-export const handleDrawEvent = (map: MaplibreMap, features: GeoJSONFeature[], actions: IActions) => {
-  actions.updateDrawings(features[0] as GeoJSONFeature);
-  if (features[0].geometry.type === 'Polygon') {
-    getFeaturesInPolygon(map, features, actions);
-  }
+export const handleDrawEvent = (_map: MaplibreMap, features: GeoJSONFeature[], actions: IActions) => {
+  displayInfoSidebar(features, actions, 'CREATE_POI');
+  // actions.updateDrawings(features[0] as GeoJSONFeature);
+  // if (features[0].geometry.type === 'Polygon') {
+  //   getFeaturesInPolygon(map, features, actions);
+  // }
 
-  const elem = document.getElementById('layerSelect') as HTMLElement;
-  M.FormSelect.init(elem);
-  const instance = M.Modal.getInstance(document.getElementById('createPOIModal') as HTMLElement);
-  instance.open();
+  // const elem = document.getElementById('layerSelect') as HTMLElement;
+  // M.FormSelect.init(elem);
+  // const instance = M.Modal.getInstance(document.getElementById('create-poi-modal') as HTMLElement);
+  // instance && instance.open();
 };
 
 export const setZoomLevel = (map: MaplibreMap, actions: IActions) => {
@@ -70,41 +72,42 @@ export const setLonLat = (map: MaplibreMap, actions: IActions) => {
   actions.setLonLat([lonlat.lng, lonlat.lat]);
 };
 
-const getFeaturesInPolygon = (map: MaplibreMap, features: Feature[], actions: IActions) => {
-  let layers: Array<string> = [];
+// const getFeaturesInPolygon = (map: MaplibreMap, features: Feature[], actions: IActions) => {
+//   let layers: Array<string> = [];
 
-  if (map.getLayer('ResourcesresourcesIDfiremanResources')) layers.push('ResourcesresourcesIDfiremanResources');
-  if (map.getLayer('ResourcesresourcesIDpolicemanResources')) layers.push('ResourcesresourcesIDpolicemanResources');
-  if (map.getLayer('ResourcesresourcesIDfirst_responderResources'))
-    layers.push('ResourcesresourcesIDfirst_responderResources');
-  if (map.getLayer('ResourcesresourcesIDsanitaryResources')) layers.push('ResourcesresourcesIDsanitaryResources');
-  if (map.getLayer('ResourcesresourcesIDcarResources')) layers.push('ResourcesresourcesIDcarResources');
-  if (map.getLayer('ResourcesresourcesIDvanResources')) layers.push('ResourcesresourcesIDvanResources');
-  if (map.getLayer('ResourcesresourcesIDtruckResources')) layers.push('ResourcesresourcesIDtruckResources');
-  if (map.getLayer('ResourcesresourcesIDairResources')) layers.push('ResourcesresourcesIDairResources');
-  if (map.getLayer('ResourcesresourcesIDgroundResources')) layers.push('ResourcesresourcesIDgroundResources');
+//   if (map.getLayer('ResourcesresourcesIDfiremanResources')) layers.push('ResourcesresourcesIDfiremanResources');
+//   if (map.getLayer('ResourcesresourcesIDpolicemanResources')) layers.push('ResourcesresourcesIDpolicemanResources');
+//   if (map.getLayer('ResourcesresourcesIDfirst_responderResources'))
+//     layers.push('ResourcesresourcesIDfirst_responderResources');
+//   if (map.getLayer('ResourcesresourcesIDsanitaryResources')) layers.push('ResourcesresourcesIDsanitaryResources');
+//   if (map.getLayer('ResourcesresourcesIDcarResources')) layers.push('ResourcesresourcesIDcarResources');
+//   if (map.getLayer('ResourcesresourcesIDvanResources')) layers.push('ResourcesresourcesIDvanResources');
+//   if (map.getLayer('ResourcesresourcesIDtruckResources')) layers.push('ResourcesresourcesIDtruckResources');
+//   if (map.getLayer('ResourcesresourcesIDairResources')) layers.push('ResourcesresourcesIDairResources');
+//   if (map.getLayer('ResourcesresourcesIDgroundResources')) layers.push('ResourcesresourcesIDgroundResources');
 
-  if (layers.length === 0) return;
+//   if (layers.length === 0) return;
 
-  const bounding = bbox(features[0]);
-  let bboxFeatures = map.queryRenderedFeatures(
-    [map.project([bounding[0], bounding[1]]), map.project([bounding[2], bounding[3]])],
-    { layers: layers }
-  );
-  const polyFeatures = bboxFeatures.filter((element) =>
-    booleanPointInPolygon(
-      [(element.geometry as Point).coordinates[0], (element.geometry as Point).coordinates[1]],
-      features[0] as Feature<Polygon>
-    )
-  );
-  actions.updateSelectedFeatures(polyFeatures);
-};
+//   const bounding = bbox(features[0]);
+//   let bboxFeatures = map.queryRenderedFeatures(
+//     [map.project([bounding[0], bounding[1]]), map.project([bounding[2], bounding[3]])],
+//     { layers: layers }
+//   );
+//   const polyFeatures = bboxFeatures.filter((element) =>
+//     booleanPointInPolygon(
+//       [(element.geometry as Point).coordinates[0], (element.geometry as Point).coordinates[1]],
+//       features[0] as Feature<Polygon>
+//     )
+//   );
+//   actions.updateSelectedFeatures(polyFeatures);
+// };
 
-export const displayInfoSidebar = (features: GeoJSONFeature[], actions: IActions) => {
+export const displayInfoSidebar = (features: GeoJSONFeature[], actions: IActions, mode: SidebarMode) => {
   if (!features || features.length === 0) return;
-  actions.updateClickedFeature(features[0] as GeoJSONFeature);
+  const feature = features[0] as GeoJSONFeature;
+  actions.updateClickedFeature(feature, mode);
   const instance = M.Sidenav.getInstance(document.getElementById('slide-out-2') as HTMLElement);
-  instance.open();
+  instance && instance.open();
 };
 
 export const getGridSource = (map: MaplibreMap, actions: IActions, appState: IAppModel): FeatureCollection<Polygon> => {
@@ -159,7 +162,17 @@ export const getLabelsSource = (gridSource: FeatureCollection<Polygon>): Feature
 export const loadMissingImages = (map: MaplibreMap) => {
   map.on('styleimagemissing', (e) => {
     const id = e.id; // id of the missing image
-    const url = `${process.env.SERVER_URL}/layer_styles/${id}`;
+    // if (id.endsWith('MARKER')) {
+    //   console.log(`Missing image ID: ${id}`);
+    //   map.loadImage(marker, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+    //     if (error) throw error;
+    //     if (!map.hasImage(id)) map.addImage(id, image as ImageBitmap);
+    //   });
+    //   return;
+    // }
+    const url = id.endsWith('/') ? marker : `${process.env.SERVER_URL}/layer_styles/${id}`;
+    console.log(`Missing image URL: ${url}`);
+    console.log(e);
     map.loadImage(url, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
       if (error) throw error;
       if (!map.hasImage(id)) map.addImage(id, image as ImageBitmap);
@@ -168,74 +181,78 @@ export const loadMissingImages = (map: MaplibreMap) => {
 };
 
 export const loadImages = (map: MaplibreMap) => {
-  map.loadImage(fireman, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  map.loadImage(marker, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
     if (error) throw error;
-    if (!map.hasImage('FIREFIGHTER')) map.addImage('FIREFIGHTER', image as ImageBitmap);
+    if (!map.hasImage('MARKER')) map.addImage('MARKER', image as ImageBitmap);
   });
-  map.loadImage(policeman, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('POLICE')) map.addImage('POLICE', image as ImageBitmap);
-  });
-  map.loadImage(sanitary, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('MEDICAL')) map.addImage('MEDICAL', image as ImageBitmap);
-  });
-  map.loadImage(first_responder, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('OTHER')) map.addImage('OTHER', image as ImageBitmap);
-  });
-  map.loadImage(car, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('CAR')) map.addImage('CAR', image as ImageBitmap);
-  });
-  map.loadImage(van, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('VAN')) map.addImage('VAN', image as ImageBitmap);
-  });
-  map.loadImage(truck, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('TRUCK')) map.addImage('TRUCK', image as ImageBitmap);
-  });
-  map.loadImage(air, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('AIR')) map.addImage('AIR', image as ImageBitmap);
-  });
-  map.loadImage(ground, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('GROUND')) map.addImage('GROUND', image as ImageBitmap);
-  });
-  map.loadImage(chemical, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('chemical')) map.addImage('chemical', image as ImageBitmap);
-  });
-  map.loadImage(roadBlock, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('roadBlock')) map.addImage('roadBlock', image as ImageBitmap);
-  });
-  map.loadImage(media, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('media')) map.addImage('media', image as ImageBitmap);
-  });
-  map.loadImage(controlPoint, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('controlPoint')) map.addImage('controlPoint', image as ImageBitmap);
-  });
-  map.loadImage(divisionCommand, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('divisionCommand')) map.addImage('divisionCommand', image as ImageBitmap);
-  });
-  map.loadImage(evacuation, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('evacuation')) map.addImage('evacuation', image as ImageBitmap);
-  });
-  map.loadImage(helicopter, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('helicopter')) map.addImage('helicopter', image as ImageBitmap);
-  });
-  map.loadImage(military, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('military')) map.addImage('military', image as ImageBitmap);
-  });
+  // map.loadImage(fireman, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('FIREFIGHTER')) map.addImage('FIREFIGHTER', image as ImageBitmap);
+  // });
+  // map.loadImage(policeman, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('POLICE')) map.addImage('POLICE', image as ImageBitmap);
+  // });
+  // map.loadImage(sanitary, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('MEDICAL')) map.addImage('MEDICAL', image as ImageBitmap);
+  // });
+  // map.loadImage(first_responder, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('OTHER')) map.addImage('OTHER', image as ImageBitmap);
+  // });
+  // map.loadImage(car, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('CAR')) map.addImage('CAR', image as ImageBitmap);
+  // });
+  // map.loadImage(van, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('VAN')) map.addImage('VAN', image as ImageBitmap);
+  // });
+  // map.loadImage(truck, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('TRUCK')) map.addImage('TRUCK', image as ImageBitmap);
+  // });
+  // map.loadImage(air, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('AIR')) map.addImage('AIR', image as ImageBitmap);
+  // });
+  // map.loadImage(ground, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('GROUND')) map.addImage('GROUND', image as ImageBitmap);
+  // });
+  // map.loadImage(chemical, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('chemical')) map.addImage('chemical', image as ImageBitmap);
+  // });
+  // map.loadImage(roadBlock, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('roadBlock')) map.addImage('roadBlock', image as ImageBitmap);
+  // });
+  // map.loadImage(media, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('media')) map.addImage('media', image as ImageBitmap);
+  // });
+  // map.loadImage(controlPoint, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('controlPoint')) map.addImage('controlPoint', image as ImageBitmap);
+  // });
+  // map.loadImage(divisionCommand, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('divisionCommand')) map.addImage('divisionCommand', image as ImageBitmap);
+  // });
+  // map.loadImage(evacuation, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('evacuation')) map.addImage('evacuation', image as ImageBitmap);
+  // });
+  // map.loadImage(helicopter, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('helicopter')) map.addImage('helicopter', image as ImageBitmap);
+  // });
+  // map.loadImage(military, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
+  //   if (error) throw error;
+  //   if (!map.hasImage('military')) map.addImage('military', image as ImageBitmap);
+  // });
 };
 
 export const switchBasemap = async (map: MaplibreMap, styleID: string) => {
@@ -277,7 +294,6 @@ export const toLayerName = (sourceName: string, layer: ILayer) =>
   `${sourceName}.${layer.layerName}`.toLowerCase().replace(/\s/g, '_');
 
 export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, map: MaplibreMap) => {
-  console.log('UPDATING SOURCES AND LAYERS');
   const { sources = [] } = appState.app;
   sources
     .filter((s) => s.source.features?.length > 0)
@@ -288,14 +304,13 @@ export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, m
         map.addSource(sourceName, {
           type: 'geojson',
           data: source.source,
-          generateId: true //This ensures that all features have unique IDs
+          generateId: true, //This ensures that all features have unique IDs
         });
       } else {
         (map.getSource(sourceName) as GeoJSONSource).setData(source.source);
       }
 
       // Set Layers
-      console.log(source);
       source.layers
         .filter((l) => typeof l.showLayer === 'undefined' || l.showLayer === true)
         .forEach((layer: ILayer) => {
@@ -316,17 +331,21 @@ export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, m
             } as LayerSpecification;
             console.log(mapLayer);
             map.addLayer(mapLayer);
-            map.on('click', layerName, ({ features }) => displayInfoSidebar(features as GeoJSONFeature[], actions));
+            map.on('click', layerName, ({ features }) =>
+              displayInfoSidebar(features as GeoJSONFeature[], actions, 'EDIT_POI')
+            );
             map.on('mouseenter', layerName, (e) => {
               map.getCanvas().style.cursor = 'pointer';
 
               const feature = e.features ? e.features[0] : undefined;
               if (!feature) return;
-              console.log(feature)
-              const coordinates = (feature.geometry as Point).coordinates.slice();
+              // console.log(feature)
+              const coordinates = (
+                feature.geometry.type === 'Point' ? (feature.geometry as Point).coordinates.slice() : e.lngLat
+              ) as number[];
               const title = feature.properties.title;
               const description = feature.properties.description;
-              const html = `${title ? `<h5>${title}</h5>` : ''}${description ? `<p>${description}</p>`: ''}`;
+              const html = `${title ? `<h5>${title}</h5>` : ''}${description ? `<p>${description}</p>` : ''}`;
               if (!html) return;
               // Ensure that if the map is zoomed out such that multiple
               // copies of the feature are visible, the popup appears
@@ -354,7 +373,25 @@ export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, m
     });
 };
 
-const defaultLayerStyle = {
+/** Add or update an item in a feature collection */
+export const addOrUpdateFeature = <T extends Geometry | null, K extends GeoJsonProperties>(
+  fc: FeatureCollectionExt<T, K>,
+  newItem: Feature<T, K>
+): FeatureCollectionExt<T, K> => {
+  const { id } = newItem.properties || {};
+  const { features = [] } = fc;
+  const existingItem = features.find((f) => f.properties?.id === id);
+
+  if (existingItem) {
+    // If an item with the same id exists, update it
+    return { ...fc, features: features.map((f) => (f.properties?.id === id ? { ...newItem } : f)) };
+  } else {
+    // If the item doesn't exist, add it
+    return { ...fc, features: [...features, { ...newItem }] };
+  }
+};
+
+export const defaultLayerStyle = {
   id: 'default',
   name: 'Default layer style',
   iconPath: `${process.env.SERVER_URL}/layer_styles/maki`,
@@ -398,12 +435,14 @@ const defaultLayerStyle = {
         // 'icon-image': ['coalesce', ["get", "marker-symbol"], "pin"],
         // 'icon-size': ['coalesce', ["get", "marker-size"], .2], // small, medium or large
         // 'icon-color': ['coalesce', ["get", "marker-color"], "#7e7e7e"],
-        'icon-image': [
-          'coalesce',
-          ['get', 'marker-symbol'],
-          // ['image', ['concat', ['get', 'icon'], '_15']],
-          'OTHER',
-        ],
+        // 'icon-image': [
+        //   'coalesce',
+        //   ['get', 'marker-symbol'],
+        //   // ['image', ['concat', ['get', 'icon'], '_15']],
+        //   'MARKER',
+        // ],
+        'icon-size': ['coalesce', ['get', 'marker-size'], 1], // small, medium or large
+        'icon-image': ['concat', 'default/maki/', ['get', 'marker-symbol']],
         'text-field': ['coalesce', ['get', 'title'], ''],
         // Existing fonts are located in maptiler container, in /usr/src/app/node_modules/tileserver-gl-styles/fonts
         // By default, only 'Noto Sans Regular' exists.
@@ -425,7 +464,220 @@ const defaultLayerStyle = {
     //   filter: ['all', ['in', 'type', 'man', 'firefighter']],
     // },
   ] as ILayer[],
-  icons: [] as Array<[name: string, src: string]>,
+  icons: [
+    ['Aerialway', 'aerialway.svg'],
+    ['Airfield', 'airfield.svg'],
+    ['Airport', 'airport.svg'],
+    ['Alcohol', 'alcohol-shop.svg'],
+    ['American', 'american-football.svg'],
+    ['Amusement', 'amusement-park.svg'],
+    ['Animal', 'animal-shelter.svg'],
+    ['Aquarium', 'aquarium.svg'],
+    ['Arrow', 'arrow.svg'],
+    ['Art', 'art-gallery.svg'],
+    ['Attraction', 'attraction.svg'],
+    ['Bakery', 'bakery.svg'],
+    ['Bank', 'bank.svg'],
+    ['Bank', 'bank-JP.svg'],
+    ['Bar', 'bar.svg'],
+    ['Barrier', 'barrier.svg'],
+    ['Baseball', 'baseball.svg'],
+    ['Basketball', 'basketball.svg'],
+    ['Bbq', 'bbq.svg'],
+    ['Beach', 'beach.svg'],
+    ['Beer', 'beer.svg'],
+    ['Bicycle', 'bicycle.svg'],
+    ['Bicycle', 'bicycle-share.svg'],
+    ['Blood', 'blood-bank.svg'],
+    ['Bowling', 'bowling-alley.svg'],
+    ['Bridge', 'bridge.svg'],
+    ['Building', 'building.svg'],
+    ['Building', 'building-alt1.svg'],
+    ['Bus', 'bus.svg'],
+    ['Cafe', 'cafe.svg'],
+    ['Campsite', 'campsite.svg'],
+    ['Car', 'car.svg'],
+    ['Car', 'car-rental.svg'],
+    ['Car', 'car-repair.svg'],
+    ['Casino', 'casino.svg'],
+    ['Castle', 'castle.svg'],
+    ['Castle', 'castle-JP.svg'],
+    ['Caution', 'caution.svg'],
+    ['Cemetery', 'cemetery.svg'],
+    ['Cemetery', 'cemetery-JP.svg'],
+    ['Charging', 'charging-station.svg'],
+    ['Cinema', 'cinema.svg'],
+    ['Circle', 'circle.svg'],
+    ['Circle', 'circle-stroked.svg'],
+    ['City', 'city.svg'],
+    ['Clothing', 'clothing-store.svg'],
+    ['College', 'college.svg'],
+    ['College', 'college-JP.svg'],
+    ['Commercial', 'commercial.svg'],
+    ['Communications', 'communications-tower.svg'],
+    ['Confectionery', 'confectionery.svg'],
+    ['Construction', 'construction.svg'],
+    ['Convenience', 'convenience.svg'],
+    ['Cricket', 'cricket.svg'],
+    ['Cross', 'cross.svg'],
+    ['Dam', 'dam.svg'],
+    ['Danger', 'danger.svg'],
+    ['Defibrillator', 'defibrillator.svg'],
+    ['Dentist', 'dentist.svg'],
+    ['Diamond', 'diamond.svg'],
+    ['Doctor', 'doctor.svg'],
+    ['Dog', 'dog-park.svg'],
+    ['Drinking', 'drinking-water.svg'],
+    ['Elevator', 'elevator.svg'],
+    ['Embassy', 'embassy.svg'],
+    ['Emergency', 'emergency-phone.svg'],
+    ['Entrance', 'entrance.svg'],
+    ['Entrance', 'entrance-alt1.svg'],
+    ['Farm', 'farm.svg'],
+    ['Fast', 'fast-food.svg'],
+    ['Fence', 'fence.svg'],
+    ['Ferry', 'ferry.svg'],
+    ['Ferry', 'ferry-JP.svg'],
+    ['Fire', 'fire-station.svg'],
+    ['Fire', 'fire-station-JP.svg'],
+    ['Fitness', 'fitness-centre.svg'],
+    ['Florist', 'florist.svg'],
+    ['Fuel', 'fuel.svg'],
+    ['Furniture', 'furniture.svg'],
+    ['Gaming', 'gaming.svg'],
+    ['Garden', 'garden.svg'],
+    ['Garden', 'garden-centre.svg'],
+    ['Gate', 'gate.svg'],
+    ['Gift', 'gift.svg'],
+    ['Globe', 'globe.svg'],
+    ['Golf', 'golf.svg'],
+    ['Grocery', 'grocery.svg'],
+    ['Hairdresser', 'hairdresser.svg'],
+    ['Harbor', 'harbor.svg'],
+    ['Hardware', 'hardware.svg'],
+    ['Heart', 'heart.svg'],
+    ['Heliport', 'heliport.svg'],
+    ['Highway', 'highway-rest-area.svg'],
+    ['Historic', 'historic.svg'],
+    ['Home', 'home.svg'],
+    ['Horse', 'horse-riding.svg'],
+    ['Hospital', 'hospital.svg'],
+    ['Hospital', 'hospital-JP.svg'],
+    ['Hot', 'hot-spring.svg'],
+    ['Ice', 'ice-cream.svg'],
+    ['Industry', 'industry.svg'],
+    ['Information', 'information.svg'],
+    ['Jewelry', 'jewelry-store.svg'],
+    ['Karaoke', 'karaoke.svg'],
+    ['Landmark', 'landmark.svg'],
+    ['Landmark', 'landmark-JP.svg'],
+    ['Landuse', 'landuse.svg'],
+    ['Laundry', 'laundry.svg'],
+    ['Library', 'library.svg'],
+    ['Lift', 'lift-gate.svg'],
+    ['Lighthouse', 'lighthouse.svg'],
+    ['Lighthouse', 'lighthouse-JP.svg'],
+    ['Lodging', 'lodging.svg'],
+    ['Logging', 'logging.svg'],
+    ['Marker', 'marker.svg'],
+    ['Marker', 'marker-stroked.svg'],
+    ['Mobile', 'mobile-phone.svg'],
+    ['Monument', 'monument.svg'],
+    ['Monument', 'monument-JP.svg'],
+    ['Mountain', 'mountain.svg'],
+    ['Museum', 'museum.svg'],
+    ['Music', 'music.svg'],
+    ['Natural', 'natural.svg'],
+    ['Observation', 'observation-tower.svg'],
+    ['Optician', 'optician.svg'],
+    ['Paint', 'paint.svg'],
+    ['Park', 'park.svg'],
+    ['Park', 'park-alt1.svg'],
+    ['Parking', 'parking.svg'],
+    ['Parking', 'parking-garage.svg'],
+    ['Parking', 'parking-paid.svg'],
+    ['Pharmacy', 'pharmacy.svg'],
+    ['Picnic', 'picnic-site.svg'],
+    ['Pitch', 'pitch.svg'],
+    ['Place', 'place-of-worship.svg'],
+    ['Playground', 'playground.svg'],
+    ['Police', 'police.svg'],
+    ['Police', 'police-JP.svg'],
+    ['Post', 'post.svg'],
+    ['Post', 'post-JP.svg'],
+    ['Prison', 'prison.svg'],
+    ['Racetrack', 'racetrack.svg'],
+    ['Racetrack', 'racetrack-boat.svg'],
+    ['Racetrack', 'racetrack-cycling.svg'],
+    ['Racetrack', 'racetrack-horse.svg'],
+    ['Rail', 'rail.svg'],
+    ['Rail', 'rail-light.svg'],
+    ['Rail', 'rail-metro.svg'],
+    ['Ranger', 'ranger-station.svg'],
+    ['Recycling', 'recycling.svg'],
+    ['Religious', 'religious-buddhist.svg'],
+    ['Religious', 'religious-christian.svg'],
+    ['Religious', 'religious-jewish.svg'],
+    ['Religious', 'religious-muslim.svg'],
+    ['Religious', 'religious-shinto.svg'],
+    ['Residential', 'residential-community.svg'],
+    ['Restaurant', 'restaurant.svg'],
+    ['Restaurant', 'restaurant-bbq.svg'],
+    ['Restaurant', 'restaurant-noodle.svg'],
+    ['Restaurant', 'restaurant-pizza.svg'],
+    ['Restaurant', 'restaurant-seafood.svg'],
+    ['Restaurant', 'restaurant-sushi.svg'],
+    ['Road', 'road-accident.svg'],
+    ['Roadblock', 'roadblock.svg'],
+    ['Rocket', 'rocket.svg'],
+    ['School', 'school.svg'],
+    ['School', 'school-JP.svg'],
+    ['Scooter', 'scooter.svg'],
+    ['Shelter', 'shelter.svg'],
+    ['Shoe', 'shoe.svg'],
+    ['Shop', 'shop.svg'],
+    ['Skateboard', 'skateboard.svg'],
+    ['Skiing', 'skiing.svg'],
+    ['Slaughterhouse', 'slaughterhouse.svg'],
+    ['Slipway', 'slipway.svg'],
+    ['Snowmobile', 'snowmobile.svg'],
+    ['Soccer', 'soccer.svg'],
+    ['Square', 'square.svg'],
+    ['Square', 'square-stroked.svg'],
+    ['Stadium', 'stadium.svg'],
+    ['Star', 'star.svg'],
+    ['Star', 'star-stroked.svg'],
+    ['Suitcase', 'suitcase.svg'],
+    ['Swimming', 'swimming.svg'],
+    ['Table', 'table-tennis.svg'],
+    ['Teahouse', 'teahouse.svg'],
+    ['Telephone', 'telephone.svg'],
+    ['Tennis', 'tennis.svg'],
+    ['Terminal', 'terminal.svg'],
+    ['Theatre', 'theatre.svg'],
+    ['Toilet', 'toilet.svg'],
+    ['Toll', 'toll.svg'],
+    ['Town', 'town.svg'],
+    ['Town', 'town-hall.svg'],
+    ['Triangle', 'triangle.svg'],
+    ['Triangle', 'triangle-stroked.svg'],
+    ['Tunnel', 'tunnel.svg'],
+    ['Veterinary', 'veterinary.svg'],
+    ['Viewpoint', 'viewpoint.svg'],
+    ['Village', 'village.svg'],
+    ['Volcano', 'volcano.svg'],
+    ['Volleyball', 'volleyball.svg'],
+    ['Warehouse', 'warehouse.svg'],
+    ['Waste', 'waste-basket.svg'],
+    ['Watch', 'watch.svg'],
+    ['Water', 'water.svg'],
+    ['Waterfall', 'waterfall.svg'],
+    ['Watermill', 'watermill.svg'],
+    ['Wetland', 'wetland.svg'],
+    ['Wheelchair', 'wheelchair.svg'],
+    ['Windmill', 'windmill.svg'],
+    ['Zoo', 'zoo.svg'],
+  ] as Array<[name: string, src: string]>,
 } as LayerStyle<any>;
 
 export const featureCollectionToSource = (fc: FeatureCollectionExt, styles: LayerStyle<any>[] = []) => {

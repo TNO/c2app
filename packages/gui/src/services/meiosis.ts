@@ -19,45 +19,14 @@ import {
 // @ts-ignore
 import ch from '../ch.json';
 import { routingSvc } from './routing-service';
-import { FeatureCollectionExt, Pages } from '../models';
-import { GeoJSONFeature, LayerSpecification, LinePaintProps, SymbolLayoutProps } from 'maplibre-gl';
+import { FeatureCollectionExt, ILayer, ISource, Pages, SidebarMode, SourceType } from '../models';
+import { GeoJSONFeature } from 'maplibre-gl';
 import { layerStylesSvc } from './layer_styles';
 import { restServiceFactory } from './rest-service';
 import { featureCollectionToSource } from '../components/map/map-utils';
-import { UIForm } from 'mithril-ui-form';
 
-const ZOOM_LEVEL = "SAFR_ZOOM_LEVEL";
-const LON_LAT = "SAFR_LON_LAT";
-
-export interface ILayer {
-  layerName: string;
-  showLayer: boolean;
-  type: LayerSpecification;
-  layout?: Partial<SymbolLayoutProps>;
-  paint?: LinePaintProps | Record<string, any>;
-  filter?: any[];
-}
-
-export const enum SourceType {
-  'realtime',
-  'grid',
-  'custom',
-  'alert',
-  'chemical_incident',
-  'plume',
-}
-
-export interface ISource {
-  id: string;
-  source: FeatureCollection;
-  sourceName: string;
-  dts?: Array<number>;
-  sourceCategory: SourceType;
-  layers: ILayer[];
-  shared: boolean;
-  shareWith?: string[];
-  ui: UIForm;
-}
+const ZOOM_LEVEL = 'SAFR_ZOOM_LEVEL';
+const LON_LAT = 'SAFR_LON_LAT';
 
 export interface IAppModel {
   app: {
@@ -91,13 +60,15 @@ export interface IAppModel {
     newMessages: { [key: string]: number };
 
     // Layers/styles
+    sidebarMode: SidebarMode;
     map: maplibregl.Map;
     layerStyles?: LayerStyle<Record<string, any>>[];
     sources: Array<ISource>;
     mapStyle: string;
     switchStyle: boolean;
     gridOptions: IGridOptions;
-    editLayer: number;
+    /** Source ID that is being edited */
+    editSourceId: string;
     resourceDict: { [id: string]: IAssistanceResource };
     sensorDict: { [id: string]: ISensor };
     showSatellite: boolean;
@@ -107,11 +78,11 @@ export interface IAppModel {
       scenario: IChemicalIncidentScenario;
       control_parameters: IChemicalIncidentControlParameters;
     };
-
   };
 }
 
 export interface IActions {
+  update: (value: Partial<ModelUpdateFunction>) => void;
   // Utils
   switchToPage: (
     pageId: Pages,
@@ -127,7 +98,7 @@ export interface IActions {
   openAlert: (alert: IAlert) => void;
 
   // Clicking/selecting
-  updateClickedFeature: (feature: GeoJSONFeature) => void;
+  updateClickedFeature: (feature: GeoJSONFeature, mode: SidebarMode) => void;
   updateSelectedFeatures: (features: Array<Feature>) => void;
   resetClickedFeature: () => void;
 
@@ -147,13 +118,13 @@ export interface IActions {
   sendChat: (group: IGroup, message: string) => void;
 
   // Layers/styles
-  loadGeoJSON: () => Promise<void>,
+  loadGeoJSON: () => Promise<void>;
   // loadLayerStyles: () => Promise<void>;
-  setMap: (map: maplibregl.Map) => void,
-  setZoomLevel: (zoomLevel: number) => void,
-  getZoomLevel: () => number,
-  setLonLat: (lonlat: [lon: number, lat: number]) => void,
-  getLonLat: () => [lon: number, lat: number],
+  setMap: (map: maplibregl.Map) => void;
+  setZoomLevel: (zoomLevel: number) => void;
+  getZoomLevel: () => number;
+  setLonLat: (lonlat: [lon: number, lat: number]) => void;
+  getLonLat: () => [lon: number, lat: number];
   saveSource: (source: ISource) => Promise<void>;
   switchStyle: (style: string) => void;
   toggleLayer: (sourceIndex: number, layerIndex: number) => void;
@@ -165,7 +136,7 @@ export interface IActions {
   addDrawingsToLayer: (index: number) => void;
   updateDrawings: (feature: Feature) => void;
   deleteLayer: (sourceIndex: number) => void;
-  setLayerEdit: (sourceIndex: number) => void;
+  setLayerEdit: (sourceIndex: string) => void;
   toggleSatellite: () => void;
 
   // CHT
@@ -217,6 +188,7 @@ export const appState = {
       newMessages: {} as { [key: string]: number },
 
       // Layers/styles
+      sidebarMode: 'NONE',
       layerStyles: undefined,
       sources: [] as Array<ISource>,
       mapStyle: 'mapbox/streets-v11',
@@ -236,9 +208,10 @@ export const appState = {
         control_parameters: {} as IChemicalIncidentControlParameters,
       },
     },
-  },
-  actions: (update: UpdateStream, states: Stream<IAppModel>) => {
+  } as Partial<IAppModel>,
+  actions: (update: UpdateStream, states: Stream<IAppModel>): IActions => {
     return {
+      update: (value) => update(value),
       // Utils
       switchToPage: (
         pageId: Pages,
@@ -250,17 +223,17 @@ export const appState = {
 
       // Core
       loadGeoJSON: async () => {
-        console.log('LOADING GEOJSON')
-        const layerStyles = await layerStylesSvc.loadStyles() || [];
+        console.log('LOADING GEOJSON');
+        const layerStyles = (await layerStylesSvc.loadStyles()) || [];
         const { socket } = states().app;
         socket.setLayerStyles(layerStyles);
-        const sources = (await geojsonSvc.loadList()).map(source => featureCollectionToSource(source, layerStyles));
+        const sources = (await geojsonSvc.loadList()).map((source) => featureCollectionToSource(source, layerStyles));
         update({
           app: {
             layerStyles: () => layerStyles,
             sources: () => sources,
-          }
-        })
+          },
+        });
       },
       drawingCleared: () => {
         update({
@@ -347,9 +320,16 @@ export const appState = {
       },
 
       // Clicking/selecting
-      updateClickedFeature: (feature: GeoJSONFeature & { source?: string }) => {
-        console.log(feature);
-        update({ app: { clickedFeature: () => feature }});
+      updateClickedFeature: (feature: GeoJSONFeature & { source?: string }, mode) => {
+        const f = {
+          id: feature.id,
+          type: feature.type,
+          geometry: feature.geometry || feature._geometry,
+          properties: feature.properties || [],
+          source: feature.source,
+        } as GeoJSONFeature & { source?: string };
+        console.log(f);
+        update({ app: { clickedFeature: () => f, sidebarMode: mode } });
       },
       updateSelectedFeatures: (features: Array<Feature>) => {
         update({ app: { selectedFeatures: { type: 'FeatureCollection', features: features } } });
@@ -472,18 +452,22 @@ export const appState = {
 
       // Layers/style
       setMap: (map: maplibregl.Map) => update({ app: { map: () => map } }),
-      setZoomLevel: (zoomLevel: number) => { localStorage.setItem(ZOOM_LEVEL, zoomLevel.toString()) },
+      setZoomLevel: (zoomLevel: number) => {
+        localStorage.setItem(ZOOM_LEVEL, zoomLevel.toString());
+      },
       getZoomLevel: () => +(localStorage.getItem(ZOOM_LEVEL) || 4),
-      setLonLat: (lonlat: [lon: number, lat: number]) => { localStorage.setItem(LON_LAT, JSON.stringify(lonlat)) },
-      getLonLat: () => JSON.parse(localStorage.getItem(LON_LAT) || "[5, 53]") as [lon: number, lat: number],
+      setLonLat: (lonlat: [lon: number, lat: number]) => {
+        localStorage.setItem(LON_LAT, JSON.stringify(lonlat));
+      },
+      getLonLat: () => JSON.parse(localStorage.getItem(LON_LAT) || '[5, 53]') as [lon: number, lat: number],
       saveSource: async (source: ISource) => {
         if (!source || !source.source) return;
         await geojsonSvc.save(source.source);
-        update({ 
+        update({
           app: {
-            sources: (s: ISource[]) => s.map(source => source.id === source.id ? source : source)
-          }
-        })
+            sources: (s: ISource[]) => s.map((source) => (source.id === source.id ? source : source)),
+          },
+        });
       },
       switchStyle: (style: string) => {
         update({
@@ -654,7 +638,7 @@ export const appState = {
         });
       },
       updateDrawings: (feature: Feature) => {
-        update({ app: { latestDrawing: feature } });
+        update({ app: { latestDrawing: () => feature } });
       },
       deleteLayer: (sourceIndex: number) => {
         update({
@@ -666,12 +650,8 @@ export const appState = {
           },
         });
       },
-      setLayerEdit: (sourceIndex: number) => {
-        update({
-          app: {
-            editLayer: sourceIndex,
-          },
-        });
+      setLayerEdit: (sourceIndex: string) => {
+        update({ app: { editSourceId: sourceIndex } });
       },
       toggleSatellite: () => {
         update({
@@ -858,16 +838,16 @@ const app = {
   // Initial state of the appState
   initial: Object.assign({}, appState.initial) as IAppModel,
   // Actions that can be called to update the state
-  actions: (us: UpdateStream, states: Stream<IAppModel>) =>
-    Object.assign({}, appState.actions(us, states)) as IActions,
+  actions: (us: UpdateStream, states: Stream<IAppModel>) => Object.assign({}, appState.actions(us, states)) as IActions,
   // Services that run everytime the state is updated (so after the action is done)
   services: [] as Array<(s: IAppModel) => Partial<IAppModel> | void>,
   // Effects run from state update until some condition is met (can cause infinite loop)
-  effects: (_update: UpdateStream, _actions: IActions) => [
-    // (state) => {
-    //   if (!state.app.layerStyles) actions.loadGeoJSON()
-    // },
-  ] as Array<(state: IAppModel) => Promise<void> | void>,
+  effects: (_update: UpdateStream, _actions: IActions) =>
+    [
+      // (state) => {
+      //   if (!state.app.layerStyles) actions.loadGeoJSON()
+      // },
+    ] as Array<(state: IAppModel) => Promise<void> | void>,
 };
 
 const runServices = (startingState: IAppModel) =>

@@ -1,5 +1,5 @@
 import m, { FactoryComponent } from 'mithril';
-import { IActions, ISource, IAppModel } from '../../services/meiosis';
+import { IActions, IAppModel } from '../../services/meiosis';
 import M from 'materialize-css';
 import { LayoutForm } from 'mithril-ui-form';
 import { formGenerator } from '../../template/form';
@@ -10,6 +10,7 @@ import {
   ICbrnProperties,
 } from 'c2app-models-utils';
 import { GeoJSONFeature } from 'maplibre-gl';
+import { ISource } from '../../models';
 
 export const formatMan = (ft: GeoJSONFeature) => {
   const props = ft?.properties;

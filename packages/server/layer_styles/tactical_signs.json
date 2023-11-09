@@ -86,18 +86,21 @@
         "type": "symbol"
       },
       "layout": {
-        "icon-size": 0.1,
-        "icon-image": [
+        "icon-size": [
           "coalesce",
           [
-            "concat",
-            "tactical_signs/",
-            [
-              "get",
-              "marker-symbol"
-            ]
+            "get",
+            "marker-size"
           ],
-          "OTHER"
+          1
+        ],
+        "icon-image": [
+          "concat",
+          "tactical_signs/",
+          [
+            "get",
+            "marker-symbol"
+          ]
         ],
         "text-field": [
           "coalesce",

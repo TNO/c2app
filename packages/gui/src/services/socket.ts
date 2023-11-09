@@ -1,5 +1,5 @@
 import { Feature, FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
-import { SourceType, IAppModel, ILayer, ISource, UpdateStream, states } from './meiosis';
+import { IAppModel, UpdateStream, states } from './meiosis';
 import io, { Socket as ioSocket } from 'socket.io-client';
 import {
   IAlert,
@@ -24,7 +24,7 @@ import {
 import M from 'materialize-css';
 import mapboxgl from 'mapbox-gl';
 import m from 'mithril';
-import { FeatureCollectionExt } from '../models';
+import { FeatureCollectionExt, ILayer, ISource, SourceType } from '../models';
 import { uniqueId } from 'mithril-materialized';
 import { featureCollectionToSource, toLayerName, toSourceName } from '../components/map/map-utils';
 
@@ -443,18 +443,20 @@ export class Socket {
           const state = states();
           const { sources = [], map } = state.app;
           if (!map) break;
-          sources.forEach(source => {
+          sources.forEach((source) => {
             const { layers = [] } = source;
             const sourceName = toSourceName(source);
             const s = map.getSource(sourceName);
             if (s) {
-              layers.map(layer => toLayerName(sourceName, layer)).forEach(layerName => {
-                if (map.getLayer(layerName)) map.removeLayer(layerName);
-              });
+              layers
+                .map((layer) => toLayerName(sourceName, layer))
+                .forEach((layerName) => {
+                  if (map.getLayer(layerName)) map.removeLayer(layerName);
+                });
               map.removeSource(sourceName);
             }
-          })
-          us({ app: { sources: () => [], } });
+          });
+          us({ app: { sources: () => [] } });
           break;
       }
     });
@@ -471,7 +473,7 @@ export class Socket {
             if (index > -1) {
               sources[index].source = source;
             } else {
-              sources.push(featureCollectionToSource(source, this.layerStyles))
+              sources.push(featureCollectionToSource(source, this.layerStyles));
               // sources.push({
               //   id,
               //   source,
@@ -669,12 +671,12 @@ export class Socket {
     this.socket.emit(
       'client-message',
       { id: group.id, callsign: s.app.callsign, message: message },
-      (_result: string) => { }
+      (_result: string) => {}
     );
   }
 
   serverCHT(chemicalIncident: Partial<IChemicalIncident>) {
-    this.socket.emit('client-cht', { hazard: chemicalIncident }, (_result: string) => { });
+    this.socket.emit('client-cht', { hazard: chemicalIncident }, (_result: string) => {});
   }
 
   serverPopulator(feature: Feature): Promise<FeatureCollection> {

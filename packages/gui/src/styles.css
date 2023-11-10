@@ -30,3 +30,19 @@ p {
   bottom: 0;
   overflow-y: auto;
 }
+
+/* LEGEND CONTROL */
+.legend-control {
+  position: absolute;
+  max-width: 30%;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  background: white;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.ml10 {
+  margin-left: 10px;
+}

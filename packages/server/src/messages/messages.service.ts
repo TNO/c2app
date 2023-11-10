@@ -91,7 +91,6 @@ export class MessagesService {
         return result;
       }
     }
-    console.log('CREATE inserting item');
     return collection.insert(message);
   }
 

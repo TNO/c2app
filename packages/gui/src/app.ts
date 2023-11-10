@@ -9,6 +9,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import './styles.css';
 
+document.documentElement.lang = 'en';
 process.env.NODE_ENV === 'development' && console.log('Running in development: no service worker');
 if (process.env.NODE_ENV !== 'development' && 'serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');

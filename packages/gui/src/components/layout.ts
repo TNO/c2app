@@ -1,17 +1,12 @@
 import m from 'mithril';
 import { MeiosisComponent } from '../services/meiosis';
-import logo from '../assets/safr.svg';
-import { profileModal } from './sidebars/modals';
 import M from 'materialize-css';
 import { poiSidebar } from './sidebars/poi-sidebar';
-import { profileSidebar } from './sidebars/profile-sidebar';
-import { routingSvc } from '../services/routing-service';
+import { legendControl } from './sidebars/legend-control';
 
 export const Layout: MeiosisComponent = () => {
   return {
     view: ({ children, attrs: { state, actions } }) => {
-      const { switchToPage } = actions;
-
       return m('.main', [
         // m(profileModal, { state, actions }),
         // m(
@@ -92,7 +87,8 @@ export const Layout: MeiosisComponent = () => {
         //   )
         // ),
         m('.row', children),
-        m('.row', m(poiSidebar, { state, actions })),
+        m(poiSidebar, { state, actions }),
+        m(legendControl, { state, actions }),
         // m('.row', m(profileSidebar, { state, actions })),
       ]);
     },

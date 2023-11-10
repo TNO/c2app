@@ -17,7 +17,7 @@
   ],
   "layers": [
     {
-      "layerName": "areas",
+      "layerName": "Bereiche",
       "showLayer": true,
       "type": {
         "type": "fill"
@@ -47,7 +47,7 @@
       ]
     },
     {
-      "layerName": "lines",
+      "layerName": "Linien",
       "showLayer": true,
       "type": {
         "type": "line"
@@ -80,7 +80,7 @@
       }
     },
     {
-      "layerName": "icons",
+      "layerName": "Symbole",
       "showLayer": true,
       "type": {
         "type": "symbol"

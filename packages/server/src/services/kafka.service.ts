@@ -6,7 +6,6 @@ import {
   AdapterMessage,
   AdapterProducerRecord,
   RecordMetadata,
-  FeatureCollectionType,
 } from 'node-test-bed-adapter';
 import { DefaultWebSocketGateway } from '../gateway/default-websocket.gateway.js';
 import { FeatureCollection } from 'geojson';
@@ -60,17 +59,17 @@ export class KafkaService {
         consume: process.env.CONSUME
           ? process.env.CONSUME.split(',').map((t) => t.trim())
           : [
-            SimEntityFeatureCollectionTopic,
-            capMessage,
-            contextTopic,
-            geojsonLayer,
-            missionTopic,
-            resourceTopic,
-            sensorTopic,
-            chemicalIncidentTopic,
-            plumeTopic,
-            messageTopic,
-          ],
+              SimEntityFeatureCollectionTopic,
+              capMessage,
+              contextTopic,
+              geojsonLayer,
+              missionTopic,
+              resourceTopic,
+              sensorTopic,
+              chemicalIncidentTopic,
+              plumeTopic,
+              messageTopic,
+            ],
         logging: {
           logToConsole: LogLevel.Info,
           logToKafka: LogLevel.Warn,
@@ -109,7 +108,7 @@ export class KafkaService {
     while (this.messageQueue.length > 0 && !this.busy) {
       this.busy = true;
       const { topic, value } = this.messageQueue.shift();
-      console.log(JSON.stringify(value))
+      console.log(JSON.stringify(value));
       switch (topic) {
         case geojsonLayer:
         case SimEntityFeatureCollectionTopic:
@@ -118,49 +117,49 @@ export class KafkaService {
             this.socket.server.emit('instructions', { action: 'CLEAR_ALL_COLLECTIONS' });
           } else {
             const geojson = KafkaService.normalizeGeoJSON(value as FeatureCollection);
-            console.log(JSON.stringify(geojson))
-            this.socket.server.emit('geojson', geojson);
+            console.log(JSON.stringify(geojson));
             this.messagesService.create('geojson', geojson);
+            this.socket.server.emit('geojson', geojson);
           }
           break;
         case capMessage:
           const alert = value as IAlert;
-          this.socket.server.emit('alert', alert);
           this.messagesService.create('alerts', alert);
+          this.socket.server.emit('alert', alert);
           break;
         case contextTopic:
           const context = KafkaService.prepareContext(value as IContext);
-          this.socket.server.emit('context', context);
           this.messagesService.create('contexts', context);
+          this.socket.server.emit('context', context);
           break;
         case missionTopic:
-          this.socket.server.emit('mission', value as IMission);
           this.messagesService.create('missions', value);
+          this.socket.server.emit('mission', value as IMission);
           break;
         case resourceTopic:
-          this.socket.server.emit('resource', value as IAssistanceResource);
           this.messagesService.create('resources', value);
+          this.socket.server.emit('resource', value as IAssistanceResource);
           break;
         case sensorTopic:
-          this.socket.server.emit('sensor', value as ISensor);
           this.messagesService.create('sensors', value);
+          this.socket.server.emit('sensor', value as ISensor);
           break;
         case chemicalIncidentTopic:
-          this.socket.server.emit('chemical_incident', value as ISensor);
           this.messagesService.create('chemical_incidents', value);
+          this.socket.server.emit('chemical_incident', value as ISensor);
           break;
         case plumeTopic:
           const plume = KafkaService.preparePlume(value as ICbrnFeatureCollection);
-          this.socket.server.emit('plume', plume);
           this.messagesService.create('plumes', plume);
+          this.socket.server.emit('plume', plume);
           break;
         case messageTopic:
           const msg = value as IAssistanceMessage;
           const { resource } = msg;
           // Send message only to the resource that is mentioned
           if (this.socket.callsignToSocketId.get(resource)) {
-            this.socket.server.to(this.socket.callsignToSocketId.get(resource)).emit('sas_message', msg);
             this.messagesService.create('sas_messages', msg);
+            this.socket.server.to(this.socket.callsignToSocketId.get(resource)).emit('sas_message', msg);
           } else {
             console.log('Alert for ID: ' + msg.resource + ', resource not logged in!');
           }
@@ -174,25 +173,26 @@ export class KafkaService {
     }
   }
 
-  private static normalizeGeoJSON(collection: FeatureCollection) {
-    if (typeof (collection as any).id === 'undefined') {
-      (collection as any).id = (collection as any).layerId || uniqueId();
-    }
-    for (const feature of collection.features) {
-      feature.geometry = Object.entries(feature.geometry).map(([_key, value]) => value).shift();
+  private static normalizeGeoJSON(fc: FeatureCollection) {
+    if (typeof (fc as any).layerId === 'undefined') (fc as any).layerId = uniqueId();
+    for (const feature of fc.features) {
+      feature.geometry = Object.entries(feature.geometry)
+        .map(([_key, value]) => value)
+        .shift();
       feature.properties = Object.entries(feature.properties).reduce((acc, [key, value]) => {
-        acc[key] = typeof value.string !== 'undefined'
-          ? value.string
-          : typeof value.int !== 'undefined'
+        acc[key] =
+          typeof value.string !== 'undefined'
+            ? value.string
+            : typeof value.int !== 'undefined'
             ? value.int
             : typeof value.double !== 'undefined'
-              ? value.double
-              : value;
+            ? value.double
+            : value;
         return acc;
-      }, {} as Record<string, any>)
+      }, {} as Record<string, any>);
       if (typeof feature.properties.id === 'undefined') feature.properties.id = uniqueId();
     }
-    return collection as FeatureCollection;
+    return fc as FeatureCollection;
   }
 
   private static preparePlume(collection: ICbrnFeatureCollection) {

@@ -17,7 +17,7 @@ MapboxDraw.constants.classes.CONTROL_GROUP = 'maplibregl-ctrl-group';
 export const Map: MeiosisComponent = () => {
   let map: MaplibreMap;
   let draw: MapboxDraw;
-  console.table(process.env.VECTOR_TILE_SERVER === 'undefined')
+  console.table(process.env.VECTOR_TILE_SERVER === 'undefined');
   return {
     view: () => {
       return m('#mapboxMap.col.s12.l9.right');
@@ -26,29 +26,32 @@ export const Map: MeiosisComponent = () => {
       // Create map and add controls
       map = new MaplibreMap({
         container: 'mapboxMap',
-        style: process.env.VECTOR_TILE_SERVER && process.env.VECTOR_TILE_SERVER !== 'undefined'
-          ? process.env.VECTOR_TILE_SERVER
-          : {
-            version: 8,
-            sources: {
-              'brt-achtergrondkaart': {
-                type: 'raster',
-                tiles: ['https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png'],
-                tileSize: 256,
-                minzoom: 1,
-                maxzoom: 19,
-                attribution: 'Kaartgegevens: <a href="https://kadaster.nl">Kadaster</a>',
+        style:
+          process.env.VECTOR_TILE_SERVER && process.env.VECTOR_TILE_SERVER !== 'undefined'
+            ? process.env.VECTOR_TILE_SERVER
+            : {
+                version: 8,
+                sources: {
+                  'brt-achtergrondkaart': {
+                    type: 'raster',
+                    tiles: [
+                      'https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png',
+                    ],
+                    tileSize: 256,
+                    minzoom: 1,
+                    maxzoom: 19,
+                    attribution: 'Kaartgegevens: <a href="https://kadaster.nl">Kadaster</a>',
+                  },
+                },
+                glyphs: 'https://api.pdok.nl/lv/bgt/ogc/v1_0/resources/fonts/{fontstack}/{range}.pbf',
+                layers: [
+                  {
+                    id: 'standard-raster',
+                    type: 'raster',
+                    source: 'brt-achtergrondkaart',
+                  },
+                ],
               },
-            },
-            glyphs: 'https://api.pdok.nl/lv/bgt/ogc/v1_0/resources/fonts/{fontstack}/{range}.pbf',
-            layers: [
-              {
-                id: 'standard-raster',
-                type: 'raster',
-                source: 'brt-achtergrondkaart',
-              },
-            ],
-          },
         center: actions.getLonLat(),
         zoom: actions.getZoomLevel(),
       });
@@ -75,7 +78,7 @@ export const Map: MeiosisComponent = () => {
           MapUtils.updateSourcesAndLayers(appState, actions, map);
           MapUtils.updateSatellite(appState, map);
         });
-        
+
         actions.setMap(map);
       });
     },
@@ -89,9 +92,9 @@ export const Map: MeiosisComponent = () => {
       }
 
       // Update the grid if necessary
-      if (appState.app.gridOptions.updateGrid) {
-        MapUtils.updateGrid(appState, actions, map);
-      }
+      // if (appState.app.gridOptions.updateGrid) {
+      //   MapUtils.updateGrid(appState, actions, map);
+      // }
 
       // Check if basemap should be switched
       // if (token && !map.getStyle().sprite?.includes(appState.app.mapStyle)) {

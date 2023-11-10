@@ -1,14 +1,19 @@
 import { Controller, Get, Post, Body, Param, Delete, Inject, Put } from '@nestjs/common';
 import { MessagesService } from './messages.service.js';
+import { DefaultWebSocketGateway } from '../gateway/default-websocket.gateway.js';
 import { CreateMessageDto } from './dto/create-message.dto.js';
 import { UpdateMessageDto } from './dto/update-message.dto.js';
 
 @Controller('messages')
 export class MessagesController {
-  constructor(@Inject(MessagesService) private readonly messagesService: MessagesService) { }
+  constructor(
+    @Inject(DefaultWebSocketGateway) private readonly socket: DefaultWebSocketGateway,
+    @Inject(MessagesService) private readonly messagesService: MessagesService
+  ) {}
 
   @Post('/:topic')
   create(@Param('topic') topic: string, @Body() msg: CreateMessageDto) {
+    this.socket.server.emit(topic, msg);
     return this.messagesService.create(topic, msg);
   }
 
@@ -26,6 +31,7 @@ export class MessagesController {
 
   @Put('/:topic/:id')
   update(@Param('topic') topic: string, @Param('id') id: string, @Body() msg: UpdateMessageDto) {
+    this.socket.server.emit(topic, msg);
     return this.messagesService.update(topic, +id, msg);
   }
 

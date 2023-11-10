@@ -38,6 +38,7 @@ export interface IAppModel {
     alert?: IAlert;
 
     // Clicking/Selecting
+    showLegend: boolean;
     clickedFeature?: GeoJSONFeature & { source?: string };
     selectedFeatures?: FeatureCollection;
     latestDrawing: Feature;
@@ -117,7 +118,8 @@ export interface IActions {
   openChat: (group: IGroup) => void;
   sendChat: (group: IGroup, message: string) => void;
 
-  // Layers/styles
+  // Layers/styles'
+  toggleLegend: () => void;
   loadGeoJSON: () => Promise<void>;
   // loadLayerStyles: () => Promise<void>;
   setMap: (map: maplibregl.Map) => void;
@@ -125,7 +127,9 @@ export interface IActions {
   getZoomLevel: () => number;
   setLonLat: (lonlat: [lon: number, lat: number]) => void;
   getLonLat: () => [lon: number, lat: number];
+  updateLayerVisibility: (sourceId: string, layerName: string, visibility: boolean) => void;
   saveSource: (source: ISource) => Promise<void>;
+  deleteSource: (source: ISource) => Promise<void>;
   switchStyle: (style: string) => void;
   toggleLayer: (sourceIndex: number, layerIndex: number) => void;
   updateGridLocation: (bbox: [number, number, number, number]) => void;
@@ -188,6 +192,7 @@ export const appState = {
       newMessages: {} as { [key: string]: number },
 
       // Layers/styles
+      showLegend: false,
       sidebarMode: 'NONE',
       layerStyles: undefined,
       sources: [] as Array<ISource>,
@@ -222,12 +227,18 @@ export const appState = {
       },
 
       // Core
+      toggleLegend: () => {
+        const { showLegend } = states().app;
+        update({ app: { showLegend: !showLegend } });
+      },
+
       loadGeoJSON: async () => {
         console.log('LOADING GEOJSON');
         const layerStyles = (await layerStylesSvc.loadStyles()) || [];
         const { socket } = states().app;
         socket.setLayerStyles(layerStyles);
         const sources = (await geojsonSvc.loadList()).map((source) => featureCollectionToSource(source, layerStyles));
+        console.log(sources);
         update({
           app: {
             layerStyles: () => layerStyles,
@@ -462,10 +473,41 @@ export const appState = {
       getLonLat: () => JSON.parse(localStorage.getItem(LON_LAT) || '[5, 53]') as [lon: number, lat: number],
       saveSource: async (source: ISource) => {
         if (!source || !source.source) return;
-        await geojsonSvc.save(source.source);
+        const updatedSource = await geojsonSvc.save(source.source);
+        if (!updatedSource) return;
+        source.source = updatedSource;
         update({
           app: {
-            sources: (s: ISource[]) => s.map((source) => (source.id === source.id ? source : source)),
+            sources: (sources: ISource[]) => sources.map((s) => (s.id === source.id ? source : s)),
+          },
+        });
+      },
+      deleteSource: async (source: ISource) => {
+        if (!source || !source.source || !source.source.$loki) return;
+        const { $loki } = source.source;
+        console.log(source);
+        await geojsonSvc.del($loki);
+        update({
+          app: {
+            sources: (sources: ISource[]) => sources.filter((s) => s.source.$loki !== $loki),
+          },
+        });
+      },
+      updateLayerVisibility: (sourceId: string, layerName: string, visibility: boolean) => {
+        update({
+          app: {
+            sources: (sources: ISource[]) => {
+              sources.forEach((curSource) => {
+                if (curSource.id === sourceId) {
+                  curSource.layers.forEach((curLayer) => {
+                    if (curLayer.layerName === layerName) {
+                      curLayer.showLayer = visibility;
+                    }
+                  });
+                }
+              });
+              return sources;
+            },
           },
         });
       },
@@ -560,6 +602,7 @@ export const appState = {
                       layout: {
                         'text-field': '${cellLabel}',
                         'text-allow-overlap': true,
+                        'text-font': ['Noto Sans Regular'],
                       } as any, // TODO FIX
                       paint: {
                         'text-opacity': 0.5,

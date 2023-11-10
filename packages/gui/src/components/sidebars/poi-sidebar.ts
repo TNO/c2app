@@ -1,12 +1,8 @@
 import m from 'mithril';
 import { MeiosisComponent } from '../../services/meiosis';
-import { addOrUpdateFeature, toSourceName } from '../map/map-utils';
+import { addOrUpdateFeature, deleteFeature, toSourceName } from '../map/map-utils';
 import { FormAttributes, LayoutForm, UIForm } from 'mithril-ui-form';
-
-type LayerSourceDef = {
-  sourceName: string;
-  layerStyleId: number;
-};
+import { FlatButton } from 'mithril-materialized';
 
 type PoiSourceDef = {
   sourceId: string;
@@ -24,7 +20,7 @@ export const poiSidebar: MeiosisComponent = () => {
       const { saveSource, update } = actions;
 
       const curSources = sources.filter((s) => s.shared).map((s) => ({ id: s.id, label: s.sourceName }));
-      poiSourceDef.sourceId = editSourceId || curSources.length === 1 ? curSources[0].id : '';
+      poiSourceDef.sourceId = editSourceId || (curSources.length === 1 ? curSources[0].id : '');
       formValid = poiSourceDef.sourceId ? true : false;
 
       const sourceName = clickedFeature && clickedFeature.source;
@@ -57,7 +53,7 @@ export const poiSidebar: MeiosisComponent = () => {
         case 'LineString':
           ui.push(
             { label: 'Stroke color', id: 'stroke', type: 'color', value: '#555555' },
-            { label: 'Stroke opacity', id: 'stroke-opacity', type: 'number', min: 0, max: 1, step: 0.05 },
+            { label: 'Stroke opacity', id: 'stroke-opacity', type: 'number', min: 0.05, max: 1, step: 0.05 },
             { label: 'Stroke width', id: 'stroke-width', type: 'number', min: 1, step: 0.5 }
           );
           break;
@@ -65,9 +61,9 @@ export const poiSidebar: MeiosisComponent = () => {
           ui.push(
             { label: 'Stroke color', id: 'stroke', type: 'color', value: '#555555' },
             { label: 'Stroke opacity', id: 'stroke-opacity', type: 'number', min: 0, max: 1, step: 0.05 },
-            { label: 'Stroke width', id: 'stroke-width', type: 'number', value: 1, min: 1, step: 0.5 },
+            { label: 'Stroke width', id: 'stroke-width', type: 'number', value: 0, min: 0, step: 0.5 },
             { label: 'Fill color', id: 'fill', type: 'color', value: '#555555' },
-            { label: 'Fill opacity', id: 'fill-opacity', type: 'number', min: 0, max: 1, step: 0.05 }
+            { label: 'Fill opacity', id: 'fill-opacity', type: 'number', min: 0.05, max: 1, step: 0.05 }
           );
           break;
       }
@@ -81,13 +77,14 @@ export const poiSidebar: MeiosisComponent = () => {
                 (clickedFeature.properties.hasOwnProperty(id) && typeof clickedFeature.properties[id] !== 'undefined')
             ));
 
-      const curStyles = layerStyles.map((s, i) => ({ id: i, label: s.name }));
+      const key1 = poiSourceDef.sourceId || 'create_poi';
+      const key2 = clickedFeature?.properties?.id || 'edit_poi';
 
       return m(
         'ul#slide-out-2.sidenav.no-autoinit',
         m('.row', [
-          sidebarMode === 'CREATE_POI' &&
-            m('.col.s12', [
+          m('.col.s12', { key: key1 }, [
+            sidebarMode === 'CREATE_POI' &&
               m(LayoutForm, {
                 form: [
                   {
@@ -105,18 +102,17 @@ export const poiSidebar: MeiosisComponent = () => {
                   update({ app: { editSourceId: sourceId } });
                 },
               } as FormAttributes<PoiSourceDef>),
-              ,
-            ]),
+          ]),
           m(
             '.col.s12',
+            { key: key2 },
             form && [
               m(LayoutForm, {
                 disabled: !formValid,
                 form,
                 obj: clickedFeature.properties,
-                onchange: async () => {
-                  if (source && source.source) {
-                    console.log(clickedFeature);
+                onchange: async (isValid) => {
+                  if (isValid && source && source.source) {
                     source.source = addOrUpdateFeature(source.source, clickedFeature);
                     await saveSource(source);
                   }
@@ -124,6 +120,18 @@ export const poiSidebar: MeiosisComponent = () => {
               } as FormAttributes<Record<string, any>>),
             ]
           ),
+          m('.buttons', { key: 'buttons' }, [
+            m(FlatButton, {
+              label: 'Delete',
+              iconName: 'delete',
+              onclick: async () => {
+                if (source && source.source) {
+                  source.source = deleteFeature(source.source, clickedFeature);
+                  await saveSource(source);
+                }
+              },
+            }),
+          ]),
         ])
       );
     },
@@ -132,10 +140,7 @@ export const poiSidebar: MeiosisComponent = () => {
       elem &&
         M.Sidenav.init(elem, {
           edge: 'right',
-          onOpenStart: function (_elem: Element) {
-            // @ts-ignore
-            // elem.M_Sidenav._overlay.remove();
-          },
+          onOpenStart: function (_elem: Element) {},
         });
     },
   };

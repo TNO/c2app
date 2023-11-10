@@ -38,6 +38,7 @@ import { FeatureCollectionExt, ILayer, ISource, SidebarMode, SourceType } from '
 import { uniqueId } from 'mithril-materialized';
 import { LayerStyle } from 'c2app-models-utils';
 import { UIForm } from 'mithril-ui-form';
+import { clone } from '../../utils';
 
 export const drawConfig = {
   displayControlsDefault: false,
@@ -171,8 +172,6 @@ export const loadMissingImages = (map: MaplibreMap) => {
     //   return;
     // }
     const url = id.endsWith('/') ? marker : `${process.env.SERVER_URL}/layer_styles/${id}`;
-    console.log(`Missing image URL: ${url}`);
-    console.log(e);
     map.loadImage(url, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
       if (error) throw error;
       if (!map.hasImage(id)) map.addImage(id, image as ImageBitmap);
@@ -287,7 +286,7 @@ export const switchBasemap = async (map: MaplibreMap, styleID: string) => {
 };
 
 /** Convert a source to a unique name */
-export const toSourceName = (source: ISource) => `${source.sourceName}.${source.id}`.toLowerCase().replace(/\s/g, '_');
+export const toSourceName = (source: ISource) => `${source.id}`.toLowerCase().replace(/\s/g, '_');
 
 /** Convert a layer to a unique name */
 export const toLayerName = (sourceName: string, layer: ILayer) =>
@@ -304,91 +303,105 @@ export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, m
         map.addSource(sourceName, {
           type: 'geojson',
           data: source.source,
-          generateId: true, //This ensures that all features have unique IDs
+          // generateId: true, //This ensures that all features have unique IDs
         });
       } else {
         (map.getSource(sourceName) as GeoJSONSource).setData(source.source);
       }
 
       // Set Layers
-      source.layers
-        .filter((l) => typeof l.showLayer === 'undefined' || l.showLayer === true)
-        .forEach((layer: ILayer) => {
-          const layerName = toLayerName(sourceName, layer);
+      source.layers.forEach((layer: ILayer) => {
+        const layerName = toLayerName(sourceName, layer);
 
-          // Create a popup, but don't add it to the map yet.
-          const popup = new Popup({
-            closeButton: false,
-            closeOnClick: false,
-          });
-
-          if (!map.getLayer(layerName)) {
-            const mapLayer = {
-              id: layerName,
-              ...layer,
-              type: layer.type.type,
-              source: sourceName,
-            } as LayerSpecification;
-            console.log(mapLayer);
-            map.addLayer(mapLayer);
-            map.on('click', layerName, ({ features }) =>
-              displayInfoSidebar(features as GeoJSONFeature[], actions, 'EDIT_POI')
-            );
-            map.on('mouseenter', layerName, (e) => {
-              map.getCanvas().style.cursor = 'pointer';
-
-              const feature = e.features ? e.features[0] : undefined;
-              if (!feature) return;
-              // console.log(feature)
-              const coordinates = (
-                feature.geometry.type === 'Point' ? (feature.geometry as Point).coordinates.slice() : e.lngLat
-              ) as number[];
-              const title = feature.properties.title;
-              const description = feature.properties.description;
-              const html = `${title ? `<h5>${title}</h5>` : ''}${description ? `<p>${description}</p>` : ''}`;
-              if (!html) return;
-              // Ensure that if the map is zoomed out such that multiple
-              // copies of the feature are visible, the popup appears
-              // over the copy being pointed to.
-              while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-              }
-
-              // Populate the popup and set its coordinates
-              // based on the feature found.
-              popup
-                .setLngLat(coordinates as LngLatLike)
-                .setHTML(html)
-                .addTo(map);
-            });
-            map.on('mouseleave', layerName, () => {
-              map.getCanvas().style.cursor = '';
-              popup.remove();
-            });
-          }
-          map.setLayoutProperty(layerName, 'visibility', layer.showLayer ? 'visible' : 'none');
-          if (source.sourceCategory === SourceType.alert || source.sourceCategory === SourceType.plume)
-            layer.paint && map.setPaintProperty(layerName, 'line-opacity', layer.paint['line-opacity']);
+        // Create a popup, but don't add it to the map yet.
+        const popup = new Popup({
+          closeButton: false,
+          closeOnClick: false,
         });
+
+        if (!map.getLayer(layerName)) {
+          const mapLayer = {
+            id: layerName,
+            ...layer,
+            type: layer.type.type,
+            source: sourceName,
+          } as LayerSpecification;
+          console.log(mapLayer);
+          map.addLayer(mapLayer);
+          map.on('click', layerName, ({ features }) =>
+            displayInfoSidebar(features as GeoJSONFeature[], actions, 'EDIT_POI')
+          );
+          map.on('mouseenter', layerName, (e) => {
+            map.getCanvas().style.cursor = 'pointer';
+
+            const feature = e.features ? e.features[0] : undefined;
+            if (!feature) return;
+            // console.log(feature)
+            const coordinates = (
+              feature.geometry.type === 'Point' ? (feature.geometry as Point).coordinates.slice() : e.lngLat
+            ) as number[];
+            const title = feature.properties.title;
+            const description = feature.properties.description;
+            const html = `${title ? `<h5>${title}</h5>` : ''}${description ? `<p>${description}</p>` : ''}`;
+            if (!html) return;
+            // Ensure that if the map is zoomed out such that multiple
+            // copies of the feature are visible, the popup appears
+            // over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+              coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            popup
+              .setLngLat(coordinates as LngLatLike)
+              .setHTML(html)
+              .addTo(map);
+          });
+          map.on('mouseleave', layerName, () => {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+          });
+        }
+        map.setLayoutProperty(layerName, 'visibility', layer.showLayer ? 'visible' : 'none');
+        if (source.sourceCategory === SourceType.alert || source.sourceCategory === SourceType.plume)
+          layer.paint && map.setPaintProperty(layerName, 'line-opacity', layer.paint['line-opacity']);
+      });
     });
 };
 
 /** Add or update an item in a feature collection */
 export const addOrUpdateFeature = <T extends Geometry | null, K extends GeoJsonProperties>(
   fc: FeatureCollectionExt<T, K>,
-  newItem: Feature<T, K>
+  f: Feature<T, K>
 ): FeatureCollectionExt<T, K> => {
-  const { id } = newItem.properties || {};
+  const { id } = f.properties || {};
   const { features = [] } = fc;
   const existingItem = features.find((f) => f.properties?.id === id);
 
   if (existingItem) {
     // If an item with the same id exists, update it
-    return { ...fc, features: features.map((f) => (f.properties?.id === id ? { ...newItem } : f)) };
-  } else {
-    // If the item doesn't exist, add it
-    return { ...fc, features: [...features, { ...newItem }] };
+    return { ...fc, features: features.map((feature) => (feature === existingItem ? { ...f } : feature)) };
   }
+  // If the item doesn't exist, add it
+  return { ...fc, features: [...features, { ...f }] };
+};
+
+/** Add or update an item in a feature collection */
+export const deleteFeature = <T extends Geometry | null, K extends GeoJsonProperties>(
+  fc: FeatureCollectionExt<T, K>,
+  f?: Feature<T, K>
+): FeatureCollectionExt<T, K> => {
+  if (!f) return fc;
+  const { id } = f.properties || {};
+  const { features = [] } = fc;
+  const existingItem = features.find((f) => f.properties?.id === id);
+
+  if (existingItem) {
+    // If an item with the same id exists, update it
+    return { ...fc, features: features.filter((f) => f.properties?.id !== id) };
+  }
+  return fc;
 };
 
 export const defaultLayerStyle = {
@@ -683,10 +696,14 @@ export const defaultLayerStyle = {
 export const featureCollectionToSource = (fc: FeatureCollectionExt, styles: LayerStyle<any>[] = []) => {
   const {
     layerId: id = uniqueId(),
-    layerName: sourceName = '',
-    layerStyle = 'default',
+    layerName: sourceName = 'SOURCE_NAME',
+    layerStyle = defaultLayerStyle.id,
     layerShared: shared = false,
   } = fc;
+  fc.layerId = id;
+  fc.layerStyle = layerStyle;
+  fc.layerName = sourceName;
+  fc.layerShared = shared;
   const style = styles.filter((s) => s.id.toUpperCase() === layerStyle.toUpperCase()).shift() || defaultLayerStyle;
   return {
     id,
@@ -694,8 +711,8 @@ export const featureCollectionToSource = (fc: FeatureCollectionExt, styles: Laye
     sourceName,
     shared,
     sourceCategory: SourceType.realtime,
-    layers: style.layers || ([] as ILayer[]),
-    ui: style.ui || ([] as UIForm),
+    layers: clone(style.layers || ([] as ILayer[])),
+    ui: clone(style.ui || ([] as UIForm)),
   } as ISource;
 };
 

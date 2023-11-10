@@ -41,11 +41,12 @@ export interface IAppModel {
     showLegend: boolean;
     clickedFeature?: GeoJSONFeature & { source?: string };
     selectedFeatures?: FeatureCollection;
+    cleanDrawLayer: boolean;
     latestDrawing: Feature;
-    clearDrawing: {
-      delete: boolean;
-      id: string;
-    };
+    // clearDrawing: {
+    //   delete: boolean;
+    //   id: string;
+    // };
 
     // Groups
     groups: Array<IGroup>;
@@ -63,6 +64,7 @@ export interface IAppModel {
     // Layers/styles
     sidebarMode: SidebarMode;
     map: maplibregl.Map;
+    draw: MapboxDraw;
     layerStyles?: LayerStyle<Record<string, any>>[];
     sources: Array<ISource>;
     mapStyle: string;
@@ -92,7 +94,7 @@ export interface IActions {
   ) => void;
 
   // Core
-  drawingCleared: () => void;
+  // clearDrawing: () => void;
   createPOI: () => void;
 
   // Alerts
@@ -122,7 +124,8 @@ export interface IActions {
   toggleLegend: () => void;
   loadGeoJSON: () => Promise<void>;
   // loadLayerStyles: () => Promise<void>;
-  setMap: (map: maplibregl.Map) => void;
+  setMap: (map: maplibregl.Map, draw: MapboxDraw) => void;
+  clearDrawLayer: () => void;
   setZoomLevel: (zoomLevel: number) => void;
   getZoomLevel: () => number;
   setLonLat: (lonlat: [lon: number, lat: number]) => void;
@@ -176,10 +179,11 @@ export const appState = {
 
       // Clicking/Selecting
       latestDrawing: {} as Feature,
-      clearDrawing: {
-        delete: false,
-        id: '',
-      },
+      cleanDrawLayer: false,
+      // clearDrawing: {
+      //   delete: false,
+      //   id: '',
+      // },
 
       // Groups
       groups: Array<IGroup>(),
@@ -246,14 +250,14 @@ export const appState = {
           },
         });
       },
-      drawingCleared: () => {
-        update({
-          app: {
-            clearDrawing: { delete: false, id: '' },
-            drawings: undefined,
-          },
-        });
-      },
+      // clearDrawing: () => {
+      //   update({
+      //     app: {
+      //       clearDrawing: { delete: false, id: '' },
+      //       drawings: undefined,
+      //     },
+      //   });
+      // },
       createPOI: () => {
         update({
           app: {
@@ -462,7 +466,11 @@ export const appState = {
       },
 
       // Layers/style
-      setMap: (map: maplibregl.Map) => update({ app: { map: () => map } }),
+      setMap: (map, draw) => update({ app: { map: () => map, draw: () => draw } }),
+      clearDrawLayer: () => {
+        const { draw } = states().app;
+        if (draw) draw.deleteAll();
+      },
       setZoomLevel: (zoomLevel: number) => {
         localStorage.setItem(ZOOM_LEVEL, zoomLevel.toString());
       },

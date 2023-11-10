@@ -79,17 +79,18 @@ export const Map: MeiosisComponent = () => {
           MapUtils.updateSatellite(appState, map);
         });
 
-        actions.setMap(map);
+        actions.setMap(map, draw);
       });
     },
     // Executes on every redraw
     onupdate: ({ attrs: { state: appState, actions } }) => {
       if (!map.loaded()) return;
       // Check if drawings should be removed from the map
-      if (appState.app.clearDrawing.delete) {
-        draw.delete(appState.app.clearDrawing.id);
-        actions.drawingCleared();
-      }
+      // if (appState.app.cleanDrawLayer) {
+      //   draw.deleteAll();
+      //   // draw.delete(appState.app.clearDrawing.id);
+      //   // actions.clearDrawing();
+      // }
 
       // Update the grid if necessary
       // if (appState.app.gridOptions.updateGrid) {

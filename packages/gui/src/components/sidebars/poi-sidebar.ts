@@ -17,7 +17,7 @@ export const poiSidebar: MeiosisComponent = () => {
       const {
         app: { clickedFeature, sources, sidebarMode, layerStyles = [], editSourceId },
       } = state;
-      const { saveSource, update } = actions;
+      const { saveSource, update, clearDrawLayer } = actions;
 
       const curSources = sources.filter((s) => s.shared).map((s) => ({ id: s.id, label: s.sourceName }));
       poiSourceDef.sourceId = editSourceId || (curSources.length === 1 ? curSources[0].id : '');
@@ -114,6 +114,7 @@ export const poiSidebar: MeiosisComponent = () => {
                 onchange: async (isValid) => {
                   if (isValid && source && source.source) {
                     source.source = addOrUpdateFeature(source.source, clickedFeature);
+                    actions.clearDrawLayer();
                     await saveSource(source);
                   }
                 },

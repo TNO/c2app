@@ -26,7 +26,7 @@ module.exports = {
     html: [
       {
         title: 'SAFR',
-        publicPath: devMode ? undefined : 'https://tno.github.io/safr',
+        // publicPath: devMode ? undefined : '',
         scriptLoading: 'defer',
         minify: !devMode,
         favicon: './src/favicon.ico',
@@ -37,8 +37,8 @@ module.exports = {
             content: 'interest-cohort=(), user-id=()',
           },
           'og:title': 'SAFR',
-          'og:description': 'SA and C2 tools for FRs',
-          'og:url': 'https://tno.github.io/scenario-spark/',
+          'og:description': 'Situational Awareness (SA) and Command & Control (C2) tool for First Responders (FR)',
+          'og:url': 'https://github.com/TNO/c2app',
           'og:site_name': 'SAFR',
           'og:image:alt': 'SAFR',
           'og:image': './src/assets/safr.svg',
@@ -63,7 +63,7 @@ module.exports = {
     //           content: 'interest-cohort=(), user-id=()',
     //         },
     //         'og:title': 'SAFR',
-    //         'og:description': 'Situational Awareness (SA) and Command & Control (C2) tools for First Responders (FR)',
+    //         'og:description': 'Situational Awareness (SA) and Command & Control (C2) tool for First Responders (FR)',
     //         'og:url': 'https://tno.github.io/scenario-spark/',
     //         'og:site_name': 'SAFR',
     //         'og:image:alt': 'SAFR',

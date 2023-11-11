@@ -42,9 +42,12 @@ FROM node:18-alpine as app
 
 ARG SERVER_URL
 ARG SERVER_PATH
+ARG GIT_COMMIT=latest
 
 ENV SERVER_URL=${SERVER_URL}
 ENV SERVER_PATH=${SERVER_PATH}
+
+LABEL git_commit=$GIT_COMMIT
 
 RUN mkdir -p /app
 COPY --from=builder /packages/shared/node_modules /shared/node_modules

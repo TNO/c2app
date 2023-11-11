@@ -10,8 +10,16 @@
     "docker:tag": "docker tag safr erikvullings/safr:latest",
     "docker:publish": "docker push erikvullings/safr:latest",
     "docker:local": "npm run docker:build && npm run docker:tag",
-    "docker:sh": "docker run -it safr sh",
-    "docker:run": "docker run -it -p 8080:8080 safr"
+    "docker:sh": "docker run --rm -it safr sh",
+    "docker:run": "docker run --rm -it -p 8080:8080 safr",
+    "build-docker": "npm run build && npm run tag-docker",
+    "build": "docker build --build-arg GIT_COMMIT=$(git rev-parse HEAD) -t erikvullings/safr:latest .",
+    "tag-docker": "npm run tag-latest && npm run tag-commit",
+    "tag-latest": "docker tag erikvullings/safr:latest erikvullings/safr:latest",
+    "tag-commit": "docker tag erikvullings/safr:latest erikvullings/safr:$(git rev-parse HEAD)",
+    "push-docker": "npm run push-latest && npm run push-commit",
+    "push-latest": "docker push erikvullings/safr:latest",
+    "push-commit": "docker push erikvullings/safr:$(git rev-parse HEAD)"
   },
   "repository": {
     "type": "git",

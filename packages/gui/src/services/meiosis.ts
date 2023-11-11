@@ -23,7 +23,7 @@ import { FeatureCollectionExt, ILayer, ISource, Pages, SidebarMode, SourceType }
 import { GeoJSONFeature } from 'maplibre-gl';
 import { layerStylesSvc } from './layer_styles';
 import { restServiceFactory } from './rest-service';
-import { featureCollectionToSource } from '../components/map/map-utils';
+import { defaultLayerStyle, featureCollectionToSource } from '../components/map/map-utils';
 
 const ZOOM_LEVEL = 'SAFR_ZOOM_LEVEL';
 const LON_LAT = 'SAFR_LON_LAT';
@@ -239,6 +239,7 @@ export const appState = {
       loadGeoJSON: async () => {
         console.log('LOADING GEOJSON');
         const layerStyles = (await layerStylesSvc.loadStyles()) || [];
+        layerStyles.push(defaultLayerStyle);
         const { socket } = states().app;
         socket.setLayerStyles(layerStyles);
         const sources = (await geojsonSvc.loadList()).map((source) => featureCollectionToSource(source, layerStyles));

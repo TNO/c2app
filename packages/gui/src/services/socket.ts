@@ -36,10 +36,9 @@ export class Socket {
   private layerStyles = [] as LayerStyle<Record<string, any>>[];
 
   constructor(us: UpdateStream, config: SafrConfig) {
-    console.table({ url: process.env.SERVER_URL, path: config.SOCKET_PATH });
-    this.socket = io(process.env.SERVER_URL as string, {
-      path: config.SOCKET_PATH as string,
-    });
+    const url = process.env.SERVER_URL && process.env.SERVER_URL !== './' ? process.env.SERVER_URL : location.origin;
+    console.table({ url, path: config.SOCKET_PATH });
+    this.socket = io(url, { path: config.SOCKET_PATH });
     // ASSISTANCE context
     this.socket.on('context', (data: IContext) => {
       const fc = {

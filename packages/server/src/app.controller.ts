@@ -4,6 +4,12 @@ import { Controller, Get } from '@nestjs/common';
 export class AppController {
   @Get('version')
   version() {
-    return { "version": 'v0.0.1' };
+    return { version: 'v0.0.1' };
+  }
+
+  @Get('config')
+  config() {
+    console.log('Get config');
+    return { VECTOR_TILE_SERVER: process.env.VECTOR_TILE_SERVER };
   }
 }

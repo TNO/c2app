@@ -5,7 +5,7 @@ import { AppModule } from './app.module.js';
 import { cwd } from 'node:process';
 import { readFile, readdir, writeFile } from 'fs/promises';
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 async function convertToJsonArrayAndWriteIndexJson(folderPath: string): Promise<void> {
   // Read the list of files in the specified folder.
@@ -16,7 +16,7 @@ async function convertToJsonArrayAndWriteIndexJson(folderPath: string): Promise<
 
   // Read and parse each JSON file into an array.
   const jsonArray: any[] = [];
-  for (const jsonFile of jsonFiles.filter(f => f !== 'index.json')) {
+  for (const jsonFile of jsonFiles.filter((f) => f !== 'index.json')) {
     const jsonFilePath = join(folderPath, jsonFile);
     const jsonData = await readFile(jsonFilePath, 'utf-8');
     const parsedData = JSON.parse(jsonData);

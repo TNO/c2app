@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -16,11 +16,11 @@ import {
   IGroupCreate,
   IGroupUpdate,
   IGroupDelete,
-  ICHT,
+  // ICHT,
   IReturnGroup,
   INameUpdate,
 } from 'c2app-models-utils';
-import { HttpService } from '@nestjs/axios';
+// import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -30,16 +30,16 @@ export class DefaultWebSocketGateway implements OnGatewayConnection, OnGatewayDi
   private clients: number = 0;
   private groups: Map<string, IServerGroup> = new Map<string, IServerGroup>();
   public callsignToSocketId: Map<string, string> = new Map<string, string>();
-  private URL: string;
-  private pop_URL: string = 'http://localhost:3333/detailed';
+  // private URL: string;
+  // private pop_URL: string = 'http://localhost:3333/detailed';
 
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly configService: ConfigService) {
-    this.URL =
-      this.configService && this.configService.get<string>('DISPERSION_SERVICE')
-        ? `${this.configService.get<string>('DISPERSION_SERVICE') + '/process'}`
-        : 'http://localhost:8080/process';
+  constructor() // private readonly httpService: HttpService,
+  // private readonly configService: ConfigService
+  {
+    // this.URL =
+    //   this.configService && this.configService.get<string>('DISPERSION_SERVICE')
+    //     ? `${this.configService.get<string>('DISPERSION_SERVICE') + '/process'}`
+    //     : 'http://localhost:8080/process';
   }
 
   /** Handlers */
@@ -106,16 +106,16 @@ export class DefaultWebSocketGateway implements OnGatewayConnection, OnGatewayDi
     return data.message;
   }
 
-  @SubscribeMessage('client-cht')
-  async handleClientCHT(client: Socket, data: ICHT) {
-    await this.httpService.post(this.URL, data.hazard).toPromise();
-  }
+  // @SubscribeMessage('client-cht')
+  // async handleClientCHT(client: Socket, data: ICHT) {
+  //   await this.httpService.post(this.URL, data.hazard).toPromise();
+  // }
 
-  @SubscribeMessage('client-pop')
-  async handleClientPop(client: Socket, data: { feature: Feature }) {
-    const response = await this.httpService.post(this.pop_URL, data.feature).toPromise();
-    return JSON.stringify(response.data);
-  }
+  // @SubscribeMessage('client-pop')
+  // async handleClientPop(client: Socket, data: { feature: Feature }) {
+  //   const response = await this.httpService.post(this.pop_URL, data.feature).toPromise();
+  //   return JSON.stringify(response.data);
+  // }
 
   /** Helper Funcs */
   getGroupIdsForCallsign(callsign: string): string {

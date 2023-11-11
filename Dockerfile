@@ -1,12 +1,12 @@
 # Creates the Chemical Hazard Tool server and GUI
 #
 # You can access the container using:
-#   docker run -it c2app sh
+#   docker run -it safr sh
 # To start it stand-alone:
-#   docker run -it -p 3000:3000 c2app
+#   docker run -it -p 8080:8080 safr
 
 # Build the app separately
-FROM node:14.17.2-alpine3.13 as builder
+FROM node:18-alpine as builder
 
 ARG SERVER_URL
 ARG SERVER_PATH
@@ -38,7 +38,7 @@ RUN rm -fr node_modules && \
   npm run build:domain
 
 # Serve the built app
-FROM node:14.17.2-alpine3.13 as app
+FROM node:18-alpine as app
 
 ARG SERVER_URL
 ARG SERVER_PATH
@@ -52,8 +52,9 @@ COPY --from=builder /packages/shared/dist /shared
 COPY --from=builder /packages/server/node_modules /app/node_modules
 COPY --from=builder /packages/server/package.json /app/package.json
 COPY --from=builder /packages/server/dist /app/dist
+COPY --from=builder /packages/server/public /app/public
 COPY --from=builder /packages/server/.yalc /app/.yalc
-COPY --from=builder /packages/gui/dist /app/public
+COPY --from=builder /packages/server/layer_styles /app/layer_styles
 WORKDIR /app
-EXPOSE 3000
+EXPOSE 8080
 CMD ["node", "./dist/index.js"]

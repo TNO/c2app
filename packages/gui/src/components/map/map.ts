@@ -13,6 +13,7 @@ import {
   updateSatellite,
   updateSourcesAndLayers,
 } from './map-utils';
+import { SafrConfig } from 'c2app-models-utils';
 // https://github.com/korywka/mapbox-controls/tree/master/packages/tooltip
 // import TooltipControl from '@mapbox-controls/tooltip';
 
@@ -26,42 +27,41 @@ MapboxDraw.constants.classes.CONTROL_GROUP = 'maplibregl-ctrl-group';
 export const Map: MeiosisComponent = () => {
   let map: MaplibreMap;
   let draw: MapboxDraw;
-  console.table(process.env.VECTOR_TILE_SERVER === 'undefined');
+
   return {
     view: () => {
       return m('#mapboxMap.col.s12.l9.right');
     },
     oncreate: ({ attrs: { state, actions } }) => {
+      const { config = {} as SafrConfig } = state.app;
+      const { VECTOR_TILE_SERVER } = config;
       const { getLonLat, getZoomLevel, setMap } = actions;
       // Create map and add controls
       map = new MaplibreMap({
         container: 'mapboxMap',
-        style:
-          process.env.VECTOR_TILE_SERVER && process.env.VECTOR_TILE_SERVER !== 'undefined'
-            ? process.env.VECTOR_TILE_SERVER
-            : {
-                version: 8,
-                sources: {
-                  'brt-achtergrondkaart': {
-                    type: 'raster',
-                    tiles: [
-                      'https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png',
-                    ],
-                    tileSize: 256,
-                    minzoom: 1,
-                    maxzoom: 19,
-                    attribution: 'Kaartgegevens: <a href="https://kadaster.nl">Kadaster</a>',
-                  },
+        style: VECTOR_TILE_SERVER
+          ? VECTOR_TILE_SERVER
+          : {
+              version: 8,
+              sources: {
+                'brt-achtergrondkaart': {
+                  type: 'raster',
+                  tiles: ['https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png'],
+                  tileSize: 256,
+                  minzoom: 1,
+                  maxzoom: 19,
+                  attribution: 'Kaartgegevens: <a href="https://kadaster.nl">Kadaster</a>',
                 },
-                glyphs: 'https://api.pdok.nl/lv/bgt/ogc/v1_0/resources/fonts/{fontstack}/{range}.pbf',
-                layers: [
-                  {
-                    id: 'standard-raster',
-                    type: 'raster',
-                    source: 'brt-achtergrondkaart',
-                  },
-                ],
               },
+              glyphs: 'https://api.pdok.nl/lv/bgt/ogc/v1_0/resources/fonts/{fontstack}/{range}.pbf',
+              layers: [
+                {
+                  id: 'standard-raster',
+                  type: 'raster',
+                  source: 'brt-achtergrondkaart',
+                },
+              ],
+            },
         center: getLonLat(),
         zoom: getZoomLevel(),
       });

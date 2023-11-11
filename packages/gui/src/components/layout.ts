@@ -3,10 +3,13 @@ import { MeiosisComponent } from '../services/meiosis';
 import M from 'materialize-css';
 import { poiSidebar } from './sidebars/poi-sidebar';
 import { legendControl } from './sidebars/legend-control';
+import { CircularSpinner } from './ui/preloader';
 
 export const Layout: MeiosisComponent = () => {
   return {
     view: ({ children, attrs: { state, actions } }) => {
+      const { config } = state.app;
+      if (!config) return m(CircularSpinner);
       return m('.main', [
         // m(profileModal, { state, actions }),
         // m(

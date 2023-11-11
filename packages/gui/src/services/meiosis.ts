@@ -14,6 +14,7 @@ import {
   IMessage,
   ISensor,
   LayerStyle,
+  SafrConfig,
   uuid4,
 } from 'c2app-models-utils';
 // @ts-ignore
@@ -21,16 +22,18 @@ import ch from '../ch.json';
 import { routingSvc } from './routing-service';
 import { FeatureCollectionExt, ILayer, ISource, Pages, SidebarMode, SourceType } from '../models';
 import { GeoJSONFeature } from 'maplibre-gl';
-import { layerStylesSvc } from './layer_styles';
+import { layerStylesSvc } from './layer_style_svc';
 import { restServiceFactory } from './rest-service';
 import { defaultLayerStyle, featureCollectionToSource } from '../components/map/map-utils';
+import { configSvc } from './config_svc';
 
 const ZOOM_LEVEL = 'SAFR_ZOOM_LEVEL';
 const LON_LAT = 'SAFR_LON_LAT';
 
 export interface IAppModel {
   app: {
-    // Core
+    // Core~
+    config: SafrConfig;
     socket: Socket;
 
     // Alerts
@@ -484,8 +487,9 @@ export const appState = {
       downloadSourceAsGeoJSON: (source) => {
         if (!source || !source.source || !source.source.$loki) return;
         console.log(source);
+        const { features, type, bbox } = source.source;
         // Assume jsonData is your JSON data obtained from the REST service
-        const jsonData = source.source;
+        const jsonData = { features, type, bbox };
         // Convert JSON data to a Blob
         const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
         // Create a download link
@@ -913,11 +917,13 @@ const app = {
   // Services that run everytime the state is updated (so after the action is done)
   services: [] as Array<(s: IAppModel) => Partial<IAppModel> | void>,
   // Effects run from state update until some condition is met (can cause infinite loop)
-  effects: (_update: UpdateStream, _actions: IActions) =>
+  effects: (update: UpdateStream, _actions: IActions) =>
     [
-      // (state) => {
-      //   if (!state.app.layerStyles) actions.loadGeoJSON()
-      // },
+      async (state) => {
+        if (state.app.config) return;
+        const config = await configSvc.getConfig();
+        update({ app: { config: () => config } });
+      },
     ] as Array<(state: IAppModel) => Promise<void> | void>,
 };
 
@@ -929,8 +935,8 @@ const runServices = (startingState: IAppModel) =>
 
 export const states = Stream.scan((state, patch) => runServices(merge(state, patch)), app.initial, update);
 export const actions = app.actions(update, states);
-const effects = app.effects(update, actions);
 
+const effects = app.effects(update, actions);
 states.map((state) => {
   effects.forEach((effect) => effect(state));
   m.redraw();

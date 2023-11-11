@@ -176,7 +176,7 @@ export const appState = {
   initial: {
     app: {
       // Core
-      socket: new Socket(update),
+      // socket: new Socket(update),
 
       // Alerts
       alerts: [] as Array<IAlert>,
@@ -922,7 +922,9 @@ const app = {
       async (state) => {
         if (state.app.config) return;
         const config = await configSvc.getConfig();
-        update({ app: { config: () => config } });
+        if (!config) return;
+        const socket = new Socket(update, config);
+        update({ app: { config: () => config, socket: () => socket } });
       },
     ] as Array<(state: IAppModel) => Promise<void> | void>,
 };

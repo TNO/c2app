@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+import { SafrConfig } from 'c2app-models-utils';
 
 @Controller()
 export class AppController {
@@ -10,6 +11,9 @@ export class AppController {
   @Get('config')
   config() {
     console.log('Get config');
-    return { VECTOR_TILE_SERVER: process.env.VECTOR_TILE_SERVER };
+    return {
+      VECTOR_TILE_SERVER: process.env.VECTOR_TILE_SERVER,
+      SOCKET_PATH: process.env.SOCKET_PATH,
+    } as SafrConfig;
   }
 }

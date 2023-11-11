@@ -5,7 +5,7 @@ const devMode = process.env.NODE_ENV === 'development';
 const outputPath = path.resolve(__dirname, devMode ? 'dist' : '../server/public');
 
 console.log(
-  `Working in ${devMode ? 'development' : 'production'} mode, server URL ${devMode ? process.env.SERVER_URL : ''}.`
+  `Working in ${devMode ? 'development' : 'production'} mode, server URL ${devMode ? process.env.SERVER_URL : './'}.`
 );
 
 module.exports = {
@@ -19,7 +19,7 @@ module.exports = {
   builtins: {
     define: {
       'process.env.NODE_ENV': "'development'",
-      'process.env.SERVER_URL': `"${devMode ? process.env.SERVER_URL : ''}"`,
+      'process.env.SERVER_URL': `"${devMode ? process.env.SERVER_URL : './'}"`,
       'process.env.SERVER_PATH': `"${process.env.SERVER_PATH || ''}"`,
       // 'process.env.VECTOR_TILE_SERVER': `"${process.env.VECTOR_TILE_SERVER}"`,
     },

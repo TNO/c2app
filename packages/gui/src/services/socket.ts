@@ -20,6 +20,7 @@ import {
   IArea,
   ResourceSubtype,
   LayerStyle,
+  SafrConfig,
 } from 'c2app-models-utils';
 import M from 'materialize-css';
 import mapboxgl from 'mapbox-gl';
@@ -34,10 +35,10 @@ export class Socket {
   private sensors = {} as { [id: string]: ISensor };
   private layerStyles = [] as LayerStyle<Record<string, any>>[];
 
-  constructor(us: UpdateStream) {
-    console.table({ url: process.env.SERVER_URL, path: process.env.SERVER_PATH });
+  constructor(us: UpdateStream, config: SafrConfig) {
+    console.table({ url: process.env.SERVER_URL, path: config.SOCKET_PATH });
     this.socket = io(process.env.SERVER_URL as string, {
-      path: process.env.SERVER_PATH as string,
+      path: config.SOCKET_PATH as string,
     });
     // ASSISTANCE context
     this.socket.on('context', (data: IContext) => {

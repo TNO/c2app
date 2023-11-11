@@ -30,7 +30,8 @@
     "mithril-ui-form-plugin": "0.6.2"
   },
   "devDependencies": {
-    "@types/geojson": "^7946.0.12",
+    "@types/geojson": "^7946.0.13",
+    "@types/mithril": "^2.2.4",
     "rimraf": "^5.0.5",
     "typescript": "^5.2.2"
   }

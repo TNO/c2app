@@ -6,10 +6,12 @@
     "clean": "pnpm -r --parallel run cleanup",
     "start": "pnpm -r --parallel run dev",
     "build:domain": "pnpm run build:domain",
-    "docker:build": "docker build -t c2app .",
-    "docker:tag": "docker tag c2app timovdk/c2app:latest",
-    "docker:publish": "docker push timovdk/c2app:latest",
-    "docker:local": "npm run docker:build && npm run docker:tag"
+    "docker:build": "docker build -t safr .",
+    "docker:tag": "docker tag safr erikvullings/safr:latest",
+    "docker:publish": "docker push erikvullings/safr:latest",
+    "docker:local": "npm run docker:build && npm run docker:tag",
+    "docker:sh": "docker run -it safr sh",
+    "docker:run": "docker run -it -p 8080:8080 safr"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,6 @@
   },
   "homepage": "https://github.com/TNO/c2app#readme",
   "devDependencies": {
-    "@rspack/cli": "^0.3.8"
+    "@rspack/cli": "^0.3.11"
   }
 }

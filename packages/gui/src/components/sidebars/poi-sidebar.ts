@@ -114,7 +114,7 @@ export const poiSidebar: MeiosisComponent = () => {
                 onchange: async (isValid) => {
                   if (isValid && source && source.source) {
                     source.source = addOrUpdateFeature(source.source, clickedFeature);
-                    actions.clearDrawLayer();
+                    clearDrawLayer();
                     await saveSource(source);
                   }
                 },

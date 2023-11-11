@@ -59,8 +59,8 @@ const createRestServiceFactory = (apiService: string) => {
       }
     };
 
-    const load = (id?: string | number) =>
-      m.request<T>({
+    const load = async (id?: string | number) =>
+      await m.request<T>({
         method: 'GET',
         url: url + id,
         withCredentials,
@@ -105,4 +105,4 @@ const createRestServiceFactory = (apiService: string) => {
 };
 
 //export const restServiceFactory = createRestServiceFactory(location.origin + '/tmt');
-export const restServiceFactory = createRestServiceFactory((process.env.SERVER_URL || location.origin));
+export const restServiceFactory = createRestServiceFactory(process.env.SERVER_URL || location.origin);

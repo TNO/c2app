@@ -3,7 +3,16 @@ import maplibre, { IControl, Map as MaplibreMap } from 'maplibre-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 // @ts-ignore
 import { MeiosisComponent } from '../../services/meiosis';
-import * as MapUtils from './map-utils';
+import {
+  drawConfig,
+  handleDrawEvent,
+  loadImages,
+  loadMissingImages,
+  setLonLat,
+  setZoomLevel,
+  updateSatellite,
+  updateSourcesAndLayers,
+} from './map-utils';
 // https://github.com/korywka/mapbox-controls/tree/master/packages/tooltip
 // import TooltipControl from '@mapbox-controls/tooltip';
 
@@ -22,7 +31,8 @@ export const Map: MeiosisComponent = () => {
     view: () => {
       return m('#mapboxMap.col.s12.l9.right');
     },
-    oncreate: ({ attrs: { state: appState, actions } }) => {
+    oncreate: ({ attrs: { state, actions } }) => {
+      const { getLonLat, getZoomLevel, setMap } = actions;
       // Create map and add controls
       map = new MaplibreMap({
         container: 'mapboxMap',
@@ -52,58 +62,53 @@ export const Map: MeiosisComponent = () => {
                   },
                 ],
               },
-        center: actions.getLonLat(),
-        zoom: actions.getZoomLevel(),
+        center: getLonLat(),
+        zoom: getZoomLevel(),
       });
-      MapUtils.loadMissingImages(map);
-      MapUtils.loadImages(map);
-      // MapUtils.updateGrid(appState, actions, map);
+      loadMissingImages(map);
+      loadImages(map);
+      // updateGrid(appState, actions, map);
 
       // Add draw controls
-      draw = new MapboxDraw(MapUtils.drawConfig);
+      draw = new MapboxDraw(drawConfig);
       map.addControl(new maplibre.NavigationControl(), 'top-left');
       map.addControl(draw as unknown as IControl, 'top-left');
 
       // Add map listeners
-      map.on('load', async () => {
-        map.on('draw.create', ({ features }) => MapUtils.handleDrawEvent(map, features, actions));
-        map.on('draw.update', ({ features }) => MapUtils.handleDrawEvent(map, features, actions));
+      map.on('load', () => {
+        map.on('draw.create', ({ features }) => handleDrawEvent(map, features, actions));
+        map.on('draw.update', ({ features }) => handleDrawEvent(map, features, actions));
 
-        map.on('zoomend', () => MapUtils.setZoomLevel(map, actions));
-        map.on('moveend', () => MapUtils.setLonLat(map, actions));
+        map.on('zoomend', () => setZoomLevel(map, actions));
+        map.on('moveend', () => setLonLat(map, actions));
 
-        await actions.loadGeoJSON();
+        actions.loadGeoJSON();
 
         map.once('styledata', () => {
-          MapUtils.updateSourcesAndLayers(appState, actions, map);
-          MapUtils.updateSatellite(appState, map);
+          updateSourcesAndLayers(state, actions, map);
+          updateSatellite(state, map);
         });
 
-        actions.setMap(map, draw);
+        setMap(map, draw);
       });
     },
     // Executes on every redraw
-    onupdate: ({ attrs: { state: appState, actions } }) => {
+    onupdate: ({ attrs: { state, actions } }) => {
       if (!map.loaded()) return;
-      // Check if drawings should be removed from the map
-      // if (appState.app.cleanDrawLayer) {
-      //   draw.deleteAll();
-      //   // draw.delete(appState.app.clearDrawing.id);
-      //   // actions.clearDrawing();
-      // }
+      console.log('REDRAWING MAP');
 
       // Update the grid if necessary
       // if (appState.app.gridOptions.updateGrid) {
-      //   MapUtils.updateGrid(appState, actions, map);
+      //   updateGrid(appState, actions, map);
       // }
 
       // Check if basemap should be switched
       // if (token && !map.getStyle().sprite?.includes(appState.app.mapStyle)) {
-      //   MapUtils.switchBasemap(map, appState.app.mapStyle).catch();
+      //   switchBasemap(map, appState.app.mapStyle).catch();
       // }
 
-      MapUtils.updateSourcesAndLayers(appState, actions, map);
-      MapUtils.updateSatellite(appState, map);
+      updateSourcesAndLayers(state, actions, map);
+      updateSatellite(state, map);
     },
   };
 };

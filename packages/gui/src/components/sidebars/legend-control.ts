@@ -17,7 +17,7 @@ export const legendControl: MeiosisComponent = () => {
   return {
     view: ({ attrs: { state, actions } }) => {
       const { map, sources, showLegend, layerStyles = [] } = state.app;
-      const { toggleLegend, updateLayerVisibility, saveSource, deleteSource } = actions;
+      const { toggleLegend, updateLayerVisibility, saveSource, deleteSource, downloadSourceAsGeoJSON } = actions;
 
       const curStyles = layerStyles.map((s, id) => ({ id, label: s.name }));
 
@@ -44,29 +44,29 @@ export const legendControl: MeiosisComponent = () => {
               active: chosenTab === 'LEGEND',
               vnode: m('.legend', [
                 m(
-                  'ul.col.s12',
+                  'ul.row',
                   sources.map((source) =>
-                    m('li', [
+                    m('li.col.s12', [
+                      source.sourceName,
+                      m(Icon, {
+                        title: 'Download GeoJSON',
+                        iconName: 'download',
+                        className: 'unselectable right',
+                        onclick: async () => downloadSourceAsGeoJSON(source),
+                      }),
+                      source.canDelete &&
+                        m(Icon, {
+                          iconName: 'delete',
+                          className: 'red-text unselectable right',
+                          onclick: async () => await deleteSource(source),
+                        }),
+                      // m(Icon, {
+                      //   iconName: source.shared ? 'groups' : 'person',
+                      //   className: 'unselectable right',
+                      //   style: 'position: relative; cursor: pointer; vertical-align: bottom; margin-right: 5px',
+                      // }),
                       m(
-                        '.row',
-                        m(
-                          '.col.s12',
-                          source.sourceName,
-                          m(Icon, {
-                            iconName: 'delete',
-                            className: 'red-text ml10 unselectable right',
-                            style: 'position: relative; cursor: pointer; vertical-align: bottom; margin-right: 5px',
-                            onclick: () => deleteSource(source),
-                          }),
-                          m(Icon, {
-                            iconName: source.shared ? 'groups' : 'person',
-                            className: 'ml10 unselectable right',
-                            style: 'position: relative; cursor: pointer; vertical-align: bottom; margin-right: 5px',
-                          })
-                        )
-                      ),
-                      m(
-                        'ul',
+                        'ul.row',
                         source.layers.map((l) =>
                           m(
                             'li.col.s12',

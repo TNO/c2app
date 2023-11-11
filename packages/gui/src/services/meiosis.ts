@@ -131,6 +131,7 @@ export interface IActions {
   setLonLat: (lonlat: [lon: number, lat: number]) => void;
   getLonLat: () => [lon: number, lat: number];
   updateLayerVisibility: (sourceId: string, layerName: string, visibility: boolean) => void;
+  downloadSourceAsGeoJSON: (source: ISource) => void;
   saveSource: (source: ISource) => Promise<void>;
   deleteSource: (source: ISource) => Promise<void>;
   switchStyle: (style: string) => void;
@@ -235,7 +236,6 @@ export const appState = {
         const { showLegend } = states().app;
         update({ app: { showLegend: !showLegend } });
       },
-
       loadGeoJSON: async () => {
         console.log('LOADING GEOJSON');
         const layerStyles = (await layerStylesSvc.loadStyles()) || [];
@@ -249,6 +249,7 @@ export const appState = {
             sources: () => sources,
           },
         });
+        setTimeout(() => m.redraw(), 1000);
       },
       // clearDrawing: () => {
       //   update({
@@ -344,7 +345,7 @@ export const appState = {
           source: feature.source,
         } as GeoJSONFeature & { source?: string };
         console.log(f);
-        update({ app: { clickedFeature: () => f, sidebarMode: mode } });
+        update({ app: { clickedFeature: () => f, editSourceId: f.source, sidebarMode: mode } });
       },
       updateSelectedFeatures: (features: Array<Feature>) => {
         update({ app: { selectedFeatures: { type: 'FeatureCollection', features: features } } });
@@ -479,6 +480,24 @@ export const appState = {
         localStorage.setItem(LON_LAT, JSON.stringify(lonlat));
       },
       getLonLat: () => JSON.parse(localStorage.getItem(LON_LAT) || '[5, 53]') as [lon: number, lat: number],
+      downloadSourceAsGeoJSON: (source) => {
+        if (!source || !source.source || !source.source.$loki) return;
+        console.log(source);
+        // Assume jsonData is your JSON data obtained from the REST service
+        const jsonData = source.source;
+        // Convert JSON data to a Blob
+        const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+        // Create a download link
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = `safr_${source.sourceName}.json`.replace(' ', '_').toLowerCase(); // Specify the filename for the downloaded file
+        // Append the link to the document
+        document.body.appendChild(downloadLink);
+        // Trigger a click on the link to start the download
+        downloadLink.click();
+        // Remove the link from the document
+        document.body.removeChild(downloadLink);
+      },
       saveSource: async (source: ISource) => {
         if (!source || !source.source) return;
         const updatedSource = await geojsonSvc.save(source.source);

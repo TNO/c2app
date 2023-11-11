@@ -17,6 +17,8 @@ export type FeatureCollectionProps = {
   layerStyle: string;
   /** Allow others to edit the layer */
   layerShared: boolean;
+  /** Allow others to delete the layer, @default false */
+  layerCanDelete: boolean;
   /** Layer description */
   layerDesc: string;
 };
@@ -33,6 +35,8 @@ export interface FeatureCollectionExt<G extends Geometry | null = Geometry, P = 
   layerStyle?: string;
   /** Allow others to edit the layer */
   layerShared?: boolean;
+  /** Allow others to delete the layer, @default false */
+  layerCanDelete?: boolean;
   /** Layer description */
   layerDesc?: string;
 }
@@ -69,6 +73,7 @@ export interface ISource {
   layers: ILayer[];
   shared: boolean;
   shareWith?: string[];
+  canDelete?: boolean;
   ui: UIForm<Record<string, any>>;
 }
 
@@ -81,11 +86,13 @@ export const newSource = (sourceName: string, layerStyle: LayerStyle<any>) => {
     layers: layerStyleToLayers(layerStyle),
     ui: clone(layerStyle.ui || ([] as UIForm<Record<string, any>>)),
     shared: true,
+    canDelete: true,
     source: {
       layerId: id,
       layerName: sourceName,
       layerStyle: layerStyle.id || defaultLayerStyle.id,
       layerShared: true,
+      layerCanDelete: true,
       type: 'FeatureCollection',
       features: [],
     } as FeatureCollectionExt,

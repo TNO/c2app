@@ -693,23 +693,27 @@ export const defaultLayerStyle = {
   ] as Array<[name: string, src: string]>,
 } as LayerStyle<any>;
 
+/** Convert a feature collection that you received to a valid source */
 export const featureCollectionToSource = (fc: FeatureCollectionExt, styles: LayerStyle<any>[] = []) => {
   const {
     layerId: id = uniqueId(),
     layerName: sourceName = 'SOURCE_NAME',
     layerStyle = defaultLayerStyle.id,
     layerShared: shared = false,
+    layerCanDelete: canDelete = false,
   } = fc;
   fc.layerId = id;
   fc.layerStyle = layerStyle;
   fc.layerName = sourceName;
   fc.layerShared = shared;
+  fc.layerCanDelete = canDelete;
   const style = styles.filter((s) => s.id.toUpperCase() === layerStyle.toUpperCase()).shift() || defaultLayerStyle;
   return {
     id,
     source: fc,
     sourceName,
     shared,
+    canDelete,
     sourceCategory: SourceType.realtime,
     layers: clone(style.layers || ([] as ILayer[])),
     ui: clone(style.ui || ([] as UIForm)),

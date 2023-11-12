@@ -35,6 +35,7 @@ export interface IAppModel {
     // Core~
     config: SafrConfig;
     socket: Socket;
+    sessionID: string;
 
     // Alerts
     alerts: Array<IAlert>;
@@ -176,6 +177,7 @@ export const appState = {
   initial: {
     app: {
       // Core
+      sessionID: '',
       // socket: new Socket(update),
 
       // Alerts
@@ -505,12 +507,21 @@ export const appState = {
       },
       saveSource: async (source: ISource) => {
         if (!source || !source.source) return;
+        source.source.lastEditedBy = states().app.sessionID;
         const updatedSource = await geojsonSvc.save(source.source);
         if (!updatedSource) return;
         source.source = updatedSource;
         update({
           app: {
-            sources: (sources: ISource[]) => sources.map((s) => (s.id === source.id ? source : s)),
+            sources: (sources: ISource[]) => {
+              const found = sources.find((s) => s.id === source.id);
+              if (found) {
+                sources.map((s) => (s.id === source.id ? source : s));
+              } else {
+                sources.push(source);
+              }
+              return sources;
+            },
           },
         });
       },

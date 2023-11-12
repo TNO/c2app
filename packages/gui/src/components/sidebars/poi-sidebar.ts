@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { MeiosisComponent } from '../../services/meiosis';
-import { addOrUpdateFeature, deleteFeature, toSourceName } from '../map/map-utils';
+import { addOrUpdateFeature, sidebarInteraction, deleteFeature, toSourceName } from '../map/map-utils';
 import { FormAttributes, LayoutForm, UIForm } from 'mithril-ui-form';
 import { FlatButton } from 'mithril-materialized';
 
@@ -114,8 +114,8 @@ export const poiSidebar: MeiosisComponent = () => {
                 onchange: async (isValid) => {
                   if (isValid && source && source.source) {
                     source.source = addOrUpdateFeature(source.source, clickedFeature);
-                    clearDrawLayer();
                     await saveSource(source);
+                    clearDrawLayer();
                   }
                 },
               } as FormAttributes<Record<string, any>>),
@@ -129,6 +129,7 @@ export const poiSidebar: MeiosisComponent = () => {
                 if (source && source.source) {
                   source.source = deleteFeature(source.source, clickedFeature);
                   await saveSource(source);
+                  sidebarInteraction('slide-out-2', 'CLOSE');
                 }
               },
             }),
@@ -137,12 +138,7 @@ export const poiSidebar: MeiosisComponent = () => {
       );
     },
     oncreate: () => {
-      const elem = document.getElementById('slide-out-2') as HTMLElement;
-      elem &&
-        M.Sidenav.init(elem, {
-          edge: 'right',
-          onOpenStart: function (_elem: Element) {},
-        });
+      sidebarInteraction('slide-out-2', 'CREATE');
     },
   };
 };

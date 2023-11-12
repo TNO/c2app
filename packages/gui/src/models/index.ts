@@ -9,6 +9,8 @@ export * from './page';
 
 export type FeatureCollectionProps = {
   $loki?: number;
+  /** Session ID of the last user that edited it */
+  lastEditedBy: string;
   /** Identifier of the source layer: layers with identical ID are overwritten */
   layerId: string;
   /** Name of the source layer: may be used in legend */
@@ -27,6 +29,8 @@ export type FeatureCollectionProps = {
 export interface FeatureCollectionExt<G extends Geometry | null = Geometry, P = GeoJsonProperties>
   extends FeatureCollection<G, P> {
   $loki?: number;
+  /** Session ID of the last user that edited it */
+  lastEditedBy?: string;
   /** Identifier of the source layer: layers with identical ID are overwritten */
   layerId?: string;
   /** Name of the source layer: may be used in legend */

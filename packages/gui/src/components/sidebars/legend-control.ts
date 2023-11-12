@@ -91,39 +91,46 @@ export const legendControl: MeiosisComponent = () => {
               title: 'New layer',
               active: chosenTab === 'LAYERS',
               vnode: m('.create-layer', [
-                m(LayoutForm, {
-                  form: [
-                    { type: 'md', value: 'Create a new map layer' },
-                    { required: true, id: 'sourceName', label: 'Name', type: 'text' },
-                    {
-                      required: true,
-                      id: 'layerStyleId',
-                      label: 'Select layer style',
-                      type: 'select',
-                      options: curStyles,
+                [
+                  m(LayoutForm, {
+                    key: layerSourceDef.layerStyleId,
+                    form: [
+                      { type: 'md', value: 'Create a new map layer' },
+                      { required: true, id: 'sourceName', label: 'Name', type: 'text' },
+                      {
+                        required: true,
+                        id: 'layerStyleId',
+                        label: 'Select layer style',
+                        type: 'select',
+                        options: curStyles,
+                      },
+                    ],
+                    obj: layerSourceDef,
+                    onchange: () => {
+                      chosenTab = 'LAYERS';
+                      const { sourceName, layerStyleId } = layerSourceDef;
+                      formValid = sourceName && layerStyleId >= 0 ? true : false;
                     },
-                  ],
-                  obj: layerSourceDef,
-                  onchange: () => {
-                    chosenTab = 'LAYERS';
-                    const { sourceName, layerStyleId } = layerSourceDef;
-                    formValid = sourceName && typeof layerStyleId !== 'undefined' ? true : false;
-                  },
-                } as FormAttributes<LayerSourceDef>),
-                m(FlatButton, {
-                  label: 'Create',
-                  iconName: 'create',
-                  disabled: !formValid,
-                  onclick: () => {
-                    chosenTab = 'LEGEND';
-                    const { sourceName, layerStyleId } = layerSourceDef;
-                    const layerStyle = layerStyles[layerStyleId];
-                    const source = newSource(sourceName, layerStyle);
-                    layerSourceDef = { layerStyleId: -1 } as LayerSourceDef;
-                    console.log(source);
-                    saveSource(source);
-                  },
-                }),
+                  } as FormAttributes<LayerSourceDef>),
+                  m(FlatButton, {
+                    key: layerSourceDef.layerStyleId,
+                    label: 'Create',
+                    iconName: 'create',
+                    disabled: !formValid,
+                    onclick: () => {
+                      chosenTab = 'LEGEND';
+                      console.log('CREATING NEW LAYER');
+                      console.log(layerSourceDef);
+                      const { sourceName, layerStyleId } = layerSourceDef;
+                      const layerStyle = layerStyles[layerStyleId];
+                      const source = newSource(sourceName, layerStyle);
+                      layerSourceDef = {} as LayerSourceDef;
+                      formValid = false;
+                      console.log(source);
+                      saveSource(source);
+                    },
+                  }),
+                ],
               ]),
             },
           ],

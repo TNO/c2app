@@ -26,7 +26,6 @@ import M from 'materialize-css';
 import mapboxgl from 'mapbox-gl';
 import m from 'mithril';
 import { FeatureCollectionExt, ILayer, ISource, SourceType } from '../models';
-import { uniqueId } from 'mithril-materialized';
 import { featureCollectionToSource, toLayerName, toSourceName } from '../components/map/map-utils';
 
 export class Socket {
@@ -40,6 +39,11 @@ export class Socket {
     console.table({ url, path: config.SOCKET_PATH });
     this.socket = io(url, { path: config.SOCKET_PATH });
     // ASSISTANCE context
+    this.socket.on('connect', () => {
+      const sessionID = this.socket.id;
+      console.log(`Socket ID: ${sessionID}`);
+      us({ app: { sessionID } });
+    });
     this.socket.on('context', (data: IContext) => {
       const fc = {
         type: 'FeatureCollection',
@@ -460,11 +464,10 @@ export class Socket {
           break;
       }
     });
-    // These positions are received directly from the agent-smith simulator
-    // These are therefore NOT assistance resources, but 'just' simEntities
     this.socket.on('geojson', (source: FeatureCollectionExt) => {
+      if (source.lastEditedBy === this.socket.id) return;
       // if (!this.shouldUpdate()) return;
-      const { layerId = uniqueId() } = source;
+      const { layerId } = source;
       console.log(source);
       us({
         app: {

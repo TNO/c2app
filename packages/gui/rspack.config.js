@@ -29,7 +29,7 @@ module.exports = {
         // publicPath: devMode ? undefined : '',
         scriptLoading: 'defer',
         minify: !devMode,
-        favicon: './src/favicon.ico',
+        favicon: 'favicon.ico',
         meta: {
           viewport: 'width=device-width, initial-scale=1',
           'Content-Security-Policy': {

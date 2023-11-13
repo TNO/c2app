@@ -16,7 +16,7 @@ async function convertToJsonArrayAndWriteIndexJson(folderPath: string): Promise<
 
   // Read and parse each JSON file into an array.
   const jsonArray: any[] = [];
-  for (const jsonFile of jsonFiles.filter((f) => f !== 'index.json')) {
+  for (const jsonFile of jsonFiles.filter((f) => f !== 'index.json' && f !== 'style.json')) {
     const jsonFilePath = join(folderPath, jsonFile);
     const jsonData = await readFile(jsonFilePath, 'utf-8');
     const parsedData = JSON.parse(jsonData);

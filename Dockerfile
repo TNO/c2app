@@ -8,11 +8,11 @@
 # Build the app separately
 FROM node:18-alpine as builder
 
-ARG SERVER_URL
-ARG SERVER_PATH
+# ARG SERVER_URL
+# ARG SERVER_PATH
 
-ENV SERVER_URL=${SERVER_URL}
-ENV SERVER_PATH=${SERVER_PATH}
+# ENV SERVER_URL=${SERVER_URL}
+# ENV SERVER_PATH=${SERVER_PATH}
 
 RUN apk add --no-cache --virtual .gyp python3 make g++ git vips-dev && \
   npm i -g yalc
@@ -40,12 +40,12 @@ RUN rm -fr node_modules && \
 # Serve the built app
 FROM node:18-alpine as app
 
-ARG SERVER_URL
-ARG SERVER_PATH
+# ARG SERVER_URL
+# ARG SERVER_PATH
 ARG GIT_COMMIT=latest
 
-ENV SERVER_URL=${SERVER_URL}
-ENV SERVER_PATH=${SERVER_PATH}
+# ENV SERVER_URL=${SERVER_URL}
+# ENV SERVER_PATH=${SERVER_PATH}
 
 LABEL git_commit=$GIT_COMMIT
 

@@ -122,17 +122,18 @@ export const poiSidebar: MeiosisComponent = () => {
             ]
           ),
           m('.buttons', { key: 'buttons' }, [
-            m(FlatButton, {
-              label: 'Delete',
-              iconName: 'delete',
-              onclick: async () => {
-                if (source && source.source) {
-                  source.source = deleteFeature(source.source, clickedFeature);
-                  await saveSource(source);
-                  sidebarInteraction('slide-out-2', 'CLOSE');
-                }
-              },
-            }),
+            shared &&
+              m(FlatButton, {
+                label: 'Delete',
+                iconName: 'delete',
+                onclick: async () => {
+                  if (source && source.source) {
+                    source.source = deleteFeature(source.source, clickedFeature);
+                    await saveSource(source);
+                    sidebarInteraction('slide-out-2', 'CLOSE');
+                  }
+                },
+              }),
           ]),
         ])
       );

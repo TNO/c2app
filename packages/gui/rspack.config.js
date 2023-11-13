@@ -4,12 +4,11 @@ const path = require('path');
 const devMode = process.env.NODE_ENV === 'development';
 const outputPath = path.resolve(__dirname, devMode ? 'dist' : '../server/public');
 
-console.log(
-  `Working in ${devMode ? 'development' : 'production'} mode, server URL ${devMode ? process.env.SERVER_URL : './'}.`
-);
+const mode = devMode ? 'development' : 'production';
+console.log(`Working in ${mode} mode, server URL ${devMode ? process.env.SERVER_URL : './'}.`);
 
 module.exports = {
-  mode: devMode ? 'development' : 'production',
+  mode,
   entry: {
     main: './src/app.ts',
   },
@@ -37,7 +36,7 @@ module.exports = {
             content: 'interest-cohort=(), user-id=()',
           },
           'og:title': 'SAFR',
-          'og:description': 'Situational Awareness (SA) and Command & Control (C2) tool for First Responders (FR)',
+          'og:description': `Situational Awareness (SA) and Command & Control (C2) tool for First Responders (FR): Running in ${mode} mode.`,
           'og:url': 'https://github.com/TNO/c2app',
           'og:site_name': 'SAFR',
           'og:image:alt': 'SAFR',

@@ -51,7 +51,7 @@ module.exports = (env) => {
           {
             attributes: {
               property: 'og:description',
-              content: 'SA and C2 tools for FRs',
+              content: 'OLD: SA and C2 tools for FRs',
             },
           },
           {

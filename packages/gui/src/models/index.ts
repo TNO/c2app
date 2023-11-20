@@ -1,5 +1,5 @@
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
-import { LayerSpecification, LinePaintProps, SymbolLayoutProps } from 'maplibre-gl';
+import { LayerSpecification, LinePaintProps, MapGeoJSONFeature, SymbolLayoutProps } from 'maplibre-gl';
 import { uniqueId } from 'mithril-materialized';
 import { UIForm } from 'mithril-ui-form';
 import { LayerStyle } from 'c2app-models-utils';
@@ -104,3 +104,12 @@ export const newSource = (sourceName: string, layerStyle: LayerStyle<any>) => {
 };
 
 export type SidebarMode = 'NONE' | 'EDIT_POI' | 'CREATE_POI';
+
+/**
+ * An extended geojson feature used by the events to return data to the listener
+ */
+export type SafrMapGeoJSONFeature = MapGeoJSONFeature & {
+  state: {
+    isSelected?: boolean;
+  };
+};

@@ -1,5 +1,5 @@
 import m from 'mithril';
-import maplibre, { IControl, Map as MaplibreMap } from 'maplibre-gl';
+import { GeolocateControl, Hash, IControl, Map as MaplibreMap, NavigationControl, ScaleControl } from 'maplibre-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 // @ts-ignore
 import { MeiosisComponent } from '../../services/meiosis';
@@ -36,6 +36,7 @@ export const Map: MeiosisComponent = () => {
       const { VECTOR_TILE_SERVER } = config;
       const { getLonLat, getZoomLevel, setMap } = actions;
       // Create map and add controls
+
       map = new MaplibreMap({
         container: 'mapboxMap',
         style: VECTOR_TILE_SERVER
@@ -63,14 +64,29 @@ export const Map: MeiosisComponent = () => {
             },
         center: getLonLat(),
         zoom: getZoomLevel(),
+        hash: 'loc',
       });
       loadMissingImages(map);
       // updateGrid(appState, actions, map);
 
       // Add draw controls
       draw = new MapboxDraw(drawConfig);
-      map.addControl(new maplibre.NavigationControl(), 'top-left');
+      map.addControl(new NavigationControl(), 'top-left');
       map.addControl(draw as unknown as IControl, 'top-left');
+      const scale = new ScaleControl({
+        maxWidth: 200,
+        unit: 'metric',
+      });
+      map.addControl(scale);
+      map.addControl(
+        new GeolocateControl({
+          positionOptions: {
+            enableHighAccuracy: true,
+          },
+          trackUserLocation: true,
+        }),
+        'bottom-right'
+      );
 
       // Add map listeners
       map.on('load', () => {
@@ -91,23 +107,5 @@ export const Map: MeiosisComponent = () => {
         setMap(map, draw);
       });
     },
-    // Executes on every redraw
-    // onupdate: ({ attrs: { state, actions } }) => {
-    //   if (!map.loaded()) return;
-    //   console.log('REDRAWING MAP');
-
-    //   // Update the grid if necessary
-    //   // if (appState.app.gridOptions.updateGrid) {
-    //   //   updateGrid(appState, actions, map);
-    //   // }
-
-    //   // Check if basemap should be switched
-    //   // if (token && !map.getStyle().sprite?.includes(appState.app.mapStyle)) {
-    //   //   switchBasemap(map, appState.app.mapStyle).catch();
-    //   // }
-
-    //   updateSourcesAndLayers(state, actions, map);
-    //   updateSatellite(state, map);
-    // },
   };
 };

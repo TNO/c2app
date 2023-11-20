@@ -14,7 +14,6 @@ import {
   Popup,
   LngLatLike,
   MapMouseEvent,
-  MapGeoJSONFeature,
   GeoJSONFeatureId,
 } from 'maplibre-gl';
 
@@ -37,7 +36,7 @@ import marker from '../../assets/icons/mapbox-marker-icon-20px-blue.png';
 // import air from '../../assets/Operations/air.png';
 // import ground from '../../assets/Operations/ground.png';
 // import first_responder from '../../assets/Operations/Medical services.png';
-import { FeatureCollectionExt, ILayer, ISource, SidebarMode, SourceType } from '../../models';
+import { FeatureCollectionExt, ILayer, ISource, SafrMapGeoJSONFeature, SidebarMode, SourceType } from '../../models';
 import { uniqueId } from 'mithril-materialized';
 import { LayerStyle } from 'c2app-models-utils';
 import { UIForm } from 'mithril-ui-form';
@@ -53,7 +52,7 @@ export const drawConfig = {
   },
 };
 
-export const handleDrawEvent = (_map: MaplibreMap, features: GeoJSONFeature[], actions: IActions) => {
+export const handleDrawEvent = (_map: MaplibreMap, features: SafrMapGeoJSONFeature[], actions: IActions) => {
   displayInfoSidebar(features, actions, 'CREATE_POI');
   // actions.updateDrawings(features[0] as GeoJSONFeature);
   // if (features[0].geometry.type === 'Polygon') {
@@ -124,11 +123,20 @@ export const sidebarInteraction = (id: string, interaction: 'OPEN' | 'CLOSE' | '
   sidebar && setTimeout(() => (interaction === 'OPEN' ? sidebar.open() : sidebar.close()), 100);
 };
 
-export const displayInfoSidebar = (features: GeoJSONFeature[], actions: IActions, mode: SidebarMode) => {
+export const displayInfoSidebar = (features: SafrMapGeoJSONFeature[], actions: IActions, mode: SidebarMode) => {
   if (!features || features.length === 0) return;
   const feature = features[0] as GeoJSONFeature;
   actions.updateClickedFeature(feature, mode);
   sidebarInteraction('slide-out-2');
+};
+
+export const selectFeature = (features: SafrMapGeoJSONFeature[]) => {
+  if (!features || features.length === 0) return;
+  const feature = features[0] as SafrMapGeoJSONFeature;
+  feature.state.isSelected = !feature.state.isSelected;
+  if (feature.state.isSelected) {
+    console.log('Feature selected');
+  }
 };
 
 export const getGridSource = (map: MaplibreMap, actions: IActions, appState: IAppModel): FeatureCollection<Polygon> => {
@@ -215,7 +223,7 @@ export const toSourceName = (source: ISource) => `${source.id}`.toLowerCase().re
 export const toLayerName = (sourceName: string, layer: ILayer) =>
   `${sourceName}.${layer.layerName}`.toLowerCase().replace(/\s/g, '_');
 
-const showPopup = (e: MapMouseEvent, map: MaplibreMap, popup: Popup, feature: MapGeoJSONFeature) => {
+const showPopup = (e: MapMouseEvent, map: MaplibreMap, popup: Popup, feature: SafrMapGeoJSONFeature) => {
   const coordinates = (
     feature.geometry.type === 'Point' ? (feature.geometry as Point).coordinates.slice() : e.lngLat
   ) as number[];
@@ -243,7 +251,7 @@ const moveOnMap = (
   layerName: string,
   actions: IActions,
   map: MaplibreMap,
-  feature: MapGeoJSONFeature
+  feature: SafrMapGeoJSONFeature
 ) => {
   console.log('ON MOUSE MOVE');
   const canvas = map.getCanvas();
@@ -338,9 +346,10 @@ export const updateSourcesAndLayers = (sources: ISource[], actions: IActions, ma
         console.log('NEW map layer');
         console.log(mapLayer);
         map.addLayer(mapLayer);
-        map.on('click', layerName, ({ features }) =>
-          displayInfoSidebar(features as GeoJSONFeature[], actions, 'EDIT_POI')
-        );
+        map.on('click', layerName, ({ features }) => {
+          selectFeature(features as SafrMapGeoJSONFeature[]);
+          displayInfoSidebar(features as SafrMapGeoJSONFeature[], actions, 'EDIT_POI');
+        });
         map.on('mouseenter', layerName, (e) => {
           map.getCanvas().style.cursor = 'pointer';
 

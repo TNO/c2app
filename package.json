@@ -36,6 +36,6 @@
   },
   "homepage": "https://github.com/TNO/c2app#readme",
   "devDependencies": {
-    "@rspack/cli": "^0.3.11"
+    "@rspack/cli": "^0.3.14"
   }
 }

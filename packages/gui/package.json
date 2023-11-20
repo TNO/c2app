@@ -19,7 +19,7 @@
     "@turf/bbox": "^6.5.0",
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "@turf/square-grid": "^6.5.0",
-    "c2app-models-utils": "file:../shared",
+    "c2app-models-utils": "link:../shared",
     "geojson": "^0.5.0",
     "maplibre-gl": "^3.6.0",
     "material-icons": "^1.13.12",

@@ -6,7 +6,6 @@ import { MeiosisComponent } from '../../services/meiosis';
 import {
   drawConfig,
   handleDrawEvent,
-  loadImages,
   loadMissingImages,
   setLonLat,
   setZoomLevel,
@@ -66,7 +65,6 @@ export const Map: MeiosisComponent = () => {
         zoom: getZoomLevel(),
       });
       loadMissingImages(map);
-      loadImages(map);
       // updateGrid(appState, actions, map);
 
       // Add draw controls
@@ -85,7 +83,8 @@ export const Map: MeiosisComponent = () => {
         actions.loadGeoJSON();
 
         map.once('styledata', () => {
-          updateSourcesAndLayers(state, actions, map);
+          console.log('On styledata');
+          updateSourcesAndLayers(state.app.sources || [], actions, map);
           updateSatellite(state, map);
         });
 
@@ -93,22 +92,22 @@ export const Map: MeiosisComponent = () => {
       });
     },
     // Executes on every redraw
-    onupdate: ({ attrs: { state, actions } }) => {
-      if (!map.loaded()) return;
-      console.log('REDRAWING MAP');
+    // onupdate: ({ attrs: { state, actions } }) => {
+    //   if (!map.loaded()) return;
+    //   console.log('REDRAWING MAP');
 
-      // Update the grid if necessary
-      // if (appState.app.gridOptions.updateGrid) {
-      //   updateGrid(appState, actions, map);
-      // }
+    //   // Update the grid if necessary
+    //   // if (appState.app.gridOptions.updateGrid) {
+    //   //   updateGrid(appState, actions, map);
+    //   // }
 
-      // Check if basemap should be switched
-      // if (token && !map.getStyle().sprite?.includes(appState.app.mapStyle)) {
-      //   switchBasemap(map, appState.app.mapStyle).catch();
-      // }
+    //   // Check if basemap should be switched
+    //   // if (token && !map.getStyle().sprite?.includes(appState.app.mapStyle)) {
+    //   //   switchBasemap(map, appState.app.mapStyle).catch();
+    //   // }
 
-      updateSourcesAndLayers(state, actions, map);
-      updateSatellite(state, map);
-    },
+    //   updateSourcesAndLayers(state, actions, map);
+    //   updateSatellite(state, map);
+    // },
   };
 };

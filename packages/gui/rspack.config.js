@@ -36,7 +36,7 @@ module.exports = {
             content: 'interest-cohort=(), user-id=()',
           },
           'og:title': 'SAFR',
-          'og:description': `Situational Awareness (SA) and Command & Control (C2) tool for First Responders (FR): Running in ${mode} mode.`,
+          'og:description': `Situational Awareness (SA) and Command & Control (C2) tool for First Responders (FR)`,
           'og:url': 'https://github.com/TNO/c2app',
           'og:site_name': 'SAFR',
           'og:image:alt': 'SAFR',
@@ -48,13 +48,13 @@ module.exports = {
       },
     ],
     // plugins: [
-    //   new rspack.HtmlRspackPlugin([
+    //   new rspack.HtmlRspackPlugin(
     //     {
     //       title: 'SAFR',
-    //       publicPath: devMode ? undefined : '/',
+    //       // publicPath: devMode ? undefined : '/',
     //       scriptLoading: 'defer',
     //       minify: !devMode,
-    //       favicon: './src/favicon.ico',
+    //       favicon: 'favicon.ico',
     //       meta: {
     //         viewport: 'width=device-width, initial-scale=1',
     //         'Content-Security-Policy': {
@@ -63,7 +63,7 @@ module.exports = {
     //         },
     //         'og:title': 'SAFR',
     //         'og:description': 'Situational Awareness (SA) and Command & Control (C2) tool for First Responders (FR)',
-    //         'og:url': 'https://tno.github.io/scenario-spark/',
+    //         'og:url': 'https://github.com/TNO/c2app',
     //         'og:site_name': 'SAFR',
     //         'og:image:alt': 'SAFR',
     //         'og:image': './src/assets/safr.svg',
@@ -72,7 +72,7 @@ module.exports = {
     //         'og:image:height': '200',
     //       },
     //     },
-    //   ]),
+    //   ),
     // ],
     minifyOptions: devMode
       ? undefined

@@ -135,7 +135,7 @@ export class MessagesService {
     if (!collection) {
       return false;
     }
-    collection.update(msg);
+    return collection.update(msg);
     // if (!this.messageTopicStore.hasOwnProperty(topic)) {
     //   return false;
     // }

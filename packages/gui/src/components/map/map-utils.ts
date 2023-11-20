@@ -13,6 +13,9 @@ import {
   LayerSpecification,
   Popup,
   LngLatLike,
+  MapMouseEvent,
+  MapGeoJSONFeature,
+  GeoJSONFeatureId,
 } from 'maplibre-gl';
 
 // ICONS
@@ -196,81 +199,6 @@ export const loadMissingImages = (map: MaplibreMap) => {
   });
 };
 
-export const loadImages = (map: MaplibreMap) => {
-  map.loadImage(marker, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-    if (error) throw error;
-    if (!map.hasImage('MARKER')) map.addImage('MARKER', image as ImageBitmap);
-  });
-  // map.loadImage(fireman, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('FIREFIGHTER')) map.addImage('FIREFIGHTER', image as ImageBitmap);
-  // });
-  // map.loadImage(policeman, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('POLICE')) map.addImage('POLICE', image as ImageBitmap);
-  // });
-  // map.loadImage(sanitary, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('MEDICAL')) map.addImage('MEDICAL', image as ImageBitmap);
-  // });
-  // map.loadImage(first_responder, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('OTHER')) map.addImage('OTHER', image as ImageBitmap);
-  // });
-  // map.loadImage(car, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('CAR')) map.addImage('CAR', image as ImageBitmap);
-  // });
-  // map.loadImage(van, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('VAN')) map.addImage('VAN', image as ImageBitmap);
-  // });
-  // map.loadImage(truck, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('TRUCK')) map.addImage('TRUCK', image as ImageBitmap);
-  // });
-  // map.loadImage(air, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('AIR')) map.addImage('AIR', image as ImageBitmap);
-  // });
-  // map.loadImage(ground, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('GROUND')) map.addImage('GROUND', image as ImageBitmap);
-  // });
-  // map.loadImage(chemical, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('chemical')) map.addImage('chemical', image as ImageBitmap);
-  // });
-  // map.loadImage(roadBlock, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('roadBlock')) map.addImage('roadBlock', image as ImageBitmap);
-  // });
-  // map.loadImage(media, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('media')) map.addImage('media', image as ImageBitmap);
-  // });
-  // map.loadImage(controlPoint, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('controlPoint')) map.addImage('controlPoint', image as ImageBitmap);
-  // });
-  // map.loadImage(divisionCommand, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('divisionCommand')) map.addImage('divisionCommand', image as ImageBitmap);
-  // });
-  // map.loadImage(evacuation, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('evacuation')) map.addImage('evacuation', image as ImageBitmap);
-  // });
-  // map.loadImage(helicopter, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('helicopter')) map.addImage('helicopter', image as ImageBitmap);
-  // });
-  // map.loadImage(military, function (error?: Error | null, image?: HTMLImageElement | ImageBitmap | null) {
-  //   if (error) throw error;
-  //   if (!map.hasImage('military')) map.addImage('military', image as ImageBitmap);
-  // });
-};
-
 export const switchBasemap = async (map: MaplibreMap, styleID: string) => {
   const currentStyle = map.getStyle();
   const newStyle = await m.request<Style>(`https://api.mapbox.com/styles/v1/${styleID}`);
@@ -278,28 +206,6 @@ export const switchBasemap = async (map: MaplibreMap, styleID: string) => {
   // ensure any sources from the current style are copied across to the new style
   // newStyle.sources = Object.assign({}, currentStyle.sources, newStyle.sources);
   Object.entries(currentStyle.sources)?.forEach(([id, source]) => newStyle.addSource(id, source));
-
-  // TODO FIX
-  // // find the index of where to insert our layers to retain in the new style
-  // let labelIndex = newStyle.layers?.findIndex((el) => {
-  //   return el.id == 'state-label';
-  // });
-
-  // // default to on top
-  // if (labelIndex === -1) {
-  //   labelIndex = newStyle.layers?.length;
-  // }
-  // const appLayers = currentStyle.layers?.filter((el) => {
-  //   // app layers are the layers to retain, and these are any layers which have a different source set
-  //   const source = (el as any).source;
-  //   return source && source != 'mapbox://mapbox.satellite' && source != 'mapbox' && source != 'composite';
-  // });
-
-  // if (!newStyle || !newStyle.layers || !appLayers) return;
-  // newStyle.layers = [...newStyle.layers.slice(0, labelIndex), ...appLayers, ...newStyle.layers.slice(labelIndex, -1)];
-
-  // map.setStyle(newStyle);
-  loadImages(map);
 };
 
 /** Convert a source to a unique name */
@@ -309,20 +215,106 @@ export const toSourceName = (source: ISource) => `${source.id}`.toLowerCase().re
 export const toLayerName = (sourceName: string, layer: ILayer) =>
   `${sourceName}.${layer.layerName}`.toLowerCase().replace(/\s/g, '_');
 
-export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, map: MaplibreMap) => {
-  const { sources = [] } = appState.app;
+const showPopup = (e: MapMouseEvent, map: MaplibreMap, popup: Popup, feature: MapGeoJSONFeature) => {
+  const coordinates = (
+    feature.geometry.type === 'Point' ? (feature.geometry as Point).coordinates.slice() : e.lngLat
+  ) as number[];
+  const title = feature.properties.title;
+  const description = feature.properties.description;
+  const html = `${title ? `<h5>${title}</h5>` : ''}${description ? `<p>${description}</p>` : ''}`;
+  if (!html) return;
+  // Ensure that if the map is zoomed out such that multiple
+  // copies of the feature are visible, the popup appears
+  // over the copy being pointed to.
+  while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+  }
+
+  // Populate the popup and set its coordinates
+  // based on the feature found.
+  popup
+    .setLngLat(coordinates as LngLatLike)
+    .setHTML(html)
+    .addTo(map);
+};
+
+const moveOnMap = (
+  source: ISource,
+  layerName: string,
+  actions: IActions,
+  map: MaplibreMap,
+  feature: MapGeoJSONFeature
+) => {
+  console.log('ON MOUSE MOVE');
+  const canvas = map.getCanvas();
+  const geometry = feature.geometry;
+  const featureSource = feature.source;
+  if (geometry.type !== 'Point' || !featureSource) return;
+  canvas.style.cursor = 'move';
+
+  const onMove = (e: MapMouseEvent) => {
+    console.log('onMove');
+    canvas.style.cursor = 'grabbing';
+    const coords = e.lngLat;
+    geometry.coordinates = [coords.lng, coords.lat];
+    source.source.features = source.source.features.map((f) =>
+      f.properties?.id === feature.id ? { ...f, geometry } : f
+    );
+    const s = map.getSource(featureSource) as GeoJSONSource;
+    // s && s.setData(source.source);
+    s && s.updateData({ update: [{ id: feature.id as GeoJSONFeatureId, newGeometry: geometry }] });
+  };
+
+  const onUp = (e: MapMouseEvent) => {
+    console.log('onUp');
+    const coords = e.lngLat;
+
+    // // Print the coordinates of where the point had
+    // // finished being dragged to on the map.
+    // coordinates.style.display = 'block';
+    // coordinates.innerHTML = `Longitude: ${coords.lng}<br />Latitude: ${coords.lat}`;
+    console.log(`Longitude: ${coords.lng}<br />Latitude: ${coords.lat}`);
+    canvas.style.cursor = '';
+
+    // Unbind mouse/touch events
+    map.off('mousemove', onMove);
+    map.off('touchmove', onMove);
+    actions.saveSource(source);
+  };
+
+  map.on('mousedown', layerName, (e) => {
+    // Prevent the default map drag behavior.
+    e.preventDefault();
+    canvas.style.cursor = 'grab';
+    map.on('mousemove', onMove);
+    map.once('mouseup', onUp);
+  });
+
+  map.on('touchstart', layerName, (e) => {
+    if (e.points.length !== 1) return;
+    // Prevent the default map drag behavior.
+    e.preventDefault();
+    map.on('touchmove', onMove);
+    map.once('touchend', onUp);
+  });
+};
+
+export const updateSourcesAndLayers = (sources: ISource[], actions: IActions, map: MaplibreMap) => {
+  console.log('UPDATING sources and layer');
+  // const { sources = [] } = appState.app;
   sources.forEach((source: ISource) => {
     // Set source
     const sourceName = toSourceName(source);
     if (map.getSource(sourceName)) {
       (map.getSource(sourceName) as GeoJSONSource).setData(source.source);
+      return;
     } else {
       console.log('ADD SOURCE');
       console.log(source);
       map.addSource(sourceName, {
         type: 'geojson',
         data: source.source,
-        generateId: true, //This ensures that all features have unique IDs
+        promoteId: 'id',
       });
     }
 
@@ -354,27 +346,11 @@ export const updateSourcesAndLayers = (appState: IAppModel, actions: IActions, m
 
           const feature = e.features ? e.features[0] : undefined;
           if (!feature) return;
-          // console.log(feature)
-          const coordinates = (
-            feature.geometry.type === 'Point' ? (feature.geometry as Point).coordinates.slice() : e.lngLat
-          ) as number[];
-          const title = feature.properties.title;
-          const description = feature.properties.description;
-          const html = `${title ? `<h5>${title}</h5>` : ''}${description ? `<p>${description}</p>` : ''}`;
-          if (!html) return;
-          // Ensure that if the map is zoomed out such that multiple
-          // copies of the feature are visible, the popup appears
-          // over the copy being pointed to.
-          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          if (feature.state.isLocked) {
+            showPopup(e, map, popup, feature);
+          } else if (source.shared) {
+            moveOnMap(source, layerName, actions, map, feature);
           }
-
-          // Populate the popup and set its coordinates
-          // based on the feature found.
-          popup
-            .setLngLat(coordinates as LngLatLike)
-            .setHTML(html)
-            .addTo(map);
         });
         map.on('mouseleave', layerName, () => {
           map.getCanvas().style.cursor = '';

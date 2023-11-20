@@ -24,7 +24,7 @@ import { FeatureCollectionExt, ILayer, ISource, Pages, SidebarMode, SourceType }
 import { GeoJSONFeature } from 'maplibre-gl';
 import { layerStylesSvc } from './layer_style_svc';
 import { restServiceFactory } from './rest-service';
-import { defaultLayerStyle, featureCollectionToSource } from '../components/map/map-utils';
+import { defaultLayerStyle, featureCollectionToSource, updateSourcesAndLayers } from '../components/map/map-utils';
 import { configSvc } from './config_svc';
 
 const ZOOM_LEVEL = 'SAFR_ZOOM_LEVEL';
@@ -245,10 +245,11 @@ export const appState = {
         console.log('LOADING GEOJSON');
         const layerStyles = (await layerStylesSvc.loadStyles()) || [];
         layerStyles.push(defaultLayerStyle);
-        const { socket } = states().app;
+        const { socket, map } = states().app;
         socket.setLayerStyles(layerStyles);
         const sources = (await geojsonSvc.loadList()).map((source) => featureCollectionToSource(source, layerStyles));
         console.log(sources);
+        updateSourcesAndLayers(sources, actions, map);
         update({
           app: {
             layerStyles: () => layerStyles,
@@ -509,8 +510,7 @@ export const appState = {
         if (!source || !source.source) return;
         source.source.lastEditedBy = states().app.sessionID;
         const updatedSource = await geojsonSvc.save(source.source);
-        if (!updatedSource) return;
-        source.source = updatedSource;
+        if (updatedSource) source.source = updatedSource;
         update({
           app: {
             sources: (sources: ISource[]) => {
@@ -520,6 +520,7 @@ export const appState = {
               } else {
                 sources.push(source);
               }
+              updateSourcesAndLayers(sources, actions, states().app.map);
               return sources;
             },
           },

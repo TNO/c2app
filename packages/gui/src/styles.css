@@ -43,6 +43,18 @@ p {
   border-radius: 10px;
 }
 
+.clickable {
+  margin: 5px 0;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
 .ml10 {
   margin-left: 10px;
+}
+
+.sidenav-overlay {
+  height: 0px;
+  width: 0px;
 }

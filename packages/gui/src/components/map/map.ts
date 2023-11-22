@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { GeolocateControl, Hash, IControl, Map as MaplibreMap, NavigationControl, ScaleControl } from 'maplibre-gl';
+import { GeolocateControl, IControl, Map as MaplibreMap, NavigationControl, ScaleControl } from 'maplibre-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 // @ts-ignore
 import { MeiosisComponent } from '../../services/meiosis';

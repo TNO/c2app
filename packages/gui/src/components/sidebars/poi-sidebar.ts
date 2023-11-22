@@ -1,8 +1,8 @@
 import m from 'mithril';
 import { MeiosisComponent } from '../../services/meiosis';
-import { addOrUpdateFeature, sidebarInteraction, deleteFeature, toSourceName } from '../map/map-utils';
+import { addOrUpdateFeature, sidebarInteraction, deleteFeature, toSourceName, setFeatureState } from '../map/map-utils';
 import { FormAttributes, LayoutForm, UIForm } from 'mithril-ui-form';
-import { FlatButton } from 'mithril-materialized';
+import { FlatButton, Icon } from 'mithril-materialized';
 
 type PoiSourceDef = {
   sourceId: string;
@@ -15,7 +15,7 @@ export const poiSidebar: MeiosisComponent = () => {
   return {
     view: ({ attrs: { state, actions } }) => {
       const {
-        app: { clickedFeature, sources, sidebarMode, layerStyles = [], editSourceId },
+        app: { map, clickedFeature, sources, sidebarMode, layerStyles = [], editSourceId },
       } = state;
       const { saveSource, update, clearDrawLayer } = actions;
 
@@ -59,11 +59,11 @@ export const poiSidebar: MeiosisComponent = () => {
           break;
         case 'Polygon':
           ui.push(
+            { label: 'Fill color', id: 'fill', type: 'color', value: '#555555' },
+            { label: 'Fill opacity', id: 'fill-opacity', type: 'number', min: 0.05, max: 1, step: 0.05 },
             { label: 'Stroke color', id: 'stroke', type: 'color', value: '#555555' },
             { label: 'Stroke opacity', id: 'stroke-opacity', type: 'number', min: 0, max: 1, step: 0.05 },
-            { label: 'Stroke width', id: 'stroke-width', type: 'number', value: 0, min: 0, step: 0.5 },
-            { label: 'Fill color', id: 'fill', type: 'color', value: '#555555' },
-            { label: 'Fill opacity', id: 'fill-opacity', type: 'number', min: 0.05, max: 1, step: 0.05 }
+            { label: 'Stroke width', id: 'stroke-width', type: 'number', value: 0, min: 0, step: 0.5 }
           );
           break;
       }
@@ -81,8 +81,20 @@ export const poiSidebar: MeiosisComponent = () => {
       const key2 = clickedFeature?.properties?.id || 'edit_poi';
 
       return m(
-        'ul#slide-out-2.sidenav.no-autoinit',
+        '#slide-out-2.sidenav.no-autoinit',
         m('.row', [
+          m(
+            '.col.s12',
+            { key: 'close_button' },
+            m(Icon, {
+              iconName: 'clear',
+              className: 'clickable right',
+              onclick: () => {
+                clickedFeature && setFeatureState(map, [clickedFeature], 'isSelected', false);
+                sidebarInteraction('slide-out-2', 'CLOSE');
+              },
+            })
+          ),
           m('.col.s12', { key: key1 }, [
             sidebarMode === 'CREATE_POI' &&
               m(LayoutForm, {

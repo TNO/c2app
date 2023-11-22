@@ -1,10 +1,11 @@
 import { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
-import { LayerSpecification, LinePaintProps, MapGeoJSONFeature, SymbolLayoutProps } from 'maplibre-gl';
+import { MapGeoJSONFeature } from 'maplibre-gl';
 import { uniqueId } from 'mithril-materialized';
 import { UIForm } from 'mithril-ui-form';
 import { LayerStyle } from 'c2app-models-utils';
-import { defaultLayerStyle } from '../components/map/map-utils';
+import { defaultLayerStyle } from '../components/map/default-layer-style';
 import { clone } from '../utils';
+import { AnyLayer } from 'mapbox-gl';
 export * from './page';
 
 export type FeatureCollectionProps = {
@@ -46,12 +47,12 @@ export interface FeatureCollectionExt<G extends Geometry | null = Geometry, P = 
 }
 
 export interface ILayer {
-  layerName: string;
+  // layerName: string;
   showLayer: boolean;
-  type: LayerSpecification;
-  layout?: Partial<SymbolLayoutProps>;
-  paint?: LinePaintProps | Record<string, any>;
-  filter?: any[];
+  type: AnyLayer;
+  // layout?: Partial<SymbolLayoutProps>;
+  // paint?: LinePaintProps | Record<string, any>;
+  // filter?: any[];
 }
 
 export const layerStyleToLayers = (layerStyle: LayerStyle<any>): ILayer[] => {
@@ -105,11 +106,13 @@ export const newSource = (sourceName: string, layerStyle: LayerStyle<any>) => {
 
 export type SidebarMode = 'NONE' | 'EDIT_POI' | 'CREATE_POI';
 
+export type SafrFeatureStateKeys = 'isSelected' | 'hover';
+
+export type SafrFeatureState = Record<SafrFeatureStateKeys, boolean>;
+
 /**
  * An extended geojson feature used by the events to return data to the listener
  */
 export type SafrMapGeoJSONFeature = MapGeoJSONFeature & {
-  state: {
-    isSelected?: boolean;
-  };
+  state: Record<SafrFeatureStateKeys, boolean>;
 };

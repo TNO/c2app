@@ -20,12 +20,22 @@ import {
 // @ts-ignore
 import ch from '../ch.json';
 import { routingSvc } from './routing-service';
-import { FeatureCollectionExt, ILayer, ISource, Pages, SidebarMode, SourceType } from '../models';
+import {
+  FeatureCollectionExt,
+  ILayer,
+  ISource,
+  Pages,
+  SafrMapGeoJSONFeature,
+  SidebarMode,
+  SourceType,
+} from '../models';
 import { GeoJSONFeature } from 'maplibre-gl';
 import { layerStylesSvc } from './layer_style_svc';
 import { restServiceFactory } from './rest-service';
-import { defaultLayerStyle, featureCollectionToSource, updateSourcesAndLayers } from '../components/map/map-utils';
+import { featureCollectionToSource, updateSourcesAndLayers } from '../components/map/map-utils';
+import { defaultLayerStyle } from '../components/map/default-layer-style';
 import { configSvc } from './config_svc';
+import { AnyLayer, FillLayer, LineLayer, SymbolLayer } from 'mapbox-gl';
 
 const ZOOM_LEVEL = 'SAFR_ZOOM_LEVEL';
 const LON_LAT = 'SAFR_LON_LAT';
@@ -43,7 +53,7 @@ export interface IAppModel {
 
     // Clicking/Selecting
     showLegend: boolean;
-    clickedFeature?: GeoJSONFeature & { source?: string };
+    clickedFeature?: SafrMapGeoJSONFeature;
     selectedFeatures?: FeatureCollection;
     cleanDrawLayer: boolean;
     latestDrawing: Feature;
@@ -333,7 +343,9 @@ export const appState = {
                 };
                 // TODO FIX
                 source.layers.forEach((layer: ILayer, index: number) => {
-                  if (layer.paint) layer.paint['line-opacity'] = opacityCalc((source.dts as Array<number>)[index]);
+                  const fillLayer = layer.type as LineLayer;
+                  if (fillLayer && fillLayer.paint)
+                    fillLayer.paint['line-opacity'] = opacityCalc((source.dts as Array<number>)[index]);
                 });
               });
               return sources;
@@ -544,7 +556,7 @@ export const appState = {
               sources.forEach((curSource) => {
                 if (curSource.id === sourceId) {
                   curSource.layers.forEach((curLayer) => {
-                    if (curLayer.layerName === layerName) {
+                    if (curLayer.type.id === layerName) {
                       curLayer.showLayer = visibility;
                     }
                   });
@@ -615,12 +627,14 @@ export const appState = {
                   shared: false,
                   layers: [
                     {
-                      layerName: 'Grid',
                       showLayer: false,
-                      type: { type: 'line' } as mapboxgl.AnyLayer,
-                      paint: {
-                        'line-opacity': 0.5,
-                      },
+                      type: {
+                        id: 'Grid',
+                        type: 'line',
+                        paint: {
+                          'line-opacity': 0.5,
+                        },
+                      } as AnyLayer,
                     },
                   ] as ILayer[],
                 } as ISource);
@@ -640,17 +654,19 @@ export const appState = {
                   shared: false,
                   layers: [
                     {
-                      layerName: 'Grid Labels',
                       showLayer: false,
-                      type: { type: 'symbol' } as mapboxgl.AnyLayer,
-                      layout: {
-                        'text-field': '${cellLabel}',
-                        'text-allow-overlap': true,
-                        'text-font': ['Noto Sans Regular'],
-                      } as any, // TODO FIX
-                      paint: {
-                        'text-opacity': 0.5,
-                      },
+                      type: {
+                        id: 'Grid Labels',
+                        type: 'symbol',
+                        layout: {
+                          'text-field': '${cellLabel}',
+                          'text-allow-overlap': true,
+                          'text-font': ['Noto Sans Regular'],
+                        } as any, // TODO FIX
+                        paint: {
+                          'text-opacity': 0.5,
+                        },
+                      } as AnyLayer,
                     },
                   ] as ILayer[],
                 } as ISource);
@@ -677,14 +693,16 @@ export const appState = {
                 shareWith: shareWith,
                 layers: [
                   {
-                    layerName: layerName,
                     showLayer: true,
-                    type: { type: 'symbol' } as mapboxgl.AnyLayer,
-                    layout: {
-                      'icon-image': icon,
-                      'icon-size': icon === 'ground' ? 0.1 : icon === 'air' ? 0.25 : 0.5,
-                      'icon-allow-overlap': true,
-                    } as any, // TODO FIX
+                    type: {
+                      id: layerName,
+                      type: 'symbol',
+                      layout: {
+                        'icon-image': icon,
+                        'icon-size': icon === 'ground' ? 0.1 : icon === 'air' ? 0.25 : 0.5,
+                        'icon-allow-overlap': true,
+                      },
+                    } as AnyLayer,
                   },
                 ] as ILayer[],
               } as ISource);
@@ -798,14 +816,16 @@ export const appState = {
                   shared: false,
                   layers: [
                     {
-                      layerName: 'Incident',
                       showLayer: true,
-                      type: { type: 'symbol' } as mapboxgl.AnyLayer,
-                      layout: {
-                        'icon-image': 'chemical',
-                        'icon-size': 0.5,
-                        'icon-allow-overlap': true,
-                      } as any, // TODO FIX
+                      type: {
+                        id: 'Incident',
+                        type: 'symbol',
+                        layout: {
+                          'icon-image': 'chemical',
+                          'icon-size': 0.5,
+                          'icon-allow-overlap': true,
+                        },
+                      } as AnyLayer,
                     },
                   ] as ILayer[],
                 } as ISource);
@@ -862,14 +882,16 @@ export const appState = {
                   shared: false,
                   layers: [
                     {
-                      layerName: 'Incident',
                       showLayer: true,
-                      type: { type: 'symbol' } as mapboxgl.AnyLayer,
-                      layout: {
-                        'icon-image': 'chemical',
-                        'icon-size': 0.5,
-                        'icon-allow-overlap': true,
-                      } as any, // TODO FIX
+                      type: {
+                        id: 'Incident',
+                        type: 'symbol',
+                        layout: {
+                          'icon-image': 'chemical',
+                          'icon-size': 0.5,
+                          'icon-allow-overlap': true,
+                        },
+                      } as SymbolLayer,
                     },
                   ] as ILayer[],
                 } as ISource);
@@ -902,12 +924,14 @@ export const appState = {
                   shared: false,
                   layers: [
                     {
-                      layerName: 'Population Data',
                       showLayer: true,
-                      type: { type: 'line' } as mapboxgl.AnyLayer,
-                      paint: {
-                        'line-opacity': 0.5,
-                      },
+                      type: {
+                        id: 'Population Data',
+                        type: 'line',
+                        paint: {
+                          'line-opacity': 0.5,
+                        },
+                      } as AnyLayer,
                     },
                   ] as ILayer[],
                 } as ISource);

@@ -17,1659 +17,438 @@
   ],
   "layers": [
     {
-      "layerName": "Bereiche",
       "showLayer": true,
       "type": {
-        "type": "fill"
-      },
-      "paint": {
-        "fill-color": [
-          "coalesce",
-          [
-            "get",
-            "fill"
-          ],
-          "#555555"
-        ],
-        "fill-opacity": [
-          "coalesce",
-          [
-            "get",
-            "fill-opacity"
-          ],
-          0.6
-        ]
-      },
-      "filter": [
-        "==",
-        "$type",
-        "Polygon"
-      ]
-    },
-    {
-      "layerName": "Linien",
-      "showLayer": true,
-      "type": {
-        "type": "line"
-      },
-      "paint": {
-        "line-color": [
-          "coalesce",
-          [
-            "get",
-            "stroke"
-          ],
-          "#555555"
-        ],
-        "line-width": [
-          "coalesce",
-          [
-            "get",
-            "stroke-width"
-          ],
-          2
-        ],
-        "line-opacity": [
-          "coalesce",
-          [
-            "get",
-            "stroke-opacity"
-          ],
-          1
-        ]
+        "id": "Bereiche",
+        "type": "fill",
+        "paint": {
+          "fill-color": ["coalesce", ["get", "fill"], "#555555"],
+          "fill-opacity": ["coalesce", ["get", "fill-opacity"], 0.6]
+        },
+        "filter": ["==", "$type", "Polygon"]
       }
     },
     {
-      "layerName": "Symbole",
       "showLayer": true,
       "type": {
-        "type": "symbol"
-      },
-      "layout": {
-        "icon-size": [
-          "coalesce",
-          [
-            "get",
-            "marker-size"
-          ],
-          1
-        ],
-        "icon-image": [
-          "concat",
-          "tactical_signs/",
-          [
-            "get",
-            "marker-symbol"
-          ]
-        ],
-        "text-field": [
-          "coalesce",
-          [
-            "get",
-            "title"
-          ],
-          ""
-        ],
-        "text-font": [
-          "Noto Sans Regular"
-        ],
-        "text-offset": [
-          0,
-          0.6
-        ],
-        "text-anchor": "top"
-      },
-      "filter": [
-        "==",
-        "$type",
-        "Point"
-      ]
+        "id": "Linien",
+        "type": "line",
+        "paint": {
+          "line-color": ["coalesce", ["get", "stroke"], "#555555"],
+          "line-width": ["coalesce", ["get", "stroke-width"], 2],
+          "line-opacity": ["coalesce", ["get", "stroke-opacity"], 1]
+        }
+      }
+    },
+    {
+      "showLayer": true,
+      "type": {
+        "id": "Symbole",
+        "type": "symbol",
+        "layout": {
+          "icon-size": ["coalesce", ["get", "marker-size"], 1],
+          "icon-image": ["concat", "tactical_signs/", ["get", "marker-symbol"]],
+          "text-field": ["coalesce", ["get", "title"], ""],
+          "text-font": ["Noto Sans Regular"],
+          "text-offset": [0, 0.6],
+          "text-anchor": "top"
+        },
+        "filter": ["==", "$type", "Point"]
+      }
     }
   ],
   "icons": [
-    [
-      "1. Bergungsgruppe ASH",
-      "1._Bergungsgruppe_ASH.png"
-    ],
-    [
-      "1. Bergungsgruppe EGS",
-      "1._Bergungsgruppe_EGS.png"
-    ],
-    [
-      "1. Bergungsgruppe",
-      "1._Bergungsgruppe.png"
-    ],
-    [
-      "2. Bergungsgruppe A",
-      "2._Bergungsgruppe_A.png"
-    ],
-    [
-      "2. Bergungsgruppe B",
-      "2._Bergungsgruppe_B.png"
-    ],
-    [
-      "2. Bergungsgruppe",
-      "2._Bergungsgruppe.png"
-    ],
-    [
-      "Abrollbehälter Container",
-      "Abrollbehälter_Container.png"
-    ],
-    [
-      "Abschnittsleiter THW",
-      "Abschnittsleiter_THW.png"
-    ],
-    [
-      "Akute Gefahr durch elektrischen Strom",
-      "Akute_Gefahr_durch_elektrischen_Strom.png"
-    ],
-    [
-      "Akute Gefahr durch Explosion",
-      "Akute_Gefahr_durch_Explosion.png"
-    ],
-    [
-      "Akute Gefahr durch Explosivstoffe",
-      "Akute_Gefahr_durch_Explosivstoffe.png"
-    ],
-    [
-      "Akute Gefahr durch Gas",
-      "Akute_Gefahr_durch_Gas.png"
-    ],
-    [
-      "Akute Gefahr durch gefährliche Stoffe",
-      "Akute_Gefahr_durch_gefährliche_Stoffe.png"
-    ],
-    [
-      "Akute Gefahr durch Luftmangel",
-      "Akute_Gefahr_durch_Luftmangel.png"
-    ],
-    [
-      "Akute Gefahr durch Mineralöl",
-      "Akute_Gefahr_durch_Mineralöl.png"
-    ],
-    [
-      "Akute Gefahr durch Radioaktivität",
-      "Akute_Gefahr_durch_Radioaktivität.png"
-    ],
-    [
-      "Akute Gefahr durch Wassereinbruch",
-      "Akute_Gefahr_durch_Wassereinbruch.png"
-    ],
-    [
-      "Akute Gefahr",
-      "Akute_Gefahr.png"
-    ],
-    [
-      "Alters und Ehrengruppe",
-      "Alters_und_Ehrengruppe.png"
-    ],
-    [
-      "Angeschlagen",
-      "Angeschlagen.png"
-    ],
-    [
-      "Angeschlagener Raum Halber Raum",
-      "Angeschlagener_Raum_Halber_Raum.png"
-    ],
-    [
-      "Angeschlagener Raum Schwalbennest",
-      "Angeschlagener_Raum_Schwalbennest.png"
-    ],
-    [
-      "Angeschlagener Raum",
-      "Angeschlagener_Raum.png"
-    ],
-    [
-      "Anhänger 0 5t",
-      "Anhänger_0_5t.png"
-    ],
-    [
-      "Anhänger 2t",
-      "Anhänger_2t.png"
-    ],
-    [
-      "Anhänger 6t",
-      "Anhänger_6t.png"
-    ],
-    [
-      "Anhänger 7t",
-      "Anhänger_7t.png"
-    ],
-    [
-      "Anhänger BT 2t",
-      "Anhänger_BT_2t.png"
-    ],
-    [
-      "Anhänger DLE",
-      "Anhänger_DLE.png"
-    ],
-    [
-      "Anhänger FKH",
-      "Anhänger_FKH.png"
-    ],
-    [
-      "Anhänger FüLa",
-      "Anhänger_FüLa.png"
-    ],
-    [
-      "Anhänger I 2t",
-      "Anhänger_I_2t.png"
-    ],
-    [
-      "Anhänger K 1t",
-      "Anhänger_K_1t.png"
-    ],
-    [
-      "Anhänger kl_Boot",
-      "Anhänger_kl_Boot.png"
-    ],
-    [
-      "Anhänger Kühl",
-      "Anhänger_Kühl.png"
-    ],
-    [
-      "Anhänger Lichtmast",
-      "Anhänger_Lichtmast.png"
-    ],
-    [
-      "Anhänger Log-MW_2t",
-      "Anhänger_Log-MW_2t.png"
-    ],
-    [
-      "Anhänger MzAB",
-      "Anhänger_MzAB.png"
-    ],
-    [
-      "Anhänger MzB",
-      "Anhänger_MzB.png"
-    ],
-    [
-      "Anhänger MzPt",
-      "Anhänger_MzPt.png"
-    ],
-    [
-      "Anhänger NEA 200kVA",
-      "Anhänger_NEA_200kVA.png"
-    ],
-    [
-      "Anhänger NEA 50kVA_LiMa",
-      "Anhänger_NEA_50kVA_LiMa.png"
-    ],
-    [
-      "Anhänger NEA 650kVA",
-      "Anhänger_NEA_650kVA.png"
-    ],
-    [
-      "Anhänger Netzersatzanlage",
-      "Anhänger_Netzersatzanlage.png"
-    ],
-    [
-      "Anhänger O A 2t",
-      "Anhänger_O_A_2t.png"
-    ],
-    [
-      "Anhänger O B 2t",
-      "Anhänger_O_B_2t.png"
-    ],
-    [
-      "Anhänger PF 12t",
-      "Anhänger_PF_12t.png"
-    ],
-    [
-      "Anhänger Rettungshunde",
-      "Anhänger_Rettungshunde.png"
-    ],
-    [
-      "Anhänger RiFu",
-      "Anhänger_RiFu.png"
-    ],
-    [
-      "Anhänger Ru12t",
-      "Anhänger_Ru12t.png"
-    ],
-    [
-      "Anhänger SchlB",
-      "Anhänger_SchlB.png"
-    ],
-    [
-      "Anhänger Sp 2t",
-      "Anhänger_Sp_2t.png"
-    ],
-    [
-      "Anhänger Spül",
-      "Anhänger_Spül.png"
-    ],
-    [
-      "Anhänger Stromerzeuger",
-      "Anhänger_Stromerzeuger.png"
-    ],
-    [
-      "Anhänger SwPu 15000",
-      "Anhänger_SwPu_15000.png"
-    ],
-    [
-      "Anhänger SwPu 25000",
-      "Anhänger_SwPu_25000.png"
-    ],
-    [
-      "Anhänger SwPu 5000",
-      "Anhänger_SwPu_5000.png"
-    ],
-    [
-      "Anhänger Tieflader 18t",
-      "Anhänger_Tieflader_18t.png"
-    ],
-    [
-      "Anhänger TWAA",
-      "Anhänger_TWAA.png"
-    ],
-    [
-      "Anhänger Werkstatt",
-      "Anhänger_Werkstatt.png"
-    ],
-    [
-      "Anhänger",
-      "Anhänger.png"
-    ],
-    [
-      "Ausbildungszentrum",
-      "Ausbildungszentrum.png"
-    ],
-    [
-      "Ausgefüllter Raum Schichtung",
-      "Ausgefüllter_Raum_Schichtung.png"
-    ],
-    [
-      "Ausgefüllter Raum Wasser",
-      "Ausgefüllter_Raum_Wasser.png"
-    ],
-    [
-      "Ausgefüllter Raum",
-      "Ausgefüllter_Raum.png"
-    ],
-    [
-      "Baufachberater",
-      "Baufachberater.png"
-    ],
-    [
-      "Bergungsgruppe ASH",
-      "Bergungsgruppe_ASH.png"
-    ],
-    [
-      "Bergungsgruppe EGS",
-      "Bergungsgruppe_EGS.png"
-    ],
-    [
-      "Bergungsgruppe",
-      "Bergungsgruppe.png"
-    ],
-    [
-      "Bergungsräumgerät",
-      "Bergungsräumgerät.png"
-    ],
-    [
-      "Betreuung",
-      "Betreuung.png"
-    ],
-    [
-      "Blockiert",
-      "Blockiert.png"
-    ],
-    [
-      "Boot",
-      "Boot.png"
-    ],
-    [
-      "BR Stab",
-      "BR_Stab.png"
-    ],
-    [
-      "Brückenbau",
-      "Brückenbau.png"
-    ],
-    [
-      "Dekontaminieren",
-      "Dekontaminieren.png"
-    ],
-    [
-      "Einsatzabschnittsleiter",
-      "Einsatzabschnittsleiter.png"
-    ],
-    [
-      "Einsatzleiter",
-      "Einsatzleiter.png"
-    ],
-    [
-      "ENT",
-      "ENT.png"
-    ],
-    [
-      "Entstehungsbrand",
-      "Entstehungsbrand.png"
-    ],
-    [
-      "Erkunden",
-      "Erkunden.png"
-    ],
-    [
-      "ERS",
-      "ERS.png"
-    ],
-    [
-      "Fachberater",
-      "Fachberater.png"
-    ],
-    [
-      "Fachzug Führung Kommunikation",
-      "Fachzug_Führung_Kommunikation.png"
-    ],
-    [
-      "Fachzug Logistik",
-      "Fachzug_Logistik.png"
-    ],
-    [
-      "FGr Beleuchtung A",
-      "FGr_Beleuchtung_A.png"
-    ],
-    [
-      "FGr Beleuchtung B",
-      "FGr_Beleuchtung_B.png"
-    ],
-    [
-      "FGr Beleuchtung",
-      "FGr_Beleuchtung.png"
-    ],
-    [
-      "FGr Bergungstauchen",
-      "FGr_Bergungstauchen.png"
-    ],
-    [
-      "FGr Brückenbau A",
-      "FGr_Brückenbau_A.png"
-    ],
-    [
-      "FGr Brückenbau B",
-      "FGr_Brückenbau_B.png"
-    ],
-    [
-      "FGr Brückenbau",
-      "FGr_Brückenbau.png"
-    ],
-    [
-      "FGr Elektroversorgung",
-      "FGr_Elektroversorgung.png"
-    ],
-    [
-      "FGr Fachgruppe",
-      "FGr_Fachgruppe.png"
-    ],
-    [
-      "FGr Führung-Kommunikation A",
-      "FGr_Führung-Kommunikation_A.png"
-    ],
-    [
-      "FGr Führung-Kommunikation B",
-      "FGr_Führung-Kommunikation_B.png"
-    ],
-    [
-      "FGr Führung-Kommunikation Fernmeldetrupp",
-      "FGr_Führung-Kommunikation_Fernmeldetrupp.png"
-    ],
-    [
-      "FGr Führung-Kommunikation Führungstrupp",
-      "FGr_Führung-Kommunikation_Führungstrupp.png"
-    ],
-    [
-      "FGr Führung-Kommunikation Weitverkehrstrupp",
-      "FGr_Führung-Kommunikation_Weitverkehrstrupp.png"
-    ],
-    [
-      "FGr Führung-Kommunikation",
-      "FGr_Führung-Kommunikation.png"
-    ],
-    [
-      "FGr Führungsunterstützung",
-      "FGr_Führungsunterstützung.png"
-    ],
-    [
-      "FGr Infrastruktur",
-      "FGr_Infrastruktur.png"
-    ],
-    [
-      "FGr Kommunikation A",
-      "FGr_Kommunikation_A.png"
-    ],
-    [
-      "FGr Kommunikation B",
-      "FGr_Kommunikation_B.png"
-    ],
-    [
-      "FGr Logistik Führungstrupp",
-      "FGr_Logistik_Führungstrupp.png"
-    ],
-    [
-      "FGr Logistik Materialerhaltungstrupp",
-      "FGr_Logistik_Materialerhaltungstrupp.png"
-    ],
+    ["1. Bergungsgruppe ASH", "1._Bergungsgruppe_ASH.png"],
+    ["1. Bergungsgruppe EGS", "1._Bergungsgruppe_EGS.png"],
+    ["1. Bergungsgruppe", "1._Bergungsgruppe.png"],
+    ["2. Bergungsgruppe A", "2._Bergungsgruppe_A.png"],
+    ["2. Bergungsgruppe B", "2._Bergungsgruppe_B.png"],
+    ["2. Bergungsgruppe", "2._Bergungsgruppe.png"],
+    ["Abrollbehälter Container", "Abrollbehälter_Container.png"],
+    ["Abschnittsleiter THW", "Abschnittsleiter_THW.png"],
+    ["Akute Gefahr durch elektrischen Strom", "Akute_Gefahr_durch_elektrischen_Strom.png"],
+    ["Akute Gefahr durch Explosion", "Akute_Gefahr_durch_Explosion.png"],
+    ["Akute Gefahr durch Explosivstoffe", "Akute_Gefahr_durch_Explosivstoffe.png"],
+    ["Akute Gefahr durch Gas", "Akute_Gefahr_durch_Gas.png"],
+    ["Akute Gefahr durch gefährliche Stoffe", "Akute_Gefahr_durch_gefährliche_Stoffe.png"],
+    ["Akute Gefahr durch Luftmangel", "Akute_Gefahr_durch_Luftmangel.png"],
+    ["Akute Gefahr durch Mineralöl", "Akute_Gefahr_durch_Mineralöl.png"],
+    ["Akute Gefahr durch Radioaktivität", "Akute_Gefahr_durch_Radioaktivität.png"],
+    ["Akute Gefahr durch Wassereinbruch", "Akute_Gefahr_durch_Wassereinbruch.png"],
+    ["Akute Gefahr", "Akute_Gefahr.png"],
+    ["Alters und Ehrengruppe", "Alters_und_Ehrengruppe.png"],
+    ["Angeschlagen", "Angeschlagen.png"],
+    ["Angeschlagener Raum Halber Raum", "Angeschlagener_Raum_Halber_Raum.png"],
+    ["Angeschlagener Raum Schwalbennest", "Angeschlagener_Raum_Schwalbennest.png"],
+    ["Angeschlagener Raum", "Angeschlagener_Raum.png"],
+    ["Anhänger 0 5t", "Anhänger_0_5t.png"],
+    ["Anhänger 2t", "Anhänger_2t.png"],
+    ["Anhänger 6t", "Anhänger_6t.png"],
+    ["Anhänger 7t", "Anhänger_7t.png"],
+    ["Anhänger BT 2t", "Anhänger_BT_2t.png"],
+    ["Anhänger DLE", "Anhänger_DLE.png"],
+    ["Anhänger FKH", "Anhänger_FKH.png"],
+    ["Anhänger FüLa", "Anhänger_FüLa.png"],
+    ["Anhänger I 2t", "Anhänger_I_2t.png"],
+    ["Anhänger K 1t", "Anhänger_K_1t.png"],
+    ["Anhänger kl_Boot", "Anhänger_kl_Boot.png"],
+    ["Anhänger Kühl", "Anhänger_Kühl.png"],
+    ["Anhänger Lichtmast", "Anhänger_Lichtmast.png"],
+    ["Anhänger Log-MW_2t", "Anhänger_Log-MW_2t.png"],
+    ["Anhänger MzAB", "Anhänger_MzAB.png"],
+    ["Anhänger MzB", "Anhänger_MzB.png"],
+    ["Anhänger MzPt", "Anhänger_MzPt.png"],
+    ["Anhänger NEA 200kVA", "Anhänger_NEA_200kVA.png"],
+    ["Anhänger NEA 50kVA_LiMa", "Anhänger_NEA_50kVA_LiMa.png"],
+    ["Anhänger NEA 650kVA", "Anhänger_NEA_650kVA.png"],
+    ["Anhänger Netzersatzanlage", "Anhänger_Netzersatzanlage.png"],
+    ["Anhänger O A 2t", "Anhänger_O_A_2t.png"],
+    ["Anhänger O B 2t", "Anhänger_O_B_2t.png"],
+    ["Anhänger PF 12t", "Anhänger_PF_12t.png"],
+    ["Anhänger Rettungshunde", "Anhänger_Rettungshunde.png"],
+    ["Anhänger RiFu", "Anhänger_RiFu.png"],
+    ["Anhänger Ru12t", "Anhänger_Ru12t.png"],
+    ["Anhänger SchlB", "Anhänger_SchlB.png"],
+    ["Anhänger Sp 2t", "Anhänger_Sp_2t.png"],
+    ["Anhänger Spül", "Anhänger_Spül.png"],
+    ["Anhänger Stromerzeuger", "Anhänger_Stromerzeuger.png"],
+    ["Anhänger SwPu 15000", "Anhänger_SwPu_15000.png"],
+    ["Anhänger SwPu 25000", "Anhänger_SwPu_25000.png"],
+    ["Anhänger SwPu 5000", "Anhänger_SwPu_5000.png"],
+    ["Anhänger Tieflader 18t", "Anhänger_Tieflader_18t.png"],
+    ["Anhänger TWAA", "Anhänger_TWAA.png"],
+    ["Anhänger Werkstatt", "Anhänger_Werkstatt.png"],
+    ["Anhänger", "Anhänger.png"],
+    ["Ausbildungszentrum", "Ausbildungszentrum.png"],
+    ["Ausgefüllter Raum Schichtung", "Ausgefüllter_Raum_Schichtung.png"],
+    ["Ausgefüllter Raum Wasser", "Ausgefüllter_Raum_Wasser.png"],
+    ["Ausgefüllter Raum", "Ausgefüllter_Raum.png"],
+    ["Baufachberater", "Baufachberater.png"],
+    ["Bergungsgruppe ASH", "Bergungsgruppe_ASH.png"],
+    ["Bergungsgruppe EGS", "Bergungsgruppe_EGS.png"],
+    ["Bergungsgruppe", "Bergungsgruppe.png"],
+    ["Bergungsräumgerät", "Bergungsräumgerät.png"],
+    ["Betreuung", "Betreuung.png"],
+    ["Blockiert", "Blockiert.png"],
+    ["Boot", "Boot.png"],
+    ["BR Stab", "BR_Stab.png"],
+    ["Brückenbau", "Brückenbau.png"],
+    ["Dekontaminieren", "Dekontaminieren.png"],
+    ["Einsatzabschnittsleiter", "Einsatzabschnittsleiter.png"],
+    ["Einsatzleiter", "Einsatzleiter.png"],
+    ["ENT", "ENT.png"],
+    ["Entstehungsbrand", "Entstehungsbrand.png"],
+    ["Erkunden", "Erkunden.png"],
+    ["ERS", "ERS.png"],
+    ["Fachberater", "Fachberater.png"],
+    ["Fachzug Führung Kommunikation", "Fachzug_Führung_Kommunikation.png"],
+    ["Fachzug Logistik", "Fachzug_Logistik.png"],
+    ["FGr Beleuchtung A", "FGr_Beleuchtung_A.png"],
+    ["FGr Beleuchtung B", "FGr_Beleuchtung_B.png"],
+    ["FGr Beleuchtung", "FGr_Beleuchtung.png"],
+    ["FGr Bergungstauchen", "FGr_Bergungstauchen.png"],
+    ["FGr Brückenbau A", "FGr_Brückenbau_A.png"],
+    ["FGr Brückenbau B", "FGr_Brückenbau_B.png"],
+    ["FGr Brückenbau", "FGr_Brückenbau.png"],
+    ["FGr Elektroversorgung", "FGr_Elektroversorgung.png"],
+    ["FGr Fachgruppe", "FGr_Fachgruppe.png"],
+    ["FGr Führung-Kommunikation A", "FGr_Führung-Kommunikation_A.png"],
+    ["FGr Führung-Kommunikation B", "FGr_Führung-Kommunikation_B.png"],
+    ["FGr Führung-Kommunikation Fernmeldetrupp", "FGr_Führung-Kommunikation_Fernmeldetrupp.png"],
+    ["FGr Führung-Kommunikation Führungstrupp", "FGr_Führung-Kommunikation_Führungstrupp.png"],
+    ["FGr Führung-Kommunikation Weitverkehrstrupp", "FGr_Führung-Kommunikation_Weitverkehrstrupp.png"],
+    ["FGr Führung-Kommunikation", "FGr_Führung-Kommunikation.png"],
+    ["FGr Führungsunterstützung", "FGr_Führungsunterstützung.png"],
+    ["FGr Infrastruktur", "FGr_Infrastruktur.png"],
+    ["FGr Kommunikation A", "FGr_Kommunikation_A.png"],
+    ["FGr Kommunikation B", "FGr_Kommunikation_B.png"],
+    ["FGr Logistik Führungstrupp", "FGr_Logistik_Führungstrupp.png"],
+    ["FGr Logistik Materialerhaltungstrupp", "FGr_Logistik_Materialerhaltungstrupp.png"],
     [
       "FGr Logistik Materialwirtschaft Verbrauchsgüterversorgungstrupp",
       "FGr_Logistik_Materialwirtschaft_Verbrauchsgüterversorgungstrupp.png"
     ],
-    [
-      "FGr Logistik Materialwirtschaft",
-      "FGr_Logistik_Materialwirtschaft.png"
-    ],
-    [
-      "FGr Logistik Versorgungstrupp",
-      "FGr_Logistik_Versorgungstrupp.png"
-    ],
-    [
-      "FGr Logistik-Verpflegung",
-      "FGr_Logistik-Verpflegung.png"
-    ],
-    [
-      "FGr Logistik",
-      "FGr_Logistik.png"
-    ],
-    [
-      "FGr Notversorgung und Notinstandsetzung",
-      "FGr_Notversorgung_und_Notinstandsetzung.png"
-    ],
-    [
-      "FGr Ölschaden A",
-      "FGr_Ölschaden_A.png"
-    ],
-    [
-      "FGr Ölschaden B",
-      "FGr_Ölschaden_B.png"
-    ],
-    [
-      "FGr Ölschaden C",
-      "FGr_Ölschaden_C.png"
-    ],
-    [
-      "FGr Ölschaden",
-      "FGr_Ölschaden.png"
-    ],
-    [
-      "FGr Ortung biologisch und technisch",
-      "FGr_Ortung_biologisch_und_technisch.png"
-    ],
-    [
-      "FGr Ortung technisch",
-      "FGr_Ortung_technisch.png"
-    ],
-    [
-      "FGr Ortung_biologisch",
-      "FGr_Ortung_biologisch.png"
-    ],
-    [
-      "FGr Ortung",
-      "FGr_Ortung.png"
-    ],
-    [
-      "FGr Räumen A Radlader",
-      "FGr_Räumen_A_Radlader.png"
-    ],
-    [
-      "FGr Räumen A",
-      "FGr_Räumen_A.png"
-    ],
-    [
-      "FGr Räumen B",
-      "FGr_Räumen_B.png"
-    ],
-    [
-      "FGr Räumen C",
-      "FGr_Räumen_C.png"
-    ],
-    [
-      "FGr Räumen_A_Bagger",
-      "FGr_Räumen_A_Bagger.png"
-    ],
-    [
-      "FGr Räumen",
-      "FGr_Räumen.png"
-    ],
-    [
-      "FGr Schwere Bergung A",
-      "FGr_Schwere_Bergung_A.png"
-    ],
-    [
-      "FGr Schwere Bergung B",
-      "FGr_Schwere_Bergung_B.png"
-    ],
-    [
-      "FGr Schwere Bergung",
-      "FGr_Schwere_Bergung.png"
-    ],
-    [
-      "FGr Sprengen",
-      "FGr_Sprengen.png"
-    ],
-    [
-      "FGr Trinkwasser B",
-      "FGr_Trinkwasser_B.png"
-    ],
-    [
-      "FGr Trinkwasser_A",
-      "FGr_Trinkwasser_A.png"
-    ],
-    [
-      "FGr Trinkwasser",
-      "FGr_Trinkwasser.png"
-    ],
-    [
-      "FGr Wassergefahren A",
-      "FGr_Wassergefahren_A.png"
-    ],
-    [
-      "FGr Wassergefahren B",
-      "FGr_Wassergefahren_B.png"
-    ],
-    [
-      "FGr Wassergefahren",
-      "FGr_Wassergefahren.png"
-    ],
-    [
-      "FGr Wasserschaden-Pumpen",
-      "FGr_Wasserschaden-Pumpen.png"
-    ],
-    [
-      "FGr Wassserschaden-Pumpen A",
-      "FGr_Wassserschaden-Pumpen_A.png"
-    ],
-    [
-      "FGr Wassserschaden-Pumpen B",
-      "FGr_Wassserschaden-Pumpen_B.png"
-    ],
-    [
-      "FGr Wassserschaden-Pumpen C",
-      "FGr_Wassserschaden-Pumpen_C.png"
-    ],
+    ["FGr Logistik Materialwirtschaft", "FGr_Logistik_Materialwirtschaft.png"],
+    ["FGr Logistik Versorgungstrupp", "FGr_Logistik_Versorgungstrupp.png"],
+    ["FGr Logistik-Verpflegung", "FGr_Logistik-Verpflegung.png"],
+    ["FGr Logistik", "FGr_Logistik.png"],
+    ["FGr Notversorgung und Notinstandsetzung", "FGr_Notversorgung_und_Notinstandsetzung.png"],
+    ["FGr Ölschaden A", "FGr_Ölschaden_A.png"],
+    ["FGr Ölschaden B", "FGr_Ölschaden_B.png"],
+    ["FGr Ölschaden C", "FGr_Ölschaden_C.png"],
+    ["FGr Ölschaden", "FGr_Ölschaden.png"],
+    ["FGr Ortung biologisch und technisch", "FGr_Ortung_biologisch_und_technisch.png"],
+    ["FGr Ortung technisch", "FGr_Ortung_technisch.png"],
+    ["FGr Ortung_biologisch", "FGr_Ortung_biologisch.png"],
+    ["FGr Ortung", "FGr_Ortung.png"],
+    ["FGr Räumen A Radlader", "FGr_Räumen_A_Radlader.png"],
+    ["FGr Räumen A", "FGr_Räumen_A.png"],
+    ["FGr Räumen B", "FGr_Räumen_B.png"],
+    ["FGr Räumen C", "FGr_Räumen_C.png"],
+    ["FGr Räumen_A_Bagger", "FGr_Räumen_A_Bagger.png"],
+    ["FGr Räumen", "FGr_Räumen.png"],
+    ["FGr Schwere Bergung A", "FGr_Schwere_Bergung_A.png"],
+    ["FGr Schwere Bergung B", "FGr_Schwere_Bergung_B.png"],
+    ["FGr Schwere Bergung", "FGr_Schwere_Bergung.png"],
+    ["FGr Sprengen", "FGr_Sprengen.png"],
+    ["FGr Trinkwasser B", "FGr_Trinkwasser_B.png"],
+    ["FGr Trinkwasser_A", "FGr_Trinkwasser_A.png"],
+    ["FGr Trinkwasser", "FGr_Trinkwasser.png"],
+    ["FGr Wassergefahren A", "FGr_Wassergefahren_A.png"],
+    ["FGr Wassergefahren B", "FGr_Wassergefahren_B.png"],
+    ["FGr Wassergefahren", "FGr_Wassergefahren.png"],
+    ["FGr Wasserschaden-Pumpen", "FGr_Wasserschaden-Pumpen.png"],
+    ["FGr Wassserschaden-Pumpen A", "FGr_Wassserschaden-Pumpen_A.png"],
+    ["FGr Wassserschaden-Pumpen B", "FGr_Wassserschaden-Pumpen_B.png"],
+    ["FGr Wassserschaden-Pumpen C", "FGr_Wassserschaden-Pumpen_C.png"],
     [
       "FGr_Führung-Kommunikation Führungs und Kommunikationstrupp",
       "FGr_Führung-Kommunikation_Führungs_und_Kommunikationstrupp.png"
     ],
-    [
-      "Flächenbrand",
-      "Flächenbrand.png"
-    ],
-    [
-      "Flugleiter",
-      "Flugleiter.png"
-    ],
-    [
-      "FmKW",
-      "FmKW.png"
-    ],
-    [
-      "Fortentwickelter Brand",
-      "Fortentwickelter_Brand.png"
-    ],
-    [
-      "Führungseinheit",
-      "Führungseinheit.png"
-    ],
-    [
-      "Führungstrupp",
-      "Führungstrupp.png"
-    ],
-    [
-      "FüKomKW",
-      "FüKomKW.png"
-    ],
-    [
-      "FüKW",
-      "FüKW.png"
-    ],
-    [
-      "Gabelstapler 2t",
-      "Gabelstapler_2t.png"
-    ],
-    [
-      "Gabelstapler 3t",
-      "Gabelstapler_3t.png"
-    ],
-    [
-      "Gabelstapler",
-      "Gabelstapler.png"
-    ],
-    [
-      "Gefahr durch elektrischen Strom",
-      "Gefahr_durch_elektrischen_Strom.png"
-    ],
-    [
-      "Gefahr durch Explosion",
-      "Gefahr_durch_Explosion.png"
-    ],
-    [
-      "Gefahr durch Explosivstoffe",
-      "Gefahr_durch_Explosivstoffe.png"
-    ],
-    [
-      "Gefahr durch Gas",
-      "Gefahr_durch_Gas.png"
-    ],
-    [
-      "Gefahr durch gefährliche Stoffe",
-      "Gefahr_durch_gefährliche_Stoffe.png"
-    ],
-    [
-      "Gefahr durch Luftmangel",
-      "Gefahr_durch_Luftmangel.png"
-    ],
-    [
-      "Gefahr durch Mineralöl",
-      "Gefahr_durch_Mineralöl.png"
-    ],
-    [
-      "Gefahr durch Radioaktivität",
-      "Gefahr_durch_Radioaktivität.png"
-    ],
-    [
-      "Gefahr durch Wassereinbruch",
-      "Gefahr_durch_Wassereinbruch.png"
-    ],
-    [
-      "Gefahr",
-      "Gefahr.png"
-    ],
-    [
-      "Geländestapler",
-      "Geländestapler.png"
-    ],
-    [
-      "Gerettete Person",
-      "Gerettete_Person.png"
-    ],
-    [
-      "GKW 7t",
-      "GKW_7t.png"
-    ],
-    [
-      "GKW I",
-      "GKW_I.png"
-    ],
-    [
-      "GKW II",
-      "GKW_II.png"
-    ],
-    [
-      "Grundausbildungsgruppe",
-      "Grundausbildungsgruppe.png"
-    ],
-    [
-      "Gruppe",
-      "Gruppe.png"
-    ],
-    [
-      "Gruppenführer B 1",
-      "Gruppenführer_B_1.png"
-    ],
-    [
-      "Gruppenführer B 2",
-      "Gruppenführer_B_2.png"
-    ],
-    [
-      "Gruppenführer B",
-      "Gruppenführer_B.png"
-    ],
-    [
-      "Gruppenführer Bel",
-      "Gruppenführer_Bel.png"
-    ],
-    [
-      "Gruppenführer BrB",
-      "Gruppenführer_BrB.png"
-    ],
-    [
-      "Gruppenführer BT",
-      "Gruppenführer_BT.png"
-    ],
-    [
-      "Gruppenführer E",
-      "Gruppenführer_E.png"
-    ],
-    [
-      "Gruppenführer F",
-      "Gruppenführer_F.png"
-    ],
-    [
-      "Gruppenführer I",
-      "Gruppenführer_I.png"
-    ],
-    [
-      "Gruppenführer K",
-      "Gruppenführer_K.png"
-    ],
-    [
-      "Gruppenführer Log-MW",
-      "Gruppenführer_Log-MW.png"
-    ],
-    [
-      "Gruppenführer Log-V",
-      "Gruppenführer_Log-V.png"
-    ],
-    [
-      "Gruppenführer Ltr FK",
-      "Gruppenführer_Ltr_FK.png"
-    ],
-    [
-      "Gruppenführer MT",
-      "Gruppenführer_MT.png"
-    ],
-    [
-      "Gruppenführer N",
-      "Gruppenführer_N.png"
-    ],
-    [
-      "Gruppenführer O",
-      "Gruppenführer_O.png"
-    ],
-    [
-      "Gruppenführer Öl",
-      "Gruppenführer_Öl.png"
-    ],
-    [
-      "Gruppenführer R",
-      "Gruppenführer_R.png"
-    ],
-    [
-      "Gruppenführer SB",
-      "Gruppenführer_SB.png"
-    ],
-    [
-      "Gruppenführer Sp",
-      "Gruppenführer_Sp.png"
-    ],
-    [
-      "Gruppenführer TW",
-      "Gruppenführer_TW.png"
-    ],
-    [
-      "Gruppenführer VOST",
-      "Gruppenführer_VOST.png"
-    ],
-    [
-      "Gruppenführer W",
-      "Gruppenführer_W.png"
-    ],
-    [
-      "Gruppenführer WP",
-      "Gruppenführer_WP.png"
-    ],
-    [
-      "Gruppenführer",
-      "Gruppenführer.png"
-    ],
-    [
-      "Helfer Fm",
-      "Helfer_Fm.png"
-    ],
-    [
-      "Helfer FmFü",
-      "Helfer_FmFü.png"
-    ],
-    [
-      "Helfer IuK",
-      "Helfer_IuK.png"
-    ],
-    [
-      "Helfer Kf",
-      "Helfer_Kf.png"
-    ],
-    [
-      "Helfer Peer",
-      "Helfer_Peer.png"
-    ],
-    [
-      "Helfer psFK",
-      "Helfer_psFK.png"
-    ],
-    [
-      "Helfer RiFu",
-      "Helfer_RiFu.png"
-    ],
-    [
-      "Helfer SGL",
-      "Helfer_SGL.png"
-    ],
-    [
-      "Helfer",
-      "Helfer.png"
-    ],
-    [
-      "Jugendgruppe",
-      "Jugendgruppe.png"
-    ],
-    [
-      "Kettenbagger",
-      "Kettenbagger.png"
-    ],
-    [
-      "Kettenfahrzeug",
-      "Kettenfahrzeug.png"
-    ],
-    [
-      "Kipper",
-      "Kipper.png"
-    ],
-    [
-      "kleines Boot",
-      "kleines_Boot.png"
-    ],
-    [
-      "Kraftfahrzeug Geländegängig",
-      "Kraftfahrzeug_Geländegängig.png"
-    ],
-    [
-      "Kraftfahrzeug",
-      "Kraftfahrzeug.png"
-    ],
-    [
-      "Landesverband",
-      "Landesverband.png"
-    ],
-    [
-      "Leitung",
-      "Leitung.png"
-    ],
-    [
-      "LKW K 9t",
-      "LKW_K_9t.png"
-    ],
-    [
-      "LKW K Lkr 1 5t",
-      "LKW_K_Lkr_1_5t.png"
-    ],
-    [
-      "LKW K Lkr",
-      "LKW_K_Lkr.png"
-    ],
-    [
-      "LKW Lbw 7t",
-      "LKW_Lbw_7t.png"
-    ],
-    [
-      "LKW Lbw",
-      "LKW_Lbw.png"
-    ],
-    [
-      "LKW-Ladekran",
-      "LKW-Ladekran.png"
-    ],
-    [
-      "LKW",
-      "LKW.png"
-    ],
-    [
-      "Logistikeinheit",
-      "Logistikeinheit.png"
-    ],
-    [
-      "Logistiktrupp",
-      "Logistiktrupp.png"
-    ],
-    [
-      "Logistikzentrum",
-      "Logistikzentrum.png"
-    ],
-    [
-      "Lotsengruppe",
-      "Lotsengruppe.png"
-    ],
-    [
-      "Maßnahme",
-      "Maßnahme.png"
-    ],
-    [
-      "Mehrzweckarbeitsboot",
-      "Mehrzweckarbeitsboot.png"
-    ],
-    [
-      "Mehrzweckboot",
-      "Mehrzweckboot.png"
-    ],
-    [
-      "Mehrzweckponton",
-      "Mehrzweckponton.png"
-    ],
-    [
-      "Melder",
-      "Melder.png"
-    ],
-    [
-      "MLW I",
-      "MLW_I.png"
-    ],
-    [
-      "MLW II",
-      "MLW_II.png"
-    ],
-    [
-      "MLW III",
-      "MLW_III.png"
-    ],
-    [
-      "MLW IV",
-      "MLW_IV.png"
-    ],
-    [
-      "MLW V",
-      "MLW_V.png"
-    ],
-    [
-      "MTW FGr",
-      "MTW_FGr.png"
-    ],
-    [
-      "MTW",
-      "MTW.png"
-    ],
-    [
-      "MzGW",
-      "MzGW.png"
-    ],
-    [
-      "MzKW",
-      "MzKW.png"
-    ],
-    [
-      "Ölschadenbekämpfung",
-      "Ölschadenbekämpfung.png"
-    ],
-    [
-      "Örtliche Gefahrenabwehr",
-      "Örtliche_Gefahrenabwehr.png"
-    ],
-    [
-      "OV Stab",
-      "OV_Stab.png"
-    ],
-    [
-      "OV Unterkunft",
-      "OV_Unterkunft.png"
-    ],
-    [
-      "Person mit Sonderfunktion",
-      "Person_mit_Sonderfunktion.png"
-    ],
-    [
-      "Person",
-      "Person.png"
-    ],
-    [
-      "PKW Geländegängig",
-      "PKW_Geländegängig.png"
-    ],
-    [
-      "PKW Weitverkehrstrupp",
-      "PKW_Weitverkehrstrupp.png"
-    ],
-    [
-      "PKW",
-      "PKW.png"
-    ],
-    [
-      "Radbagger",
-      "Radbagger.png"
-    ],
-    [
-      "Radlader",
-      "Radlader.png"
-    ],
-    [
-      "Randtrümmer",
-      "Randtrümmer.png"
-    ],
-    [
-      "Räumen",
-      "Räumen.png"
-    ],
-    [
-      "Regionalstelle",
-      "Regionalstelle.png"
-    ],
-    [
-      "Retten aus Höhen und Tiefen",
-      "Retten_aus_Höhen_und_Tiefen.png"
-    ],
-    [
-      "Rettungs und Sicherungsboot",
-      "Rettungs_und_Sicherungsboot.png"
-    ],
-    [
-      "Rutschfläche",
-      "Rutschfläche.png"
-    ],
-    [
-      "Sattelzugmaschine",
-      "Sattelzugmaschine.png"
-    ],
-    [
-      "Schichtung",
-      "Schichtung.png"
-    ],
-    [
-      "Schlauchboot",
-      "Schlauchboot.png"
-    ],
-    [
-      "SEEBA",
-      "SEEBA.png"
-    ],
-    [
-      "SEELift",
-      "SEELift.png"
-    ],
-    [
-      "SEEWA",
-      "SEEWA.png"
-    ],
-    [
-      "Sprengen",
-      "Sprengen.png"
-    ],
-    [
-      "Stab AB",
-      "Stab_AB.png"
-    ],
-    [
-      "Stab BÖH",
-      "Stab_BÖH.png"
-    ],
-    [
-      "Stab Ko",
-      "Stab_Ko.png"
-    ],
-    [
-      "Stab OB",
-      "Stab_OB.png"
-    ],
-    [
-      "Stab OJB",
-      "Stab_OJB.png"
-    ],
-    [
-      "Stab S1",
-      "Stab_S1.png"
-    ],
-    [
-      "Stab S2",
-      "Stab_S2.png"
-    ],
-    [
-      "Stab S3",
-      "Stab_S3.png"
-    ],
-    [
-      "Stab S4",
-      "Stab_S4.png"
-    ],
-    [
-      "Stab S5",
-      "Stab_S5.png"
-    ],
-    [
-      "Stab S6",
-      "Stab_S6.png"
-    ],
-    [
-      "Stab SM",
-      "Stab_SM.png"
-    ],
-    [
-      "Stab Stv OB",
-      "Stab_Stv_OB.png"
-    ],
-    [
-      "Stab Vw",
-      "Stab_Vw.png"
-    ],
-    [
-      "Stab",
-      "Stab.png"
-    ],
-    [
-      "Staffel",
-      "Staffel.png"
-    ],
-    [
-      "SysBR",
-      "SysBR.png"
-    ],
-    [
-      "Technischer Zug mit FGr Brückenbau",
-      "Technischer_Zug_mit_FGr_Brückenbau.png"
-    ],
-    [
-      "Technischer Zug mit FGr Elektroversorgung",
-      "Technischer_Zug_mit_FGr_Elektroversorgung.png"
-    ],
-    [
-      "Technischer Zug mit FGr Infrastruktur",
-      "Technischer_Zug_mit_FGr_Infrastruktur.png"
-    ],
-    [
-      "Technischer Zug mit FGr Ölschaden A",
-      "Technischer_Zug_mit_FGr_Ölschaden_A.png"
-    ],
-    [
-      "Technischer Zug mit FGr Ölschaden C",
-      "Technischer_Zug_mit_FGr_Ölschaden_C.png"
-    ],
-    [
-      "Technischer Zug mit FGr Ölschaden_B",
-      "Technischer_Zug_mit_FGr_Ölschaden_B.png"
-    ],
-    [
-      "Technischer Zug mit FGr Ölschaden",
-      "Technischer_Zug_mit_FGr_Ölschaden.png"
-    ],
-    [
-      "Technischer Zug mit FGr Ortung A",
-      "Technischer_Zug_mit_FGr_Ortung_A.png"
-    ],
-    [
-      "Technischer Zug mit FGr Ortung B",
-      "Technischer_Zug_mit_FGr_Ortung_B.png"
-    ],
-    [
-      "Technischer Zug mit FGr Ortung C",
-      "Technischer_Zug_mit_FGr_Ortung_C.png"
-    ],
-    [
-      "Technischer Zug mit FGr Ortung",
-      "Technischer_Zug_mit_FGr_Ortung.png"
-    ],
-    [
-      "Technischer Zug mit FGr Räumen A",
-      "Technischer_Zug_mit_FGr_Räumen_A.png"
-    ],
-    [
-      "Technischer Zug mit FGr Räumen_B",
-      "Technischer_Zug_mit_FGr_Räumen_B.png"
-    ],
-    [
-      "Technischer Zug mit FGr Räumen_C",
-      "Technischer_Zug_mit_FGr_Räumen_C.png"
-    ],
-    [
-      "Technischer Zug mit FGr Räumen",
-      "Technischer_Zug_mit_FGr_Räumen.png"
-    ],
-    [
-      "Technischer Zug mit FGr Sprengen",
-      "Technischer_Zug_mit_FGr_Sprengen.png"
-    ],
-    [
-      "Technischer Zug mit FGr Trinkwasser",
-      "Technischer_Zug_mit_FGr_Trinkwasser.png"
-    ],
-    [
-      "Technischer Zug mit FGr Wassergefahren_A",
-      "Technischer_Zug_mit_FGr_Wassergefahren_A.png"
-    ],
-    [
-      "Technischer Zug mit FGr Wassergefahren_B",
-      "Technischer_Zug_mit_FGr_Wassergefahren_B.png"
-    ],
-    [
-      "Technischer Zug mit FGr Wassergefahren",
-      "Technischer_Zug_mit_FGr_Wassergefahren.png"
-    ],
-    [
-      "Technischer Zug mit FGr Wasserschaden Pumpen A",
-      "Technischer_Zug_mit_FGr_Wasserschaden_Pumpen_A.png"
-    ],
-    [
-      "Technischer Zug mit FGr Wasserschaden Pumpen_B",
-      "Technischer_Zug_mit_FGr_Wasserschaden_Pumpen_B.png"
-    ],
-    [
-      "Technischer Zug mit FGr Wasserschaden Pumpen_C",
-      "Technischer_Zug_mit_FGr_Wasserschaden_Pumpen_C.png"
-    ],
-    [
-      "Technischer Zug mit FGr Wasserschaden Pumpen",
-      "Technischer_Zug_mit_FGr_Wasserschaden_Pumpen.png"
-    ],
-    [
-      "Technischer Zug",
-      "Technischer_Zug.png"
-    ],
-    [
-      "Teilblockiert",
-      "Teilblockiert.png"
-    ],
-    [
-      "Teilzerstört",
-      "Teilzerstört.png"
-    ],
-    [
-      "Teleskoplader",
-      "Teleskoplader.png"
-    ],
-    [
-      "THV Bereitschaft",
-      "THV_Bereitschaft.png"
-    ],
-    [
-      "THV",
-      "THV.png"
-    ],
-    [
-      "Tote Person",
-      "Tote_Person.png"
-    ],
-    [
-      "Transportieren",
-      "Transportieren.png"
-    ],
-    [
-      "Transportierte Person",
-      "Transportierte_Person.png"
-    ],
-    [
-      "Trupp ESS",
-      "Trupp_ESS.png"
-    ],
-    [
-      "Trupp MHP",
-      "Trupp_MHP.png"
-    ],
-    [
-      "Trupp TS",
-      "Trupp_TS.png"
-    ],
-    [
-      "Trupp UL",
-      "Trupp_UL.png"
-    ],
-    [
-      "Trupp",
-      "Trupp.png"
-    ],
-    [
-      "Truppführer B 1",
-      "Truppführer_B_1.png"
-    ],
-    [
-      "Truppführer B 2",
-      "Truppführer_B_2.png"
-    ],
-    [
-      "Truppführer B",
-      "Truppführer_B.png"
-    ],
-    [
-      "Truppführer BrB",
-      "Truppführer_BrB.png"
-    ],
-    [
-      "Truppführer BT",
-      "Truppführer_BT.png"
-    ],
-    [
-      "Truppführer E",
-      "Truppführer_E.png"
-    ],
-    [
-      "Truppführer ESS",
-      "Truppführer_ESS.png"
-    ],
-    [
-      "Truppführer F",
-      "Truppführer_F.png"
-    ],
-    [
-      "Truppführer Fm",
-      "Truppführer_Fm.png"
-    ],
-    [
-      "Truppführer FüGeh",
-      "Truppführer_FüGeh.png"
-    ],
-    [
-      "Truppführer I",
-      "Truppführer_I.png"
-    ],
-    [
-      "Truppführer K",
-      "Truppführer_K.png"
-    ],
-    [
-      "Truppführer LdF",
-      "Truppführer_LdF.png"
-    ],
-    [
-      "Truppführer Log-M",
-      "Truppführer_Log-M.png"
-    ],
-    [
-      "Truppführer Log-V",
-      "Truppführer_Log-V.png"
-    ],
-    [
-      "Truppführer Log-VG",
-      "Truppführer_Log-VG.png"
-    ],
-    [
-      "Truppführer MHP",
-      "Truppführer_MHP.png"
-    ],
-    [
-      "Truppführer MT",
-      "Truppführer_MT.png"
-    ],
-    [
-      "Truppführer N",
-      "Truppführer_N.png"
-    ],
-    [
-      "Truppführer O",
-      "Truppführer_O.png"
-    ],
-    [
-      "Truppführer Öl",
-      "Truppführer_Öl.png"
-    ],
-    [
-      "Truppführer R",
-      "Truppführer_R.png"
-    ],
-    [
-      "Truppführer SB",
-      "Truppführer_SB.png"
-    ],
-    [
-      "Truppführer Sp",
-      "Truppführer_Sp.png"
-    ],
-    [
-      "Truppführer TS",
-      "Truppführer_TS.png"
-    ],
-    [
-      "Truppführer TW",
-      "Truppführer_TW.png"
-    ],
-    [
-      "Truppführer UL",
-      "Truppführer_UL.png"
-    ],
-    [
-      "Truppführer VOST",
-      "Truppführer_VOST.png"
-    ],
-    [
-      "Truppführer W",
-      "Truppführer_W.png"
-    ],
-    [
-      "Truppführer WP",
-      "Truppführer_WP.png"
-    ],
-    [
-      "Truppführer",
-      "Truppführer.png"
-    ],
-    [
-      "Überschwemmtes Gebiet",
-      "Überschwemmtes_Gebiet.png"
-    ],
-    [
-      "Untereinsatzabschnittsleiter",
-      "Untereinsatzabschnittsleiter.png"
-    ],
-    [
-      "Verband Feldlager",
-      "Verband_Feldlager.png"
-    ],
-    [
-      "Verband Logistik",
-      "Verband_Logistik.png"
-    ],
-    [
-      "Verbandführer I",
-      "Verbandführer_I.png"
-    ],
-    [
-      "Verbandführer II",
-      "Verbandführer_II.png"
-    ],
-    [
-      "Verbandführer III",
-      "Verbandführer_III.png"
-    ],
-    [
-      "Verletzte Person",
-      "Verletzte_Person.png"
-    ],
-    [
-      "Vermisste Person",
-      "Vermisste_Person.png"
-    ],
-    [
-      "Vermutete Gefahr durch elektrischen Strom",
-      "Vermutete_Gefahr_durch_elektrischen_Strom.png"
-    ],
-    [
-      "Vermutete Gefahr durch Explosion",
-      "Vermutete_Gefahr_durch_Explosion.png"
-    ],
-    [
-      "Vermutete Gefahr durch Explosivstoffe",
-      "Vermutete_Gefahr_durch_Explosivstoffe.png"
-    ],
-    [
-      "Vermutete Gefahr durch Gas",
-      "Vermutete_Gefahr_durch_Gas.png"
-    ],
-    [
-      "Vermutete Gefahr durch gefährliche Stoffe",
-      "Vermutete_Gefahr_durch_gefährliche_Stoffe.png"
-    ],
-    [
-      "Vermutete Gefahr durch Luftmangel",
-      "Vermutete_Gefahr_durch_Luftmangel.png"
-    ],
-    [
-      "Vermutete Gefahr durch Mineralöl",
-      "Vermutete_Gefahr_durch_Mineralöl.png"
-    ],
-    [
-      "Vermutete Gefahr durch Radioaktivität",
-      "Vermutete_Gefahr_durch_Radioaktivität.png"
-    ],
-    [
-      "Vermutete Gefahr durch Wassereinbruch",
-      "Vermutete_Gefahr_durch_Wassereinbruch.png"
-    ],
-    [
-      "Vermutete Gefahr",
-      "Vermutete_Gefahr.png"
-    ],
-    [
-      "Verschüttete Person",
-      "Verschüttete_Person.png"
-    ],
-    [
-      "Vollbrand",
-      "Vollbrand.png"
-    ],
-    [
-      "VOST",
-      "VOST.png"
-    ],
-    [
-      "Wechselladerfahrzeug",
-      "Wechselladerfahrzeug.png"
-    ],
-    [
-      "Weitverkehrstrupp",
-      "Weitverkehrstrupp.png"
-    ],
-    [
-      "Werkstattcontainer",
-      "Werkstattcontainer.png"
-    ],
-    [
-      "Zerstört",
-      "Zerstört.png"
-    ],
-    [
-      "Zu transportierende Person",
-      "Zu_transportierende_Person.png"
-    ],
-    [
-      "Zug",
-      "Zug.png"
-    ],
-    [
-      "Zugführer FZ FK",
-      "Zugführer_FZ_FK.png"
-    ],
-    [
-      "Zugführer FZ Log",
-      "Zugführer_FZ_Log.png"
-    ],
-    [
-      "Zugführer TZ",
-      "Zugführer_TZ.png"
-    ],
-    [
-      "Zugführer VOST",
-      "Zugführer_VOST.png"
-    ],
-    [
-      "Zugführer",
-      "Zugführer.png"
-    ],
-    [
-      "Zugtrupp FZ-FK",
-      "Zugtrupp_FZ-FK.png"
-    ],
-    [
-      "Zugtrupp FZ-Logistik",
-      "Zugtrupp_FZ-Logistik.png"
-    ],
-    [
-      "Zugtrupp",
-      "Zugtrupp.png"
-    ],
-    [
-      "Zugtruppführer FZ FK",
-      "Zugtruppführer_FZ_FK.png"
-    ],
-    [
-      "Zugtruppführer FZ Log",
-      "Zugtruppführer_FZ_Log.png"
-    ],
-    [
-      "Zugtruppführer TZ",
-      "Zugtruppführer_TZ.png"
-    ]
+    ["Flächenbrand", "Flächenbrand.png"],
+    ["Flugleiter", "Flugleiter.png"],
+    ["FmKW", "FmKW.png"],
+    ["Fortentwickelter Brand", "Fortentwickelter_Brand.png"],
+    ["Führungseinheit", "Führungseinheit.png"],
+    ["Führungstrupp", "Führungstrupp.png"],
+    ["FüKomKW", "FüKomKW.png"],
+    ["FüKW", "FüKW.png"],
+    ["Gabelstapler 2t", "Gabelstapler_2t.png"],
+    ["Gabelstapler 3t", "Gabelstapler_3t.png"],
+    ["Gabelstapler", "Gabelstapler.png"],
+    ["Gefahr durch elektrischen Strom", "Gefahr_durch_elektrischen_Strom.png"],
+    ["Gefahr durch Explosion", "Gefahr_durch_Explosion.png"],
+    ["Gefahr durch Explosivstoffe", "Gefahr_durch_Explosivstoffe.png"],
+    ["Gefahr durch Gas", "Gefahr_durch_Gas.png"],
+    ["Gefahr durch gefährliche Stoffe", "Gefahr_durch_gefährliche_Stoffe.png"],
+    ["Gefahr durch Luftmangel", "Gefahr_durch_Luftmangel.png"],
+    ["Gefahr durch Mineralöl", "Gefahr_durch_Mineralöl.png"],
+    ["Gefahr durch Radioaktivität", "Gefahr_durch_Radioaktivität.png"],
+    ["Gefahr durch Wassereinbruch", "Gefahr_durch_Wassereinbruch.png"],
+    ["Gefahr", "Gefahr.png"],
+    ["Geländestapler", "Geländestapler.png"],
+    ["Gerettete Person", "Gerettete_Person.png"],
+    ["GKW 7t", "GKW_7t.png"],
+    ["GKW I", "GKW_I.png"],
+    ["GKW II", "GKW_II.png"],
+    ["Grundausbildungsgruppe", "Grundausbildungsgruppe.png"],
+    ["Gruppe", "Gruppe.png"],
+    ["Gruppenführer B 1", "Gruppenführer_B_1.png"],
+    ["Gruppenführer B 2", "Gruppenführer_B_2.png"],
+    ["Gruppenführer B", "Gruppenführer_B.png"],
+    ["Gruppenführer Bel", "Gruppenführer_Bel.png"],
+    ["Gruppenführer BrB", "Gruppenführer_BrB.png"],
+    ["Gruppenführer BT", "Gruppenführer_BT.png"],
+    ["Gruppenführer E", "Gruppenführer_E.png"],
+    ["Gruppenführer F", "Gruppenführer_F.png"],
+    ["Gruppenführer I", "Gruppenführer_I.png"],
+    ["Gruppenführer K", "Gruppenführer_K.png"],
+    ["Gruppenführer Log-MW", "Gruppenführer_Log-MW.png"],
+    ["Gruppenführer Log-V", "Gruppenführer_Log-V.png"],
+    ["Gruppenführer Ltr FK", "Gruppenführer_Ltr_FK.png"],
+    ["Gruppenführer MT", "Gruppenführer_MT.png"],
+    ["Gruppenführer N", "Gruppenführer_N.png"],
+    ["Gruppenführer O", "Gruppenführer_O.png"],
+    ["Gruppenführer Öl", "Gruppenführer_Öl.png"],
+    ["Gruppenführer R", "Gruppenführer_R.png"],
+    ["Gruppenführer SB", "Gruppenführer_SB.png"],
+    ["Gruppenführer Sp", "Gruppenführer_Sp.png"],
+    ["Gruppenführer TW", "Gruppenführer_TW.png"],
+    ["Gruppenführer VOST", "Gruppenführer_VOST.png"],
+    ["Gruppenführer W", "Gruppenführer_W.png"],
+    ["Gruppenführer WP", "Gruppenführer_WP.png"],
+    ["Gruppenführer", "Gruppenführer.png"],
+    ["Helfer Fm", "Helfer_Fm.png"],
+    ["Helfer FmFü", "Helfer_FmFü.png"],
+    ["Helfer IuK", "Helfer_IuK.png"],
+    ["Helfer Kf", "Helfer_Kf.png"],
+    ["Helfer Peer", "Helfer_Peer.png"],
+    ["Helfer psFK", "Helfer_psFK.png"],
+    ["Helfer RiFu", "Helfer_RiFu.png"],
+    ["Helfer SGL", "Helfer_SGL.png"],
+    ["Helfer", "Helfer.png"],
+    ["Jugendgruppe", "Jugendgruppe.png"],
+    ["Kettenbagger", "Kettenbagger.png"],
+    ["Kettenfahrzeug", "Kettenfahrzeug.png"],
+    ["Kipper", "Kipper.png"],
+    ["kleines Boot", "kleines_Boot.png"],
+    ["Kraftfahrzeug Geländegängig", "Kraftfahrzeug_Geländegängig.png"],
+    ["Kraftfahrzeug", "Kraftfahrzeug.png"],
+    ["Landesverband", "Landesverband.png"],
+    ["Leitung", "Leitung.png"],
+    ["LKW K 9t", "LKW_K_9t.png"],
+    ["LKW K Lkr 1 5t", "LKW_K_Lkr_1_5t.png"],
+    ["LKW K Lkr", "LKW_K_Lkr.png"],
+    ["LKW Lbw 7t", "LKW_Lbw_7t.png"],
+    ["LKW Lbw", "LKW_Lbw.png"],
+    ["LKW-Ladekran", "LKW-Ladekran.png"],
+    ["LKW", "LKW.png"],
+    ["Logistikeinheit", "Logistikeinheit.png"],
+    ["Logistiktrupp", "Logistiktrupp.png"],
+    ["Logistikzentrum", "Logistikzentrum.png"],
+    ["Lotsengruppe", "Lotsengruppe.png"],
+    ["Maßnahme", "Maßnahme.png"],
+    ["Mehrzweckarbeitsboot", "Mehrzweckarbeitsboot.png"],
+    ["Mehrzweckboot", "Mehrzweckboot.png"],
+    ["Mehrzweckponton", "Mehrzweckponton.png"],
+    ["Melder", "Melder.png"],
+    ["MLW I", "MLW_I.png"],
+    ["MLW II", "MLW_II.png"],
+    ["MLW III", "MLW_III.png"],
+    ["MLW IV", "MLW_IV.png"],
+    ["MLW V", "MLW_V.png"],
+    ["MTW FGr", "MTW_FGr.png"],
+    ["MTW", "MTW.png"],
+    ["MzGW", "MzGW.png"],
+    ["MzKW", "MzKW.png"],
+    ["Ölschadenbekämpfung", "Ölschadenbekämpfung.png"],
+    ["Örtliche Gefahrenabwehr", "Örtliche_Gefahrenabwehr.png"],
+    ["OV Stab", "OV_Stab.png"],
+    ["OV Unterkunft", "OV_Unterkunft.png"],
+    ["Person mit Sonderfunktion", "Person_mit_Sonderfunktion.png"],
+    ["Person", "Person.png"],
+    ["PKW Geländegängig", "PKW_Geländegängig.png"],
+    ["PKW Weitverkehrstrupp", "PKW_Weitverkehrstrupp.png"],
+    ["PKW", "PKW.png"],
+    ["Radbagger", "Radbagger.png"],
+    ["Radlader", "Radlader.png"],
+    ["Randtrümmer", "Randtrümmer.png"],
+    ["Räumen", "Räumen.png"],
+    ["Regionalstelle", "Regionalstelle.png"],
+    ["Retten aus Höhen und Tiefen", "Retten_aus_Höhen_und_Tiefen.png"],
+    ["Rettungs und Sicherungsboot", "Rettungs_und_Sicherungsboot.png"],
+    ["Rutschfläche", "Rutschfläche.png"],
+    ["Sattelzugmaschine", "Sattelzugmaschine.png"],
+    ["Schichtung", "Schichtung.png"],
+    ["Schlauchboot", "Schlauchboot.png"],
+    ["SEEBA", "SEEBA.png"],
+    ["SEELift", "SEELift.png"],
+    ["SEEWA", "SEEWA.png"],
+    ["Sprengen", "Sprengen.png"],
+    ["Stab AB", "Stab_AB.png"],
+    ["Stab BÖH", "Stab_BÖH.png"],
+    ["Stab Ko", "Stab_Ko.png"],
+    ["Stab OB", "Stab_OB.png"],
+    ["Stab OJB", "Stab_OJB.png"],
+    ["Stab S1", "Stab_S1.png"],
+    ["Stab S2", "Stab_S2.png"],
+    ["Stab S3", "Stab_S3.png"],
+    ["Stab S4", "Stab_S4.png"],
+    ["Stab S5", "Stab_S5.png"],
+    ["Stab S6", "Stab_S6.png"],
+    ["Stab SM", "Stab_SM.png"],
+    ["Stab Stv OB", "Stab_Stv_OB.png"],
+    ["Stab Vw", "Stab_Vw.png"],
+    ["Stab", "Stab.png"],
+    ["Staffel", "Staffel.png"],
+    ["SysBR", "SysBR.png"],
+    ["Technischer Zug mit FGr Brückenbau", "Technischer_Zug_mit_FGr_Brückenbau.png"],
+    ["Technischer Zug mit FGr Elektroversorgung", "Technischer_Zug_mit_FGr_Elektroversorgung.png"],
+    ["Technischer Zug mit FGr Infrastruktur", "Technischer_Zug_mit_FGr_Infrastruktur.png"],
+    ["Technischer Zug mit FGr Ölschaden A", "Technischer_Zug_mit_FGr_Ölschaden_A.png"],
+    ["Technischer Zug mit FGr Ölschaden C", "Technischer_Zug_mit_FGr_Ölschaden_C.png"],
+    ["Technischer Zug mit FGr Ölschaden_B", "Technischer_Zug_mit_FGr_Ölschaden_B.png"],
+    ["Technischer Zug mit FGr Ölschaden", "Technischer_Zug_mit_FGr_Ölschaden.png"],
+    ["Technischer Zug mit FGr Ortung A", "Technischer_Zug_mit_FGr_Ortung_A.png"],
+    ["Technischer Zug mit FGr Ortung B", "Technischer_Zug_mit_FGr_Ortung_B.png"],
+    ["Technischer Zug mit FGr Ortung C", "Technischer_Zug_mit_FGr_Ortung_C.png"],
+    ["Technischer Zug mit FGr Ortung", "Technischer_Zug_mit_FGr_Ortung.png"],
+    ["Technischer Zug mit FGr Räumen A", "Technischer_Zug_mit_FGr_Räumen_A.png"],
+    ["Technischer Zug mit FGr Räumen_B", "Technischer_Zug_mit_FGr_Räumen_B.png"],
+    ["Technischer Zug mit FGr Räumen_C", "Technischer_Zug_mit_FGr_Räumen_C.png"],
+    ["Technischer Zug mit FGr Räumen", "Technischer_Zug_mit_FGr_Räumen.png"],
+    ["Technischer Zug mit FGr Sprengen", "Technischer_Zug_mit_FGr_Sprengen.png"],
+    ["Technischer Zug mit FGr Trinkwasser", "Technischer_Zug_mit_FGr_Trinkwasser.png"],
+    ["Technischer Zug mit FGr Wassergefahren_A", "Technischer_Zug_mit_FGr_Wassergefahren_A.png"],
+    ["Technischer Zug mit FGr Wassergefahren_B", "Technischer_Zug_mit_FGr_Wassergefahren_B.png"],
+    ["Technischer Zug mit FGr Wassergefahren", "Technischer_Zug_mit_FGr_Wassergefahren.png"],
+    ["Technischer Zug mit FGr Wasserschaden Pumpen A", "Technischer_Zug_mit_FGr_Wasserschaden_Pumpen_A.png"],
+    ["Technischer Zug mit FGr Wasserschaden Pumpen_B", "Technischer_Zug_mit_FGr_Wasserschaden_Pumpen_B.png"],
+    ["Technischer Zug mit FGr Wasserschaden Pumpen_C", "Technischer_Zug_mit_FGr_Wasserschaden_Pumpen_C.png"],
+    ["Technischer Zug mit FGr Wasserschaden Pumpen", "Technischer_Zug_mit_FGr_Wasserschaden_Pumpen.png"],
+    ["Technischer Zug", "Technischer_Zug.png"],
+    ["Teilblockiert", "Teilblockiert.png"],
+    ["Teilzerstört", "Teilzerstört.png"],
+    ["Teleskoplader", "Teleskoplader.png"],
+    ["THV Bereitschaft", "THV_Bereitschaft.png"],
+    ["THV", "THV.png"],
+    ["Tote Person", "Tote_Person.png"],
+    ["Transportieren", "Transportieren.png"],
+    ["Transportierte Person", "Transportierte_Person.png"],
+    ["Trupp ESS", "Trupp_ESS.png"],
+    ["Trupp MHP", "Trupp_MHP.png"],
+    ["Trupp TS", "Trupp_TS.png"],
+    ["Trupp UL", "Trupp_UL.png"],
+    ["Trupp", "Trupp.png"],
+    ["Truppführer B 1", "Truppführer_B_1.png"],
+    ["Truppführer B 2", "Truppführer_B_2.png"],
+    ["Truppführer B", "Truppführer_B.png"],
+    ["Truppführer BrB", "Truppführer_BrB.png"],
+    ["Truppführer BT", "Truppführer_BT.png"],
+    ["Truppführer E", "Truppführer_E.png"],
+    ["Truppführer ESS", "Truppführer_ESS.png"],
+    ["Truppführer F", "Truppführer_F.png"],
+    ["Truppführer Fm", "Truppführer_Fm.png"],
+    ["Truppführer FüGeh", "Truppführer_FüGeh.png"],
+    ["Truppführer I", "Truppführer_I.png"],
+    ["Truppführer K", "Truppführer_K.png"],
+    ["Truppführer LdF", "Truppführer_LdF.png"],
+    ["Truppführer Log-M", "Truppführer_Log-M.png"],
+    ["Truppführer Log-V", "Truppführer_Log-V.png"],
+    ["Truppführer Log-VG", "Truppführer_Log-VG.png"],
+    ["Truppführer MHP", "Truppführer_MHP.png"],
+    ["Truppführer MT", "Truppführer_MT.png"],
+    ["Truppführer N", "Truppführer_N.png"],
+    ["Truppführer O", "Truppführer_O.png"],
+    ["Truppführer Öl", "Truppführer_Öl.png"],
+    ["Truppführer R", "Truppführer_R.png"],
+    ["Truppführer SB", "Truppführer_SB.png"],
+    ["Truppführer Sp", "Truppführer_Sp.png"],
+    ["Truppführer TS", "Truppführer_TS.png"],
+    ["Truppführer TW", "Truppführer_TW.png"],
+    ["Truppführer UL", "Truppführer_UL.png"],
+    ["Truppführer VOST", "Truppführer_VOST.png"],
+    ["Truppführer W", "Truppführer_W.png"],
+    ["Truppführer WP", "Truppführer_WP.png"],
+    ["Truppführer", "Truppführer.png"],
+    ["Überschwemmtes Gebiet", "Überschwemmtes_Gebiet.png"],
+    ["Untereinsatzabschnittsleiter", "Untereinsatzabschnittsleiter.png"],
+    ["Verband Feldlager", "Verband_Feldlager.png"],
+    ["Verband Logistik", "Verband_Logistik.png"],
+    ["Verbandführer I", "Verbandführer_I.png"],
+    ["Verbandführer II", "Verbandführer_II.png"],
+    ["Verbandführer III", "Verbandführer_III.png"],
+    ["Verletzte Person", "Verletzte_Person.png"],
+    ["Vermisste Person", "Vermisste_Person.png"],
+    ["Vermutete Gefahr durch elektrischen Strom", "Vermutete_Gefahr_durch_elektrischen_Strom.png"],
+    ["Vermutete Gefahr durch Explosion", "Vermutete_Gefahr_durch_Explosion.png"],
+    ["Vermutete Gefahr durch Explosivstoffe", "Vermutete_Gefahr_durch_Explosivstoffe.png"],
+    ["Vermutete Gefahr durch Gas", "Vermutete_Gefahr_durch_Gas.png"],
+    ["Vermutete Gefahr durch gefährliche Stoffe", "Vermutete_Gefahr_durch_gefährliche_Stoffe.png"],
+    ["Vermutete Gefahr durch Luftmangel", "Vermutete_Gefahr_durch_Luftmangel.png"],
+    ["Vermutete Gefahr durch Mineralöl", "Vermutete_Gefahr_durch_Mineralöl.png"],
+    ["Vermutete Gefahr durch Radioaktivität", "Vermutete_Gefahr_durch_Radioaktivität.png"],
+    ["Vermutete Gefahr durch Wassereinbruch", "Vermutete_Gefahr_durch_Wassereinbruch.png"],
+    ["Vermutete Gefahr", "Vermutete_Gefahr.png"],
+    ["Verschüttete Person", "Verschüttete_Person.png"],
+    ["Vollbrand", "Vollbrand.png"],
+    ["VOST", "VOST.png"],
+    ["Wechselladerfahrzeug", "Wechselladerfahrzeug.png"],
+    ["Weitverkehrstrupp", "Weitverkehrstrupp.png"],
+    ["Werkstattcontainer", "Werkstattcontainer.png"],
+    ["Zerstört", "Zerstört.png"],
+    ["Zu transportierende Person", "Zu_transportierende_Person.png"],
+    ["Zug", "Zug.png"],
+    ["Zugführer FZ FK", "Zugführer_FZ_FK.png"],
+    ["Zugführer FZ Log", "Zugführer_FZ_Log.png"],
+    ["Zugführer TZ", "Zugführer_TZ.png"],
+    ["Zugführer VOST", "Zugführer_VOST.png"],
+    ["Zugführer", "Zugführer.png"],
+    ["Zugtrupp FZ-FK", "Zugtrupp_FZ-FK.png"],
+    ["Zugtrupp FZ-Logistik", "Zugtrupp_FZ-Logistik.png"],
+    ["Zugtrupp", "Zugtrupp.png"],
+    ["Zugtruppführer FZ FK", "Zugtruppführer_FZ_FK.png"],
+    ["Zugtruppführer FZ Log", "Zugtruppführer_FZ_Log.png"],
+    ["Zugtruppführer TZ", "Zugtruppführer_TZ.png"]
   ]
 }

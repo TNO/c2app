@@ -211,7 +211,8 @@ export const loadMissingImages = (map: MaplibreMap) => {
       if (error) throw error;
       // SDF: https://docs.mapbox.com/help/troubleshooting/using-recolorable-images-in-mapbox-maps/#what-are-signed-distance-fields-sdf
       // See also https://docs.mapbox.com/help/troubleshooting/using-recolorable-images-in-mapbox-maps/#mapbox-gl-js
-      if (!map.hasImage(id)) map.addImage(id, image as ImageBitmap, { sdf: url.endsWith('.png') });
+      if (!map.hasImage(id)) map.addImage(id, image as ImageBitmap, { sdf: false });
+      // if (!map.hasImage(id)) map.addImage(id, image as ImageBitmap, { sdf: url.endsWith('.png') });
     });
   });
 };

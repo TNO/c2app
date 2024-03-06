@@ -9,7 +9,6 @@ import {
   loadMissingImages,
   setLonLat,
   setZoomLevel,
-  updateSatellite,
   updateSourcesAndLayers,
 } from './map-utils';
 import { SafrConfig } from 'c2app-models-utils';
@@ -29,39 +28,39 @@ export const Map: MeiosisComponent = () => {
 
   return {
     view: () => {
-      return m('#mapboxMap.col.s12.l9.right');
+      return [m('#mapboxMap'), m('canvas#draw')];
     },
     oncreate: ({ attrs: { state, actions } }) => {
       const { config = {} as SafrConfig } = state.app;
       const { VECTOR_TILE_SERVER } = config;
       const { getLonLat, getZoomLevel, setMap } = actions;
+      const brtStyle = {
+        version: 8,
+        sources: {
+          'brt-achtergrondkaart': {
+            type: 'raster',
+            tiles: ['https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png'],
+            tileSize: 256,
+            minzoom: 1,
+            maxzoom: 19,
+            attribution: 'Kaartgegevens: <a href="https://kadaster.nl">Kadaster</a>',
+          },
+        },
+        glyphs: 'https://api.pdok.nl/lv/bgt/ogc/v1_0/resources/fonts/{fontstack}/{range}.pbf',
+        layers: [
+          {
+            id: 'standard-raster',
+            type: 'raster',
+            source: 'brt-achtergrondkaart',
+          },
+        ],
+      } as maplibregl.StyleSpecification;
       // Create map and add controls
 
       map = new MaplibreMap({
         container: 'mapboxMap',
-        style: VECTOR_TILE_SERVER
-          ? VECTOR_TILE_SERVER
-          : {
-              version: 8,
-              sources: {
-                'brt-achtergrondkaart': {
-                  type: 'raster',
-                  tiles: ['https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png'],
-                  tileSize: 256,
-                  minzoom: 1,
-                  maxzoom: 19,
-                  attribution: 'Kaartgegevens: <a href="https://kadaster.nl">Kadaster</a>',
-                },
-              },
-              glyphs: 'https://api.pdok.nl/lv/bgt/ogc/v1_0/resources/fonts/{fontstack}/{range}.pbf',
-              layers: [
-                {
-                  id: 'standard-raster',
-                  type: 'raster',
-                  source: 'brt-achtergrondkaart',
-                },
-              ],
-            },
+        // style: brtStyle,
+        style: VECTOR_TILE_SERVER || brtStyle,
         center: getLonLat(),
         zoom: getZoomLevel(),
         hash: 'loc',
@@ -88,6 +87,10 @@ export const Map: MeiosisComponent = () => {
         'bottom-right'
       );
 
+      map.on('error', (e) => {
+        console.error(e);
+        map.setStyle(brtStyle);
+      });
       // Add map listeners
       map.on('load', () => {
         map.on('draw.create', ({ features }) => handleDrawEvent(map, features, actions));
@@ -101,7 +104,7 @@ export const Map: MeiosisComponent = () => {
         map.once('styledata', () => {
           console.log('On styledata');
           updateSourcesAndLayers(state.app.sources || [], actions, map);
-          updateSatellite(state, map);
+          // updateSatellite(state, map);
         });
 
         setMap(map, draw);
